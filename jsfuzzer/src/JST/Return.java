@@ -1,6 +1,6 @@
 package JST;
 
-public class Return extends Statement
+public class Return extends AbstractStatement
 {
 
 }

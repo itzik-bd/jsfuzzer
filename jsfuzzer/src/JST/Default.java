@@ -1,6 +1,6 @@
 package JST;
 
-public class Default extends Statement
+public class Default extends AbstractStatement
 {
 
 }

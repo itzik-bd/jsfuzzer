@@ -1,6 +1,6 @@
 package JST;
 
-public class MultiLineComment extends Comment
+public class MultiLineComment extends AbstractComment
 {
 
 }
