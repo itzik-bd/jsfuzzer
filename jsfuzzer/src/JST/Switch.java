@@ -5,18 +5,38 @@ import java.util.List;
 public class Switch extends AbstractStatement
 {
 	private AbstractExpression _expression;
-	private List<AbstractStatement> _statements;
+	private List<Case> _cases;
+	private Default _defaultCase;
 	
-	public Switch(AbstractExpression expression, List<AbstractStatement> statements) {
+	public Switch(AbstractExpression expression, List<Case> cases, Default defaultCase)
+	{
 		_expression = expression;
-		_statements = statements;
+		_cases = cases;
+		_defaultCase = defaultCase;
+	}
+
+	public Switch(AbstractExpression expression, List<Case> cases)
+	{
+		this(expression, cases, null);	
 	}
 	
-	public AbstractExpression getExpression() {
+	public AbstractExpression getExpression() 
+	{
 		return _expression;
 	}
 	
-	public List<AbstractStatement> getStatements() {
-		return _statements;
+	public List<Case> getCases() 
+	{
+		return _cases;
+	}
+	
+	public Default getDefaultCase()
+	{
+		return _defaultCase;
+	}
+	
+	public boolean hasDefaultCase()
+	{
+		return (_defaultCase != null);
 	}
 }

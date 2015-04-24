@@ -13,9 +13,7 @@ public class If extends AbstractStatement
 	}
 	
 	public If(AbstractExpression condition, AbstractStatement operation) {
-		_condition = condition;
-		_operation = operation;
-		_elseOperation = null;
+		this(condition, operation, null);
 	}
 	
 	public AbstractExpression getCondition() {
@@ -31,6 +29,6 @@ public class If extends AbstractStatement
 	}
 	
 	public boolean hasElse() {
-		return (_elseOperation == null);
+		return (_elseOperation != null);
 	}
 }
