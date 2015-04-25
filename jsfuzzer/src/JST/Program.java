@@ -5,13 +5,13 @@ import java.util.List;
 
 public class Program extends JSTNode
 {
-	private List<AbstractStatement> _statements = new LinkedList<AbstractStatement>();
+	private List<AbsStatement> _statements = new LinkedList<AbsStatement>();
 	
-	public List<AbstractStatement> getStatements() {
+	public List<AbsStatement> getStatements() {
 		return _statements;
 	}
 	
-	public void addStatement(AbstractStatement s) {
+	public void addStatement(AbsStatement s) {
 		_statements.add(s);
 	}
 }

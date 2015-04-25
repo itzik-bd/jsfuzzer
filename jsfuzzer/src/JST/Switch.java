@@ -1,42 +1,38 @@
 package JST;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class Switch extends AbstractStatement
+import ThirdParty.Pair;
+
+public class Switch extends AbsStatement
 {
-	private AbstractExpression _expression;
-	private List<Case> _cases;
-	private Default _defaultCase;
+	private AbsExpression _expression;
+	private List<Pair<List<AbsExpression>, AbsStatement>> _casesOperations;  
 	
-	public Switch(AbstractExpression expression, List<Case> cases, Default defaultCase)
+	public Switch(AbsExpression expression, List<Pair<List<AbsExpression>, AbsStatement>> casesOps)
 	{
 		_expression = expression;
-		_cases = cases;
-		_defaultCase = defaultCase;
+		_casesOperations = casesOps;
 	}
 
-	public Switch(AbstractExpression expression, List<Case> cases)
+	public Switch(AbsExpression expression)
 	{
-		this(expression, cases, null);	
+		this(expression, new LinkedList<Pair<List<AbsExpression>, AbsStatement>>());	
 	}
 	
-	public AbstractExpression getExpression() 
+	public AbsExpression getExpression() 
 	{
 		return _expression;
 	}
-	
-	public List<Case> getCases() 
+
+	public List<Pair<List<AbsExpression>, AbsStatement>> getCasesOps()
 	{
-		return _cases;
+		return _casesOperations;
 	}
 	
-	public Default getDefaultCase()
+	public void addCaseOp(List<AbsExpression> cases, AbsStatement stmt)
 	{
-		return _defaultCase;
-	}
-	
-	public boolean hasDefaultCase()
-	{
-		return (_defaultCase != null);
+		_casesOperations.add(new Pair<List<AbsExpression>, AbsStatement>(cases, stmt));
 	}
 }

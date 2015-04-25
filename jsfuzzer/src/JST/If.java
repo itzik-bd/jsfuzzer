@@ -1,30 +1,30 @@
 package JST;
 
-public class If extends AbstractStatement
+public class If extends AbsStatement
 {
-	private AbstractExpression _condition;
-	private AbstractStatement _operation;
-	private AbstractStatement _elseOperation;
+	private AbsExpression _condition;
+	private AbsStatement _operation;
+	private AbsStatement _elseOperation;
 	
-	public If(AbstractExpression condition, AbstractStatement operation, AbstractStatement elseOperation) {
+	public If(AbsExpression condition, AbsStatement operation, AbsStatement elseOperation) {
 		_condition = condition;
 		_operation = operation;
 		_elseOperation = elseOperation;
 	}
 	
-	public If(AbstractExpression condition, AbstractStatement operation) {
+	public If(AbsExpression condition, AbsStatement operation) {
 		this(condition, operation, null);
 	}
 	
-	public AbstractExpression getCondition() {
+	public AbsExpression getCondition() {
 		return _condition;
 	}
 	
-	public AbstractStatement getOperation() {
+	public AbsStatement getOperation() {
 		return _operation;
 	}
 	
-	public AbstractStatement getElseOperation() {
+	public AbsStatement getElseOperation() {
 		return _elseOperation;
 	}
 	

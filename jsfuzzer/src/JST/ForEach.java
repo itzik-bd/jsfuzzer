@@ -1,26 +1,26 @@
 package JST;
 
-public class ForEach extends AbstractStatement
+public class ForEach extends AbsStatement
 {
-	private AbstractStatement _item;
-	private AbstractExpression _collection;
-	private AbstractStatement _operation;
+	private AbsStatement _item;
+	private AbsExpression _collection;
+	private AbsStatement _operation;
 	
-	public ForEach(AbstractStatement item, AbstractExpression collection, AbstractStatement operation) {
+	public ForEach(AbsStatement item, AbsExpression collection, AbsStatement operation) {
 		_item = item;
 		_collection = collection;
 		_operation = operation;
 	}
 	
-	public AbstractStatement getItem() {
+	public AbsStatement getItem() {
 		return _item;
 	}
 	
-	public AbstractExpression getCollection() {
+	public AbsExpression getCollection() {
 		return _collection;
 	}
 	
-	public AbstractStatement getOperation() {
+	public AbsStatement getOperation() {
 		return _operation;
 	}
 }

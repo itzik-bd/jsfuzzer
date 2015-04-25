@@ -1,8 +1,8 @@
 package JST;
 
-public class While extends AbstractWhileLoop
+public class While extends AbsWhileLoop
 {
-	public While(AbstractExpression condition, AbstractStatement operation) {
+	public While(AbsExpression condition, AbsStatement operation) {
 		super(condition, operation);
 	}
 }

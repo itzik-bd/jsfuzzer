@@ -1,32 +1,32 @@
 package JST;
 
-public class For extends AbstractStatement
+public class For extends AbsStatement
 {
-	private AbstractStatement _initStatement;
-	private AbstractExpression _conditionExpression;
-	private AbstractExpression _stepExpression;
-	private AbstractStatement _operation;
+	private AbsStatement _initStatement;
+	private AbsExpression _conditionExpression;
+	private AbsExpression _stepExpression;
+	private AbsStatement _operation;
 	
-	public For(AbstractStatement initStatement, AbstractExpression conditionExpression, AbstractExpression stepExpression, AbstractStatement operation) {
+	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression, AbsStatement operation) {
 		_initStatement = initStatement;
 		_conditionExpression = conditionExpression;
 		_stepExpression = stepExpression;		
 		_operation = operation;
 	}
 	
-	public AbstractStatement getInitStatement() {
+	public AbsStatement getInitStatement() {
 		return _initStatement;
 	}
 	
-	public AbstractStatement getConditionExpression() {
+	public AbsStatement getConditionExpression() {
 		return _conditionExpression;
 	}
 	
-	public AbstractStatement getStepExpression() {
+	public AbsStatement getStepExpression() {
 		return _stepExpression;
 	}
 	
-	public AbstractStatement getOperation() {
+	public AbsStatement getOperation() {
 		return _operation;
 	}
 }

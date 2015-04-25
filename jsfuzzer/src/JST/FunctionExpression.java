@@ -3,27 +3,20 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FunctionDefinition
+public class FunctionExpression
 {
-	private Identifier _id;
 	private List<Identifier> _formals;
 	private List<AbsStatement> _statements;
 	
-	FunctionDefinition(Identifier id, List<Identifier> formals)
+	public FunctionExpression(List<Identifier> formals)
 	{
-		_id = id;
 		_formals = formals;
 		_statements = new LinkedList<AbsStatement>();
 	}
 	
-	FunctionDefinition(Identifier id)
+	public FunctionExpression()
 	{
-		this(id, new LinkedList<Identifier>());
-	}
-	
-	public Identifier getId()
-	{
-		return _id;
+		this(new LinkedList<Identifier>());
 	}
 	
 	public List<Identifier> getFormals()

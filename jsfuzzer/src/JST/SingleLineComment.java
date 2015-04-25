@@ -1,6 +1,6 @@
 package JST;
 
-public class SingleLineComment extends AbstractComment
+public class SingleLineComment extends AbsComment
 {
 	private String _comment;
 	

@@ -1,6 +1,6 @@
 package JST;
 
-public class Break extends AbstractStatement
+public class Break extends AbsStatement
 {
 
 }

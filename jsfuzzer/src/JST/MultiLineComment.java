@@ -3,7 +3,7 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MultiLineComment extends AbstractComment
+public class MultiLineComment extends AbsComment
 {
 	private List<String> _commentLines;
 	

@@ -1,8 +1,8 @@
 package JST;
 
-public class DoWhile extends AbstractWhileLoop
+public class DoWhile extends AbsWhileLoop
 {
-	public DoWhile(AbstractExpression condition, AbstractStatement operation) {
+	public DoWhile(AbsExpression condition, AbsStatement operation) {
 		super(condition, operation);
 	}
 }

@@ -1,6 +1,6 @@
 package JST;
 
-public class Continue extends AbstractStatement
+public class Continue extends AbsStatement
 {
 
 }

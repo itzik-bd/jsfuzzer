@@ -1,15 +1,15 @@
 package JST;
 
-public class Return extends AbstractStatement
+public class Return extends AbsStatement
 {
-	private AbstractExpression _returnedValue;
+	private AbsExpression _returnedValue;
 	
 	public Return()
 	{
 		_returnedValue = null;
 	}
 	
-	public Return(AbstractExpression value)
+	public Return(AbsExpression value)
 	{
 		_returnedValue = value;
 	}
