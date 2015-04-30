@@ -3,14 +3,12 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
-import ThirdParty.Pair;
-
 public class Switch extends AbsStatement
 {
 	private AbsExpression _expression;
-	private List<Pair<List<AbsExpression>, AbsStatement>> _casesOperations;  
+	private List<CaseBlock> _casesOperations;  
 	
-	public Switch(AbsExpression expression, List<Pair<List<AbsExpression>, AbsStatement>> casesOps)
+	public Switch(AbsExpression expression, List<CaseBlock> casesOps)
 	{
 		_expression = expression;
 		_casesOperations = casesOps;
@@ -18,7 +16,7 @@ public class Switch extends AbsStatement
 
 	public Switch(AbsExpression expression)
 	{
-		this(expression, new LinkedList<Pair<List<AbsExpression>, AbsStatement>>());	
+		this(expression, new LinkedList<CaseBlock>());	
 	}
 	
 	public AbsExpression getExpression() 
@@ -26,14 +24,14 @@ public class Switch extends AbsStatement
 		return _expression;
 	}
 
-	public List<Pair<List<AbsExpression>, AbsStatement>> getCasesOps()
+	public List<CaseBlock> getCasesOps()
 	{
 		return _casesOperations;
 	}
 	
-	public void addCaseOp(List<AbsExpression> cases, AbsStatement stmt)
+	public void addCaseOp(List<AbsExpression> cases, List<AbsStatement> stmt)
 	{
-		_casesOperations.add(new Pair<List<AbsExpression>, AbsStatement>(cases, stmt));
+		_casesOperations.add(new CaseBlock(cases, stmt));
 	}
 	
 	public class CaseBlock

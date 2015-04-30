@@ -8,7 +8,7 @@ a.aa
 a[3]
 a[3+5]
 */
-public class MemberExpression implements Assignable
+public class MemberExpression extends AbsExpression implements Assignable
 {
 	private AbsExpression _base;
 	private AbsExpression _location;

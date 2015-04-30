@@ -6,7 +6,7 @@ import java.util.List;
 /* Example:
  * [a,4+y,x/3]
  */
-public class ArrayExp
+public class ArrayExp extends AbsExpression
 {
 	private List<AbsExpression> _arrayExp;
 	

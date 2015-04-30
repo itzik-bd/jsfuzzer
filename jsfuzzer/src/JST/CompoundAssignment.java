@@ -1,21 +1,29 @@
 package JST;
 
+import JST.Enums.CompoundOps;
 import JST.Interfaces.Assignable;
 
 public class CompoundAssignment extends AbsStatement 
 {
 	private Assignable _leftHandSide;
+	private CompoundOps _op;
 	private AbsExpression _expr;
 	
-	public CompoundAssignment(Assignable leftHandSide, AbsExpression expr)
+	public CompoundAssignment(Assignable leftHandSide, CompoundOps op, AbsExpression expr)
 	{
 		_leftHandSide = leftHandSide;
+		_op = op;
 		_expr = expr;
 	}
 	
 	public Assignable getLeftHandSide()
 	{
 		return _leftHandSide;
+	}
+	
+	public CompoundOps getCompoundOp()
+	{
+		return _op;
 	}
 	
 	public AbsExpression getExpr()

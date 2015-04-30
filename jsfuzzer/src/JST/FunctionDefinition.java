@@ -3,7 +3,7 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
-public class FunctionDefinition
+public class FunctionDefinition extends AbsStatement
 {
 	private Identifier _id;
 	private List<Identifier> _formals;

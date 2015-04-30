@@ -1,9 +1,9 @@
-package JST;
+ package JST;
 
 import java.util.LinkedList;
 import java.util.List;
 
-public class FunctionExpression
+public class FunctionExpression extends AbsExpression
 {
 	private List<Identifier> _formals;
 	private List<AbsStatement> _statements;

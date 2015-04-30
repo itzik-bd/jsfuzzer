@@ -5,11 +5,11 @@ import java.util.Map;
 
 import JST.Interfaces.ObjectKeys;
 
-public class objectExpression
+public class ObjectExpression extends AbsExpression
 {
 	private Map<ObjectKeys, AbsExpression> _map;
 	
-	public objectExpression()
+	public ObjectExpression()
 	{
 		_map = new HashMap<ObjectKeys, AbsExpression>();
 	}
