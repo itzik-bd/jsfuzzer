@@ -1,6 +1,9 @@
 package JST;
 
-public class Identifier extends AbsExpression
+import JST.Interfaces.Assignable;
+import JST.Interfaces.ObjectKeys;
+
+public class Identifier extends AbsExpression implements ObjectKeys, Assignable
 {
 	private String _name;
 	

@@ -3,6 +3,9 @@ package JST;
 import java.util.ArrayList;
 import java.util.List;
 
+/* Example:
+ * [a,4+y,x/3]
+ */
 public class ArrayExp
 {
 	private List<AbsExpression> _arrayExp;

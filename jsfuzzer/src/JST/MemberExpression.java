@@ -1,6 +1,14 @@
 package JST;
 
-public class MemberExpression
+import JST.Interfaces.Assignable;
+
+/*
+a['aaa']
+a.aa
+a[3]
+a[3+5]
+*/
+public class MemberExpression implements Assignable
 {
 	private AbsExpression _base;
 	private AbsExpression _location;

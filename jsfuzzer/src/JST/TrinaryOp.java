@@ -1,8 +1,9 @@
 package JST;
 
 import JST.Enums.TrinaryOps;
+import JST.Interfaces.Assignable;
 
-public class TrinaryOp extends AbsExpression
+public class TrinaryOp extends AbsExpression implements Assignable
 {
 	private AbsExpression operand1;
 

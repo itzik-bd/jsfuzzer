@@ -2,12 +2,12 @@ package JST;
 
 import JST.Interfaces.Assignable;
 
-public class Assignment extends AbsStatement 
+public class CompoundAssignment extends AbsStatement 
 {
 	private Assignable _leftHandSide;
 	private AbsExpression _expr;
 	
-	public Assignment(Assignable leftHandSide, AbsExpression expr)
+	public CompoundAssignment(Assignable leftHandSide, AbsExpression expr)
 	{
 		_leftHandSide = leftHandSide;
 		_expr = expr;
