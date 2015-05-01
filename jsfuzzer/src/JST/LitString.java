@@ -1,12 +1,14 @@
 package JST;
 
+import JST.Enums.literalTypes.*;
+
 public class LitString extends Literal 
 {
 	String _value;
 	
 	public LitString(String value) 
 	{
-		super(literalType.LIT_STRING);
+		super(litTypes.LIT_STRING);
 		
 		_value = value;
 	}

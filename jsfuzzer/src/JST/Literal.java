@@ -1,17 +1,17 @@
 package JST;
 
-public class Literal extends AbstractExpression 
+import JST.Enums.literalTypes.*;
+
+public class Literal extends AbsExpression 
 {
-	public enum literalType {LIT_UNDEFINED, LIT_NULL, LIT_INFINITY, LIT_STRING, LIT_NUMBER};
+	private litTypes _type;
 	
-	private literalType _type;
-	
-	public Literal(literalType type)
+	public Literal(litTypes type)
 	{
 		_type = type;
 	}
 	
-	public literalType getType()
+	public litTypes getType()
 	{
 		return _type; 
 	}

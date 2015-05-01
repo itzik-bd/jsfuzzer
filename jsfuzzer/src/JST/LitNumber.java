@@ -1,5 +1,7 @@
 package JST;
 
+import JST.Enums.literalTypes.*;
+
 public class LitNumber extends Literal 
 {
 	// long cannot hold value of JS numbers
@@ -7,7 +9,7 @@ public class LitNumber extends Literal
 	
 	public LitNumber(String value) 
 	{
-		super(literalType.LIT_NUMBER);
+		super(litTypes.LIT_NUMBER);
 		
 		_value = value;
 	}
