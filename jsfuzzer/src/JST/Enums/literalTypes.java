@@ -4,11 +4,12 @@ public class literalTypes
 {
 	public enum litTypes
 	{
-		LIT_UNDEFINED(-1, "addition"),
-		LIT_NULL(0, "subtraction"),
-		LIT_INFINITY(1, "multiplication"),
-		LIT_STRING(2, "division"),
-		LIT_NUMBER(3, "modulo");
+		LIT_UNDEFINED(-1, "undefined"),
+		LIT_NULL(0, "null"),
+		LIT_INFINITY(1, "positive infinity"),
+		LIT_MIN_INFINITY(2, "negative infinity"),
+		LIT_STRING(3, "String"),
+		LIT_NUMBER(4, "Number");
 
 		private int _value;
 		private String _description;

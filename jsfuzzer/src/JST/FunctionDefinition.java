@@ -9,14 +9,14 @@ public class FunctionDefinition extends AbsStatement
 	private List<Identifier> _formals;
 	private List<AbsStatement> _statements;
 	
-	FunctionDefinition(Identifier id, List<Identifier> formals)
+	public FunctionDefinition(Identifier id, List<Identifier> formals)
 	{
 		_id = id;
 		_formals = formals;
 		_statements = new LinkedList<AbsStatement>();
 	}
 	
-	FunctionDefinition(Identifier id)
+	public FunctionDefinition(Identifier id)
 	{
 		this(id, new LinkedList<Identifier>());
 	}

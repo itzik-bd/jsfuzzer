@@ -1,6 +1,6 @@
 package JST;
 
-public abstract class AbsComment extends JSTNode
+public abstract class AbsComment extends AbsStatement
 {
 
 }

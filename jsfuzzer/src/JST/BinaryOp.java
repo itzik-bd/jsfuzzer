@@ -20,7 +20,7 @@ public class BinaryOp extends AbsExpression
 	 * @param operand2
 	 *            The second operand.
 	 */
-	protected BinaryOp(AbsExpression operand1, BinaryOps operator,
+	public BinaryOp(AbsExpression operand1, BinaryOps operator,
 			AbsExpression operand2)
 	{
 		this.operand1 = operand1;
