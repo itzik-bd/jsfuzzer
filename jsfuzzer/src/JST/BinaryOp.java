@@ -1,6 +1,7 @@
 package JST;
 
 import JST.Enums.BinaryOps;
+import JST.Interfaces.Visitor;
 
 public class BinaryOp extends AbsExpression
 {	
@@ -38,5 +39,10 @@ public class BinaryOp extends AbsExpression
 
 	public AbsExpression getSecondOperand() {
 		return operand2;
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

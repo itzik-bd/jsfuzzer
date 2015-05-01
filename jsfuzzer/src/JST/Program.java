@@ -3,6 +3,8 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
+import JST.Interfaces.Visitor;
+
 public class Program extends JSTNode
 {
 	private List<AbsStatement> _statements = new LinkedList<AbsStatement>();
@@ -13,5 +15,10 @@ public class Program extends JSTNode
 	
 	public void addStatement(AbsStatement s) {
 		_statements.add(s);
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

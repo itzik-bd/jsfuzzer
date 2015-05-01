@@ -35,8 +35,8 @@ public enum UnaryOps {
 		return description;
 	}
 	
-	public String formatOp(String a, String b)
+	public String formatOp(String a)
 	{
-		return String.format(pattern, a, b);
+		return String.format(pattern, a);
 	}
 }

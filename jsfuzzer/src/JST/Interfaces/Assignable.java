@@ -1,5 +1,6 @@
 package JST.Interfaces;
 
-public interface Assignable {
+public interface Assignable extends JSTObject
+{
 
 }

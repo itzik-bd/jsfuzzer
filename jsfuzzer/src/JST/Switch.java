@@ -3,6 +3,8 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
+import JST.Interfaces.Visitor;
+
 public class Switch extends AbsStatement
 {
 	private AbsExpression _expression;
@@ -34,7 +36,12 @@ public class Switch extends AbsStatement
 		_casesOperations.add(new CaseBlock(cases, stmt));
 	}
 	
-	public class CaseBlock
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
+	}
+	
+	public class CaseBlock extends JSTNode
 	{
 		private List<AbsExpression> _cases;
 		
@@ -65,6 +72,11 @@ public class Switch extends AbsStatement
 		public List<AbsStatement> getStatements()
 		{
 			return _statements;
-		}	
+		}
+		
+		@Override
+		public Object accept(Visitor visitor) {
+			return visitor.visit(this);
+		}
 	}
 }

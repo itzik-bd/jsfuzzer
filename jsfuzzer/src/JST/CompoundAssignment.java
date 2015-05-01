@@ -2,6 +2,7 @@ package JST;
 
 import JST.Enums.CompoundOps;
 import JST.Interfaces.Assignable;
+import JST.Interfaces.Visitor;
 
 public class CompoundAssignment extends AbsStatement 
 {
@@ -29,5 +30,10 @@ public class CompoundAssignment extends AbsStatement
 	public AbsExpression getExpr()
 	{
 		return _expr;
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

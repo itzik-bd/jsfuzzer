@@ -1,6 +1,7 @@
 package JST;
 
 import JST.Enums.OutputType;
+import JST.Interfaces.Visitor;
 
 public class OutputStatement extends AbsStatement 
 {
@@ -22,5 +23,11 @@ public class OutputStatement extends AbsStatement
 			case LIT_DOCUMENT: return ("document.write(" + _exp.toString() + ")");
 			default: return (_exp.toString());
 		}
+	}
+
+	@Override
+	public Object accept(Visitor visitor) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

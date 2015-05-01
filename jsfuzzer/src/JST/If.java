@@ -1,5 +1,7 @@
 package JST;
 
+import JST.Interfaces.Visitor;
+
 public class If extends AbsStatement
 {
 	private AbsExpression _condition;
@@ -30,5 +32,10 @@ public class If extends AbsStatement
 	
 	public boolean hasElse() {
 		return (_elseOperation != null);
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

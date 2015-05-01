@@ -2,6 +2,7 @@ package JST;
 
 import JST.Interfaces.Assignable;
 import JST.Interfaces.ObjectKeys;
+import JST.Interfaces.Visitor;
 
 public class Identifier extends AbsExpression implements ObjectKeys, Assignable
 {
@@ -33,5 +34,10 @@ public class Identifier extends AbsExpression implements ObjectKeys, Assignable
 			return false;
 		
 		return _name.equals(((Identifier) other).getName());
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

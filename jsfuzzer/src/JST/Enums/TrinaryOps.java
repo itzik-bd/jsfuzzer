@@ -22,8 +22,8 @@ public enum TrinaryOps {
 		return description;
 	}
 	
-	public String formatOp(String a, String b)
+	public String formatOp(String a, String b, String c)
 	{
-		return String.format(pattern, a, b);
+		return String.format(pattern, a, b, c);
 	}
 }

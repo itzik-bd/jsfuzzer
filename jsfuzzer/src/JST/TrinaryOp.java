@@ -2,6 +2,7 @@ package JST;
 
 import JST.Enums.TrinaryOps;
 import JST.Interfaces.Assignable;
+import JST.Interfaces.Visitor;
 
 public class TrinaryOp extends AbsExpression implements Assignable
 {
@@ -52,5 +53,10 @@ public class TrinaryOp extends AbsExpression implements Assignable
 	public AbsExpression getThirdOperand()
 	{
 		return operand3;
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

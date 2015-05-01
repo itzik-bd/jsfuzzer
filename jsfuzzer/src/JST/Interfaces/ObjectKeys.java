@@ -1,5 +1,6 @@
 package JST.Interfaces;
 
-public interface ObjectKeys {
-
+public interface ObjectKeys extends JSTObject
+{
+	
 }

@@ -1,5 +1,7 @@
 package JST;
 
+import JST.Interfaces.Visitor;
+
 public class ForEach extends AbsStatement
 {
 	private AbsStatement _item;
@@ -22,5 +24,10 @@ public class ForEach extends AbsStatement
 	
 	public AbsStatement getOperation() {
 		return _operation;
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

@@ -16,13 +16,13 @@ public enum CompoundOps
 	BITAND("&", "bitwise and"),
 	BITOR("|", "bitwise or");
 	
-	private String pattern;
+	private String token;
 	
 	private String description;
 
-	private CompoundOps(String pattern, String description)
+	private CompoundOps(String token, String description)
 	{
-		this.pattern = pattern;
+		this.token = token;
 		this.description = description;
 	}
 	
@@ -35,7 +35,7 @@ public enum CompoundOps
 		return description;
 	}
 	
-	public String getPattern() {
-		return pattern;
+	public String getToken() {
+		return token;
 	}
 }

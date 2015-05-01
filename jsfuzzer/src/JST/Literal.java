@@ -1,18 +1,24 @@
 package JST;
 
-import JST.Enums.literalTypes.*;
+import JST.Enums.LiteralTypes;
+import JST.Interfaces.Visitor;
 
 public class Literal extends AbsExpression 
 {
-	private litTypes _type;
+	private LiteralTypes _type;
 	
-	public Literal(litTypes type)
+	public Literal(LiteralTypes type)
 	{
 		_type = type;
 	}
 	
-	public litTypes getType()
+	public LiteralTypes getType()
 	{
 		return _type; 
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

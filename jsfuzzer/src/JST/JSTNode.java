@@ -1,6 +1,8 @@
 package JST;
 
-public abstract class JSTNode
-{
+import JST.Interfaces.JSTObject;
 
+public abstract class JSTNode implements JSTObject
+{
+	
 }

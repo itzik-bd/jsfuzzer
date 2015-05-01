@@ -1,6 +1,7 @@
 package JST;
 
 import JST.Interfaces.Assignable;
+import JST.Interfaces.Visitor;
 
 /*
 a['aaa']
@@ -27,5 +28,10 @@ public class MemberExpression extends AbsExpression implements Assignable
 	public AbsExpression getLocation()
 	{
 		return _location;
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

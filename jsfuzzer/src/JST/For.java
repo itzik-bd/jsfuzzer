@@ -1,5 +1,7 @@
 package JST;
 
+import JST.Interfaces.Visitor;
+
 public class For extends AbsStatement
 {
 	private AbsStatement _initStatement;
@@ -28,5 +30,10 @@ public class For extends AbsStatement
 	
 	public AbsStatement getOperation() {
 		return _operation;
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import JST.Interfaces.ObjectKeys;
+import JST.Interfaces.Visitor;
 
 public class ObjectExpression extends AbsExpression
 {
@@ -22,5 +23,10 @@ public class ObjectExpression extends AbsExpression
 	public void addToMap(ObjectKeys key, AbsExpression exp)
 	{
 		_map.put(key, exp);
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

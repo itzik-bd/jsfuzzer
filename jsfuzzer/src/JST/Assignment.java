@@ -1,6 +1,7 @@
 package JST;
 
 import JST.Interfaces.Assignable;
+import JST.Interfaces.Visitor;
 
 public class Assignment extends AbsStatement 
 {
@@ -21,5 +22,10 @@ public class Assignment extends AbsStatement
 	public AbsExpression getExpr()
 	{
 		return _expr;
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

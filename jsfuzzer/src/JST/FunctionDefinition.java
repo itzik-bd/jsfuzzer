@@ -3,6 +3,8 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
+import JST.Interfaces.Visitor;
+
 public class FunctionDefinition extends AbsStatement
 {
 	private Identifier _id;
@@ -44,5 +46,10 @@ public class FunctionDefinition extends AbsStatement
 	public void addStatement(AbsStatement stmt)
 	{
 		_statements.add(stmt);
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }

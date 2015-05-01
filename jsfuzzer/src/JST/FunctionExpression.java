@@ -3,6 +3,8 @@
 import java.util.LinkedList;
 import java.util.List;
 
+import JST.Interfaces.Visitor;
+
 public class FunctionExpression extends AbsExpression
 {
 	private List<Identifier> _formals;
@@ -37,5 +39,10 @@ public class FunctionExpression extends AbsExpression
 	public void addStatement(AbsStatement stmt)
 	{
 		_statements.add(stmt);
+	}
+	
+	@Override
+	public Object accept(Visitor visitor) {
+		return visitor.visit(this);
 	}
 }
