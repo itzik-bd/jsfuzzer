@@ -6,12 +6,12 @@ public class If extends AbsStatement
 {
 	private AbsExpression _condition;
 	private StatementsBlock _stmtsBlock;
-	private AbsStatement _elseOperation;
+	private StatementsBlock _elseStmtsBlock;
 	
-	public If(AbsExpression condition, StatementsBlock stmtsBlock, AbsStatement elseOperation) {
+	public If(AbsExpression condition, StatementsBlock stmtsBlock, StatementsBlock elseStmtsBlock) {
 		_condition = condition;
 		_stmtsBlock = stmtsBlock;
-		_elseOperation = elseOperation;
+		_elseStmtsBlock = elseStmtsBlock;
 	}
 	
 	public If(AbsExpression condition, StatementsBlock stmtsBlock) {
@@ -26,12 +26,12 @@ public class If extends AbsStatement
 		return _stmtsBlock;
 	}
 	
-	public AbsStatement getElseOperation() {
-		return _elseOperation;
+	public AbsStatement getElseStatementsBlock() {
+		return _elseStmtsBlock;
 	}
 	
 	public boolean hasElse() {
-		return (_elseOperation != null);
+		return (_elseStmtsBlock != null);
 	}
 	
 	@Override
