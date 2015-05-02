@@ -30,8 +30,8 @@ public class VarDecleration extends AbsStatement
 	}
 	
 	@Override
-	public Object accept(Visitor visitor) {
-		return visitor.visit(this);
+	public Object accept(Visitor visitor, Object context) {
+		return visitor.visit(this, context);
 	}
 	
 	public class VarDeclerator extends JSTNode
@@ -61,8 +61,8 @@ public class VarDecleration extends AbsStatement
 		}
 		
 		@Override
-		public Object accept(Visitor visitor) {
-			return visitor.visit(this);
+		public Object accept(Visitor visitor, Object context) {
+			return visitor.visit(this, context);
 		}
 	}
 }

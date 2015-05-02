@@ -1,5 +1,6 @@
 package JST.Vistors;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -46,26 +47,26 @@ public class JstToJs implements Visitor
 	
 	public String run(Program program)
 	{
-		return (String) visit(program);
+		return (String) visit(program, false);
 	}
 	
 	// --------------------------------------------
 	
 	@Override
-	public Object visit(Program program)
+	public Object visit(Program program, Object isStatement)
 	{
-		return listJoin(program.getStatements());
+		return listJoin(program.getStatements(), true);
 	}
 
 	@Override
-	public Object visit(FunctionDefinition functionDefinition)
+	public Object visit(FunctionDefinition functionDefinition, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("function %s(%s) {", functionDefinition.getId().accept(this), listJoin(functionDefinition.getFormals(), ", ")));
+		s.append(String.format("function %s(%s) {", functionDefinition.getId().accept(this, false), listJoin(functionDefinition.getFormals(), false, ", ")));
 		_depth++;
-		s.append(listJoin(functionDefinition.getStatements()));
+		s.append(listJoin(functionDefinition.getStatements(), true));
 		_depth--;
 		ident(s);
 		s.append("}");
@@ -74,99 +75,108 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(VarDecleration varDefinition)
+	public Object visit(VarDecleration varDefinition, Object isStatement)
 	{
-		return identString(String.format("var %s;", listJoin(varDefinition.getDecleratorList(), ", ")));
+		String res = String.format("var %s", listJoin(varDefinition.getDecleratorList(), false, ", "));
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 	
 	@Override
-	public Object visit(VarDeclerator varDeclerator)
+	public Object visit(VarDeclerator varDeclerator, Object isStatement)
 	{
+		String res;
+		
 		if (varDeclerator.hasInit())
-			return String.format("%s = %s", varDeclerator.getId().accept(this), varDeclerator.getInit().accept(this));
+			res = String.format("%s = %s", varDeclerator.getId().accept(this, false), varDeclerator.getInit().accept(this, false));
 		else
-			return varDeclerator.getId().accept(this);
+			res = (String) varDeclerator.getId().accept(this, false);
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(While whileStatement)
+	public Object visit(While whileStatement, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("while (%s)", whileStatement.getCondition().accept(this)));
+		s.append(String.format("while (%s)", whileStatement.getCondition().accept(this, false)));
 		_depth++;
-		s.append(whileStatement.getOperation().accept(this));
+		s.append(whileStatement.getOperation().accept(this, true));
 		_depth--;
 		
 		return s.toString();
 	}
 
 	@Override
-	public Object visit(DoWhile doWhile)
+	public Object visit(DoWhile doWhile, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
 		s.append("do");
 		_depth++;
-		s.append(doWhile.getOperation().accept(this));
+		s.append(doWhile.getOperation().accept(this, true));
 		_depth--;
 		ident(s);
-		s.append(String.format("while (%s);",doWhile.getCondition().accept(this)));
+		s.append(String.format("while (%s);",doWhile.getCondition().accept(this, false)));
 		
 		return s.toString();
 	}
 
 	@Override
-	public Object visit(For forStatement)
+	public Object visit(For forStatement, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("for (%s ; %s ; %s)", forStatement.getInitStatement().accept(this), forStatement.getConditionExpression().accept(this), forStatement.getStepExpression().accept(this)));
+		s.append(String.format("for (%s ; %s ; %s)", forStatement.getInitStatement().accept(this, false), forStatement.getConditionExpression().accept(this, false), forStatement.getStepExpression().accept(this, false)));
 		_depth++;
-		s.append(forStatement.getOperation().accept(this));
+		s.append(forStatement.getOperation().accept(this, true));
 		_depth--;
-		
+
 		return s.toString();
 	}
 
 	@Override
-	public Object visit(ForEach forEach)
+	public Object visit(ForEach forEach, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("for (%s in %s)", forEach.getItem().accept(this), forEach.getCollection().accept(this)));
+		s.append(String.format("for (%s in %s)", forEach.getItem().accept(this, false), forEach.getCollection().accept(this, false)));
 		_depth++;
-		s.append(forEach.getOperation().accept(this));
+		s.append(forEach.getOperation().accept(this, true));
 		_depth--;
-		
+
 		return s.toString();
 	}
 
 	@Override
-	public Object visit(Continue continueStatement)
+	public Object visit(Continue continueStatement, Object isStatement)
 	{
 		return identString("continue;");
 	}
 
 	@Override
-	public Object visit(Break breakStatement)
+	public Object visit(Break breakStatement, Object isStatement)
 	{
 		return identString("break;");
 	}
 
 	@Override
-	public Object visit(Switch switchStatement)
+	public Object visit(Switch switchStatement, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("switch (%s) {", switchStatement.getExpression().accept(this)));
+		s.append(String.format("switch (%s) {", switchStatement.getExpression().accept(this, false)));
 		_depth++;
-		s.append(listJoin(switchStatement.getCasesOps()));
+		s.append(listJoin(switchStatement.getCasesOps(), false));
 		_depth--;
 		ident(s);
 		s.append("}");
@@ -175,44 +185,48 @@ public class JstToJs implements Visitor
 	}
 	
 	@Override
-	public Object visit(CaseBlock caseBlock)
+	public Object visit(CaseBlock caseBlock, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
-		
+
 		ident(s);
-		s.append(listJoinFormat(caseBlock.getCases(), "case %s:", " "));
+		s.append(listJoinFormat(caseBlock.getCases(), false, "case %s:", " "));
 		_depth++;
-		s.append(listJoin(caseBlock.getStatements()));
+		s.append(listJoin(caseBlock.getStatements(), true));
 		_depth--;
 		
 		return s.toString();
 	}
 
 	@Override
-	public Object visit(Return returnStatement)
+	public Object visit(Return returnStatement, Object isStatement)
 	{
+		String res;
+		
 		if (returnStatement.hasValue())
-			return identString(String.format("return %s;", returnStatement.getValue().accept(this)));
+			res = identString(String.format("return %s;", returnStatement.getValue().accept(this, false)));
 		else
-			return identString("return;");
+			res = identString("return;");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(If ifStatement)
+	public Object visit(If ifStatement, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("if (%s)", ifStatement.getCondition().accept(this)));
+		s.append(String.format("if (%s)", ifStatement.getCondition().accept(this, false)));
 		_depth++;
-		s.append(ifStatement.getOperation().accept(this));
+		s.append(ifStatement.getOperation().accept(this, true));
 		_depth--;
 		
 		if (ifStatement.hasElse()) {
 			ident(s);
 			s.append("else");
 			_depth++;
-			s.append(ifStatement.getElseOperation().accept(this));
+			s.append(ifStatement.getElseOperation().accept(this, true));
 			_depth--;
 		}
 		
@@ -220,12 +234,12 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(StatementsBlock stmtBlock)
+	public Object visit(StatementsBlock stmtBlock, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		s.append(" {");
-		s.append(listJoin(stmtBlock.getStatements()));
+		s.append(listJoin(stmtBlock.getStatements(), true));
 		_depth--;
 		ident(s);
 		_depth++;
@@ -235,38 +249,58 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(Assignment assignment)
+	public Object visit(Assignment assignment, Object isStatement)
 	{
-		return identString(String.format("%s = %s;", assignment.getLeftHandSide().accept(this), assignment.getExpr().accept(this)));
+		String res = String.format("%s = %s", assignment.getLeftHandSide().accept(this, false), assignment.getExpr().accept(this, false));
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+
+		return res;
 	}
 
 	@Override
-	public Object visit(CompoundAssignment assignment)
+	public Object visit(CompoundAssignment assignment, Object isStatement)
 	{
-		return identString(String.format("%s %s= %s;", assignment.getLeftHandSide().accept(this), assignment.getCompoundOp().getToken(), assignment.getExpr().accept(this)));
+		String res = String.format("%s %s= %s", assignment.getLeftHandSide().accept(this, false), assignment.getCompoundOp().getToken(), assignment.getExpr().accept(this, false));
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(Call call)
+	public Object visit(Call call, Object isStatement)
 	{
-		return String.format("%s(%s)", call.getBase().accept(this), listJoin(call.getParams(), ", "));
+		String res = String.format("%s(%s)", call.getBase().accept(this, false), listJoin(call.getParams(), false, ", "));
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(ArrayExpression arrayExp)
+	public Object visit(ArrayExpression arrayExp, Object isStatement)
 	{
-		return String.format("[%s]", listJoin(arrayExp.getItemsList(), ", "));
+		String res = String.format("[%s]", listJoin(arrayExp.getItemsList(), false, ", "));
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+
+		return res;
 	}
 
 	@Override
-	public Object visit(FunctionExpression functionExpression)
+	public Object visit(FunctionExpression functionExpression, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("function (%s) {", listJoin(functionExpression.getFormals(), ", ")));
+		s.append(String.format("function (%s) {", listJoin(functionExpression.getFormals(), false, ", ")));
 		_depth++;
-		s.append(listJoin(functionExpression.getStatements()));
+		s.append(listJoin(functionExpression.getStatements(), true));
 		_depth--;
 		ident(s);
 		s.append("}");
@@ -275,93 +309,145 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(Identifier id)
+	public Object visit(Identifier id, Object isStatement)
 	{
-		return id.getName();
+		String res = id.getName();
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(MemberExpression memberExpr)
+	public Object visit(MemberExpression memberExpr, Object isStatement)
 	{
+		String res;
+		
 		if (memberExpr.getLocation() instanceof Identifier)
-			return String.format("%s.%s", memberExpr.getBase().accept(this), memberExpr.getLocation().accept(this));
+			res = String.format("%s.%s", memberExpr.getBase().accept(this, false), memberExpr.getLocation().accept(this, false));
 		else
-			return String.format("%s[%s]", memberExpr.getBase().accept(this), memberExpr.getLocation().accept(this));
+			res = String.format("%s[%s]", memberExpr.getBase().accept(this, false), memberExpr.getLocation().accept(this, false));
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		return res;
 	}
 
 	@Override
-	public Object visit(ObjectExpression objExpr)
+	public Object visit(ObjectExpression objExpr, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
+		
+		if (isTrue(isStatement))
+			ident(s);
 
 		s.append("{");
 		_depth++;
 		for (Entry<ObjectKeys, AbsExpression> entry : objExpr.getMap().entrySet()) {
 			ident(s);
-			s.append(String.format("%s: %s", entry.getKey().accept(this), entry.getValue().accept(this)));
+			s.append(String.format("%s: %s", entry.getKey().accept(this, false), entry.getValue().accept(this, false)));
 		}
 		_depth--;
 		ident(s);
 		s.append("}");
 		
+		if (isTrue(isStatement))
+			s.append(";");
+		
 		return s.toString();
 	}
 
 	@Override
-	public Object visit(This thisExpr)
+	public Object visit(This thisExpr, Object isStatement)
 	{
-		return "this";
+		String res = "this";
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(UnaryOp unaryOp)
+	public Object visit(UnaryOp unaryOp, Object isStatement)
 	{
-		return "(" + unaryOp.getOperator().formatOp((String)unaryOp.getOperand().accept(this)) + ")";
+		String res = "(" + unaryOp.getOperator().formatOp((String)unaryOp.getOperand().accept(this, false)) + ")";
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(BinaryOp binaryOp)
+	public Object visit(BinaryOp binaryOp, Object isStatement)
 	{
-		return "(" + binaryOp.getOperator().formatOp((String)binaryOp.getFirstOperand().accept(this), (String)binaryOp.getSecondOperand().accept(this)) + ")";
+		String res = "(" + binaryOp.getOperator().formatOp((String)binaryOp.getFirstOperand().accept(this, false), (String)binaryOp.getSecondOperand().accept(this, false)) + ")";
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(TrinaryOp trinaryOp)
+	public Object visit(TrinaryOp trinaryOp, Object isStatement)
 	{
-		return "(" + trinaryOp.getOperator().formatOp((String)trinaryOp.getFirstOperand().accept(this), (String)trinaryOp.getSecondOperand().accept(this), (String)trinaryOp.getThirdOperand().accept(this)) + ")";
+		String res = "(" + trinaryOp.getOperator().formatOp((String)trinaryOp.getFirstOperand().accept(this, false), (String)trinaryOp.getSecondOperand().accept(this, false), (String)trinaryOp.getThirdOperand().accept(this, false)) + ")";
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 	
 	@Override
-	public Object visit(Literal literal)
+	public Object visit(Literal literal, Object isStatement)
 	{
-		return literal.getType().getToken();
+		String res = literal.getType().getToken();
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(LiteralString literal)
+	public Object visit(LiteralString literal, Object isStatement)
 	{
-		return literal.getValue();
+		String res = literal.getValue();
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 
 	@Override
-	public Object visit(LiteralNumber literal)
+	public Object visit(LiteralNumber literal, Object isStatement)
 	{
-		return literal.getValue();
+		String res = literal.getValue();
+		
+		if (isTrue(isStatement))
+			res = identString(res + ";");
+		
+		return res;
 	}
 	
 	// -------------------------------------------------
 	
-	private String listJoinFormat(List<? extends JSTNode> list, String format, String delimiter)
+	private String listJoinFormat(List<? extends JSTNode> list, boolean isStatement, String format, String delimiter)
 	{
 		StringBuilder s = new StringBuilder();
 		
 		if (list.size() > 0)
 		{
-			s.append(String.format(format, list.get(0).accept(this)));
+			s.append(String.format(format, list.get(0).accept(this, isStatement)));
 			
 			if (list.size() > 1) {
 				for (int i=1; i<list.size() ; i++) {
-					s.append(delimiter + String.format(format, list.get(i).accept(this)));
+					s.append(delimiter + String.format(format, list.get(i).accept(this, isStatement)));
 				}
 			}
 		}
@@ -369,14 +455,14 @@ public class JstToJs implements Visitor
 		return s.toString();
 	}
 	
-	private String listJoin(List<? extends JSTNode> list, String delimiter)
+	private String listJoin(List<? extends JSTNode> list, boolean isStatement, String delimiter)
 	{
-		return listJoinFormat(list, "%s", delimiter);
+		return listJoinFormat(list, isStatement, "%s", delimiter);
 	}
 	
-	private String listJoin(List<? extends JSTNode> list)
+	private String listJoin(List<? extends JSTNode> list, boolean isStatement) // todo
 	{
-		return listJoinFormat(list, "%s", "");
+		return listJoinFormat(list, isStatement, "%s", "");
 	}
 	
 	private void ident(StringBuffer s)
@@ -394,5 +480,10 @@ public class JstToJs implements Visitor
 		s.append(str);
 		
 		return s.toString();
+	}
+	
+	private boolean isTrue(Object booleanValue)
+	{
+		return ((boolean)booleanValue == true);
 	}
 }
