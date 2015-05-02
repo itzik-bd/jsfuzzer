@@ -6,12 +6,12 @@ public class ForEach extends AbsStatement
 {
 	private AbsStatement _item;
 	private AbsExpression _collection;
-	private AbsStatement _operation;
+	private StatementsBlock _stmtsBlock;
 	
-	public ForEach(AbsStatement item, AbsExpression collection, AbsStatement operation) {
+	public ForEach(AbsStatement item, AbsExpression collection, StatementsBlock stmtsBlock) {
 		_item = item;
 		_collection = collection;
-		_operation = operation;
+		_stmtsBlock = stmtsBlock;
 	}
 	
 	public AbsStatement getItem() {
@@ -22,8 +22,8 @@ public class ForEach extends AbsStatement
 		return _collection;
 	}
 	
-	public AbsStatement getOperation() {
-		return _operation;
+	public AbsStatement getStatementsBlock() {
+		return _stmtsBlock;
 	}
 	
 	@Override

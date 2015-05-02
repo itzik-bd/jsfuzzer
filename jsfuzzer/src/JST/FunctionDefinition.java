@@ -9,13 +9,13 @@ public class FunctionDefinition extends AbsStatement
 {
 	private Identifier _id;
 	private List<Identifier> _formals;
-	private List<AbsStatement> _statements;
+	private StatementsBlock _stmtsBlock;
 	
 	public FunctionDefinition(Identifier id, List<Identifier> formals)
 	{
 		_id = id;
 		_formals = formals;
-		_statements = new LinkedList<AbsStatement>();
+		_stmtsBlock = new StatementsBlock();
 	}
 	
 	public FunctionDefinition(Identifier id)
@@ -38,14 +38,9 @@ public class FunctionDefinition extends AbsStatement
 		return (_formals != null);
 	}
 	
-	public List<AbsStatement> getStatements()
+	public StatementsBlock getStatementsBlock()
 	{
-		return _statements;
-	}
-	
-	public void addStatement(AbsStatement stmt)
-	{
-		_statements.add(stmt);
+		return _stmtsBlock;
 	}
 	
 	@Override

@@ -5,25 +5,25 @@ import JST.Interfaces.Visitor;
 public class If extends AbsStatement
 {
 	private AbsExpression _condition;
-	private AbsStatement _operation;
+	private StatementsBlock _stmtsBlock;
 	private AbsStatement _elseOperation;
 	
-	public If(AbsExpression condition, AbsStatement operation, AbsStatement elseOperation) {
+	public If(AbsExpression condition, StatementsBlock stmtsBlock, AbsStatement elseOperation) {
 		_condition = condition;
-		_operation = operation;
+		_stmtsBlock = stmtsBlock;
 		_elseOperation = elseOperation;
 	}
 	
-	public If(AbsExpression condition, AbsStatement operation) {
-		this(condition, operation, null);
+	public If(AbsExpression condition, StatementsBlock stmtsBlock) {
+		this(condition, stmtsBlock, null);
 	}
 	
 	public AbsExpression getCondition() {
 		return _condition;
 	}
 	
-	public AbsStatement getOperation() {
-		return _operation;
+	public AbsStatement getStatementsBlock() {
+		return _stmtsBlock;
 	}
 	
 	public AbsStatement getElseOperation() {

@@ -3,18 +3,18 @@ package JST;
 public abstract class AbsWhileLoop extends AbsStatement
 {
 	private AbsExpression _condition;
-	private AbsStatement _operation;
+	private StatementsBlock _stmtsBlock;
 	
-	public AbsWhileLoop(AbsExpression condition, AbsStatement operation) {
+	public AbsWhileLoop(AbsExpression condition, StatementsBlock stmtsBlock) {
 		_condition = condition;
-		_operation = operation;
+		_stmtsBlock = stmtsBlock;
 	}
 	
 	public AbsExpression getCondition() {
 		return _condition;
 	}
 	
-	public AbsStatement getOperation() {
-		return _operation;
+	public StatementsBlock getStatementsBlock() {
+		return _stmtsBlock;
 	}
 }

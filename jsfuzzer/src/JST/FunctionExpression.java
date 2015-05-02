@@ -8,12 +8,12 @@ import JST.Interfaces.Visitor;
 public class FunctionExpression extends AbsExpression
 {
 	private List<Identifier> _formals;
-	private List<AbsStatement> _statements;
+	private StatementsBlock _stmtsBlock;
 	
 	public FunctionExpression(List<Identifier> formals)
 	{
 		_formals = formals;
-		_statements = new LinkedList<AbsStatement>();
+		_stmtsBlock = new StatementsBlock();
 	}
 	
 	public FunctionExpression()
@@ -31,14 +31,9 @@ public class FunctionExpression extends AbsExpression
 		return (_formals != null);
 	}
 	
-	public List<AbsStatement> getStatements()
+	public StatementsBlock getStatementsBlock()
 	{
-		return _statements;
-	}
-	
-	public void addStatement(AbsStatement stmt)
-	{
-		_statements.add(stmt);
+		return _stmtsBlock;
 	}
 	
 	@Override

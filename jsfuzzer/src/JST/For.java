@@ -7,13 +7,13 @@ public class For extends AbsStatement
 	private AbsStatement _initStatement;
 	private AbsExpression _conditionExpression;
 	private AbsExpression _stepExpression;
-	private AbsStatement _operation;
+	private StatementsBlock _stmtsBlock;
 	
-	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression, AbsStatement operation) {
+	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression, StatementsBlock stmtsBlock) {
 		_initStatement = initStatement;
 		_conditionExpression = conditionExpression;
 		_stepExpression = stepExpression;		
-		_operation = operation;
+		_stmtsBlock = stmtsBlock;
 	}
 	
 	public AbsStatement getInitStatement() {
@@ -28,8 +28,8 @@ public class For extends AbsStatement
 		return _stepExpression;
 	}
 	
-	public AbsStatement getOperation() {
-		return _operation;
+	public AbsStatement getStatementsBlock() {
+		return _stmtsBlock;
 	}
 	
 	@Override
