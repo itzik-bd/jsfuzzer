@@ -24,6 +24,7 @@ public class Identifier extends AbsExpression implements ObjectKeys, Assignable
 		return _name.hashCode();	
 	}
 	
+	@Override
 	public boolean equals(Object other)
 	{
 		if (other == this)
