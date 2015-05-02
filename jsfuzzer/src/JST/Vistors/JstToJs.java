@@ -351,7 +351,7 @@ public class JstToJs implements Visitor
 	
 	// -------------------------------------------------
 	
-	private String listJoinFormat(List<? extends JSTNode> list, String format, String delimater)
+	private String listJoinFormat(List<? extends JSTNode> list, String format, String delimiter)
 	{
 		StringBuilder s = new StringBuilder();
 		
@@ -361,7 +361,7 @@ public class JstToJs implements Visitor
 			
 			if (list.size() > 1) {
 				for (int i=1; i<list.size() ; i++) {
-					s.append(delimater + String.format(format, list.get(i).accept(this)));
+					s.append(delimiter + String.format(format, list.get(i).accept(this)));
 				}
 			}
 		}
@@ -369,9 +369,9 @@ public class JstToJs implements Visitor
 		return s.toString();
 	}
 	
-	private String listJoin(List<? extends JSTNode> list, String delimater)
+	private String listJoin(List<? extends JSTNode> list, String delimiter)
 	{
-		return listJoinFormat(list, "%s", delimater);
+		return listJoinFormat(list, "%s", delimiter);
 	}
 	
 	private String listJoin(List<? extends JSTNode> list)
