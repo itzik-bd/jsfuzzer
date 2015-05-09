@@ -13,14 +13,16 @@ public class Main
 		String progStr = JST.Vistors.JstToJs.execute(p);
 		System.out.println(progStr);
 		
-		PrintWriter writer = new PrintWriter("file1.js", "UTF-8");
+		String jsFile = "../Tests/GeneratedPrograms/file1.js";
+		
+		PrintWriter writer = new PrintWriter(jsFile, "UTF-8");
 		writer.println(progStr);
 		writer.close();
 		
-		String fileToRun = "file2.js";
+		
 		
 		SpiderMonkeyEngine spiderMonkey = new SpiderMonkeyEngine();
-		spiderMonkey.runFile(fileToRun);
+		spiderMonkey.runFile(jsFile);
 	}
 	
 }
