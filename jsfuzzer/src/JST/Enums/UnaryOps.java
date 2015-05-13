@@ -8,7 +8,7 @@ public enum UnaryOps {
 	LNEG("!%s", "logical negation"),
 	BITNEG("~%s", "bitwise negation"),
 
-	PLUSPLUSlEFT("++%s", "plus plus"),
+	PLUSPLUSLEFT("++%s", "plus plus"),
 	MINUSMINUSLEFT("--%s", "minus minus"),
 	PLUSPLUSRIGHT("%s++", "plus plus"),
 	MINUSMINUSRIGHT("%--s", "minus minus"),

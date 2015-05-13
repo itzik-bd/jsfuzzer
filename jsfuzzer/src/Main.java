@@ -1,5 +1,7 @@
 import java.io.IOException;
 import java.io.PrintWriter;
+
+import Engines.NodejsEngine;
 import Engines.SpiderMonkeyEngine;
 
 public class Main
@@ -8,21 +10,23 @@ public class Main
 	{
 		System.out.println("Hello jsfuzzer\n");
 		
-		JST.Program p = testing.sampleAST.getSampleAST();
+		JST.Program p = testing.sampleASToutput.getSampleAST();
 		
 		String progStr = JST.Vistors.JstToJs.execute(p);
 		System.out.println(progStr);
 		
-		String jsFile = "../Tests/GeneratedPrograms/file1.js";
+		String jsFile = "testsOutput/GeneratedPrograms/test1.js";
 		
 		PrintWriter writer = new PrintWriter(jsFile, "UTF-8");
 		writer.println(progStr);
 		writer.close();
 		
 		
-		
 		SpiderMonkeyEngine spiderMonkey = new SpiderMonkeyEngine();
 		spiderMonkey.runFile(jsFile);
+		
+		NodejsEngine nodejs = new NodejsEngine();
+		nodejs.runFile(jsFile);
 	}
 	
 }

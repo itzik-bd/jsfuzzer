@@ -9,11 +9,11 @@ public class For extends AbsStatement
 	private AbsExpression _stepExpression;
 	private StatementsBlock _stmtsBlock;
 	
-	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression, StatementsBlock stmtsBlock) {
+	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression) {
 		_initStatement = initStatement;
 		_conditionExpression = conditionExpression;
 		_stepExpression = stepExpression;		
-		_stmtsBlock = stmtsBlock;
+		_stmtsBlock = new StatementsBlock();
 	}
 	
 	public AbsStatement getInitStatement() {
@@ -30,6 +30,10 @@ public class For extends AbsStatement
 	
 	public AbsStatement getStatementsBlock() {
 		return _stmtsBlock;
+	}
+	
+	public void addStatement(AbsStatement stmt) {
+		_stmtsBlock.addStatement(stmt);
 	}
 	
 	@Override

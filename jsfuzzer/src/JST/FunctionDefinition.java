@@ -38,6 +38,11 @@ public class FunctionDefinition extends AbsStatement
 		return (_formals != null);
 	}
 	
+	public void addStatement(AbsStatement stmt)
+	{
+		_stmtsBlock.addStatement(stmt);
+	}
+	
 	public StatementsBlock getStatementsBlock()
 	{
 		return _stmtsBlock;

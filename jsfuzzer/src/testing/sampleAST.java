@@ -39,17 +39,16 @@ public class sampleAST
 		
 		BinaryOp conditionExpression = new BinaryOp(i, BinaryOps.LT, new LiteralNumber("10"));
 		
-		UnaryOp stepExpression = new UnaryOp(i, UnaryOps.PLUSPLUSlEFT);
+		UnaryOp stepExpression = new UnaryOp(i, UnaryOps.PLUSPLUSLEFT);
 		
 		// the operation
-		StatementsBlock operation = new StatementsBlock();
 		StatementsBlock operationIf = new StatementsBlock();
 		operationIf.addStatement(new Continue());
 		If if1 = new If(new BinaryOp(i,BinaryOps.EQUAL,new LiteralNumber("5")), operationIf);
 		
-		operation.addStatement(if1);
 		
-		For forr = new For(initStatement, conditionExpression, stepExpression, operation);
+		For forr = new For(initStatement, conditionExpression, stepExpression);
+		forr.addStatement(if1);
 		prog.addStatement(forr);
 	
 		// while that does nothing and stops after five iterations
