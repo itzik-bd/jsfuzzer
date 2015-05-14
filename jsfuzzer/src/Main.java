@@ -15,8 +15,8 @@ public class Main
 		String progStr = JST.Vistors.JstToJs.execute(p);
 		System.out.println(progStr);
 		
-		String jsFile = "testsOutput/GeneratedPrograms/test1.js";
-		
+		String jsFile = "tests/test1.js";
+
 		PrintWriter writer = new PrintWriter(jsFile, "UTF-8");
 		writer.println(progStr);
 		writer.close();
