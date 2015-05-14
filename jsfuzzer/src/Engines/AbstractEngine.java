@@ -18,7 +18,9 @@ public abstract class AbstractEngine
 	{
 		ProcessBuilder proc = new ProcessBuilder(_platformExe, filePath);
 		File outputFile = new File(generateFileName(filePath));
+		File errFile = new File(generateErrFileName(filePath));
 		proc.redirectOutput(outputFile);
+		proc.redirectError(errFile);
 		try {
 			proc.start();
 		} catch (IOException e) {
@@ -30,6 +32,11 @@ public abstract class AbstractEngine
 	protected String generateFileName(String file)
 	{
 		return String.format("%s.%s.out", file, _platformName);
+	}
+	
+	protected String generateErrFileName(String file)
+	{
+		return String.format("%s.%s.err", file, _platformName);
 	}
 }
 
