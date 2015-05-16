@@ -15,7 +15,7 @@ public class Generator implements Visitor
 {
 	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
 	private static Properties _properties = new Properties();
-	private static final String _propertiesPath = "resources/config/properties"; 
+	private static final String _propertiesPath = "resources/config/config.properties"; 
 	
 	public static Program generate()
 	{
