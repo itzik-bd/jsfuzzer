@@ -1,5 +1,11 @@
 package Generator;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
 import JST.*;
 import JST.Switch.CaseBlock;
 import JST.VarDecleration.VarDeclerator;
@@ -8,17 +14,38 @@ import JST.Interfaces.Visitor;
 public class Generator implements Visitor
 {
 	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
+	private static Properties _properties = new Properties();
+	private static final String _propertiesPath = "resources/config/properties"; 
 	
 	public static Program generate()
 	{
 		Generator gen = new Generator();
 		Program prog = new Program();
 		Context context = new Context(); // global scope
+		loadProperties();
 		
 		// generate program
 		prog.accept(gen, context);
 		
 		return prog;
+	}
+	
+	private static void loadProperties()
+	{
+		InputStream input = null;
+		try {
+			input = new FileInputStream(_propertiesPath);
+		} catch (FileNotFoundException e) {
+			System.err.println("Failed opening properties file for input stream");
+			e.printStackTrace();
+		}
+		
+		try {
+			_properties.load(input);
+		} catch (IOException e) {
+			System.err.println("Failed loading properties file");
+			e.printStackTrace();
+		}
 	}
 	
 	private AbsStatement generateStatement()
