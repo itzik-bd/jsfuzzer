@@ -1,5 +1,7 @@
 package JST.Enums;
 
+import JST.Helper.Rand;
+
 public enum UnaryOps {
 
 	UMINUS("-%s", "unary subtraction"), 
@@ -38,5 +40,12 @@ public enum UnaryOps {
 	public String formatOp(String a)
 	{
 		return String.format(pattern, a);
+	}
+
+	public static UnaryOps getRandomly()  
+	{
+		UnaryOps[] values = values();
+	 
+		return values[Rand.getUniform(values.length)];
 	}
 }

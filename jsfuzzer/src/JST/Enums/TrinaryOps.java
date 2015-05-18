@@ -1,5 +1,7 @@
 package JST.Enums;
 
+import JST.Helper.Rand;
+
 public enum TrinaryOps {
 	
 	CONDOP("%s ? %s : %s ", "conditional operation");
@@ -25,5 +27,12 @@ public enum TrinaryOps {
 	public String formatOp(String a, String b, String c)
 	{
 		return String.format(pattern, a, b, c);
+	}
+	
+	public static TrinaryOps getRandomly() 
+	{
+		TrinaryOps[] values = values();
+		 
+		return values[Rand.getUniform(values.length)];
 	}
 }

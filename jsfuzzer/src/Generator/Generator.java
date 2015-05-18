@@ -5,6 +5,12 @@ import java.util.Properties;
 import JST.*;
 import JST.Switch.CaseBlock;
 import JST.VarDecleration.VarDeclerator;
+import JST.Enums.BinaryOps;
+import JST.Enums.LiteralTypes;
+import JST.Enums.TrinaryOps;
+import JST.Enums.UnaryOps;
+import JST.Helper.Factory;
+import JST.Helper.Rand;
 import JST.Interfaces.Visitor;
 
 public class Generator implements Visitor
@@ -35,6 +41,92 @@ public class Generator implements Visitor
 		// the fun part should be here
 		return null;
 	}
+	
+	private AbsExpression generateExpression(Context context)
+	{
+		// TODO :-}
+		// the secondary fun part should be here
+		return null;
+	}
+	
+	// ===============================================================================	
+	
+	public ArrayExpression createArrayExpression(Context context) 
+	{
+		//TODO: test length parameter
+		int p = Integer.parseInt(_configs.getProperty("array_length_parameter"));
+		
+		long length = Math.round(Rand.getExponential(p));
+		
+		// TODO: finish construction
+		//for (long i=0;)
+		
+		return null;
+	}
+	
+	public Identifier createIdentifier(Context context) 
+	{
+		// TODO: do
+		return null;
+	}
+	
+	public This createThis(Context context)
+	{
+		return ((This) _factoryJST.getConstantNode("this"));
+	}
+	
+	public UnaryOp CreateUnaryOp(Context context) 
+	{
+		AbsExpression absExp = generateExpression(context);
+		
+		return (new UnaryOp(UnaryOps.getRandomly(), absExp));
+	}
+
+	public BinaryOp CreateBinaryOp(Context context) 
+	{		
+		AbsExpression absExp1 = generateExpression(context);
+		AbsExpression absExp2 = generateExpression(context);
+	
+		return(new BinaryOp(BinaryOps.getRandomly(), absExp1, absExp2));
+	}
+
+	public TrinaryOp CreateTrinaryOp(Context context) 
+	{		
+		AbsExpression absExp1 = generateExpression(context);
+		AbsExpression absExp2 = generateExpression(context);
+		AbsExpression absExp3 = generateExpression(context);
+	
+		return(new TrinaryOp(TrinaryOps.getRandomly(), absExp1, absExp2, absExp3));
+	}
+
+	public Literal createLiteral(Context context) 
+	{
+		LiteralTypes litType = LiteralTypes.getRandomly();
+		
+		if (litType.isSingleValue())
+			return (new Literal(litType));
+		else if(litType.equals(LiteralTypes.NUMBER))
+			return (createLiteralNumber(context));
+		else if(litType.equals(LiteralTypes.STRING))
+			return (createLiteralString(context));
+		else
+			// This should never happend (no literal is nither of the above)
+			return null;
+	}
+
+	private LiteralString createLiteralString(Context context) 
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private LiteralNumber createLiteralNumber(Context  context) 
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+// ===============================================================================	
 	
 	@Override
 	public Object visit(Program program, Object context)
@@ -182,23 +274,26 @@ public class Generator implements Visitor
 	}
 
 	@Override
-	public Object visit(This thisExpr, Object context) {
-		// TODO Auto-generated method stub
+	public Object visit(This thisExpr, Object context) 
+	{
+		// Nothing to be done
 		return null;
 	}
-
+	
 	@Override
-	public Object visit(UnaryOp unaryOp, Object context) {
+	public Object visit(UnaryOp unaryOp, Object context) 
+	{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	@Override
-	public Object visit(BinaryOp binaryOp, Object context) {
+	public Object visit(BinaryOp binaryOp, Object context) 
+	{
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	
 	@Override
 	public Object visit(TrinaryOp trinaryOp, Object context) {
 		// TODO Auto-generated method stub

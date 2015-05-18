@@ -1,5 +1,7 @@
 package JST.Enums;
 
+import JST.Helper.Rand;
+
 public enum BinaryOps {
 
 	PLUS("%s + %s", "addition"),
@@ -53,5 +55,12 @@ public enum BinaryOps {
 	public String formatOp(String a, String b)
 	{
 		return String.format(pattern, a, b);
+	}
+
+	public static BinaryOps getRandomly() 
+	{
+		BinaryOps[] values = values();
+		 
+		return values[Rand.getUniform(values.length)];
 	}
 }

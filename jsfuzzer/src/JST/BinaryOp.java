@@ -21,8 +21,7 @@ public class BinaryOp extends AbsExpression
 	 * @param operand2
 	 *            The second operand.
 	 */
-	public BinaryOp(AbsExpression operand1, BinaryOps operator,
-			AbsExpression operand2)
+	public BinaryOp(BinaryOps operator, AbsExpression operand1, AbsExpression operand2)
 	{
 		this.operand1 = operand1;
 		this.operator = operator;
@@ -45,4 +44,5 @@ public class BinaryOp extends AbsExpression
 	public Object accept(Visitor visitor, Object context) {
 		return visitor.visit(this, context);
 	}
+
 }

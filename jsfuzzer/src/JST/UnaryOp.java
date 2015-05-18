@@ -18,7 +18,7 @@ public class UnaryOp extends AbsExpression
 	 *            The operator.
 	 */
 	
-	public UnaryOp(AbsExpression operand, UnaryOps operator)
+	public UnaryOp(UnaryOps operator, AbsExpression operand)
 	{
 		this.operand = operand;
 		this.operator = operator;

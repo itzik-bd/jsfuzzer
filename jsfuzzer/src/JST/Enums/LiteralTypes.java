@@ -1,5 +1,7 @@
 package JST.Enums;
 
+import JST.Helper.Rand;
+
 public enum LiteralTypes
 {
 	UNDEFINED("undefined", DataTypes.UNDEFINED),
@@ -34,5 +36,12 @@ public enum LiteralTypes
 	
 	public DataTypes getTypeValue() {
 		return _type;
+	}
+
+	public static LiteralTypes getRandomly() 
+	{
+		LiteralTypes[] values = values();
+		 
+		return values[Rand.getUniform(values.length)];
 	}
 }

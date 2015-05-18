@@ -27,7 +27,7 @@ public class TrinaryOp extends AbsExpression implements Assignable
 	 * @param operator
 	 *            The operator.
 	 */
-	public TrinaryOp(AbsExpression operand1, AbsExpression operand2, AbsExpression operand3, TrinaryOps operator)
+	public TrinaryOp(TrinaryOps operator, AbsExpression operand1, AbsExpression operand2, AbsExpression operand3)
 	{
 		this.operand1 = operand1;
 		this.operand2 = operand2;
