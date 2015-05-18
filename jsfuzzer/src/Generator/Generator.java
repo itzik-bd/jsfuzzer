@@ -13,16 +13,17 @@ import JST.Interfaces.Visitor;
 
 public class Generator implements Visitor
 {
-	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
-	private static Properties _properties = new Properties();
-	private static final String _propertiesPath = "resources/config/config.properties"; 
+	private static final String DEFAULT_CONFIG_FILE = "resources/config/config.properties";
 	
-	public static Program generate()
+	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
+	private Properties _configs;
+	 
+	
+	public static Program generate(String propertiesFile)
 	{
-		Generator gen = new Generator();
+		Generator gen = new Generator(propertiesFile);
 		Program prog = new Program();
 		Context context = new Context(); // global scope
-		loadProperties();
 		
 		// generate program
 		prog.accept(gen, context);
@@ -30,22 +31,32 @@ public class Generator implements Visitor
 		return prog;
 	}
 	
-	private static void loadProperties()
+	public Generator(String propertiesFile)
 	{
+		String actualFile = (propertiesFile != null) ? propertiesFile : DEFAULT_CONFIG_FILE;
+		loadProperties(actualFile);
+	}
+	
+	private static Properties loadProperties(String propertiesFile)
+	{
+		Properties p = new Properties();
+		
 		InputStream input = null;
 		try {
-			input = new FileInputStream(_propertiesPath);
+			input = new FileInputStream(propertiesFile);
 		} catch (FileNotFoundException e) {
 			System.err.println("Failed opening properties file for input stream");
 			e.printStackTrace();
 		}
 		
 		try {
-			_properties.load(input);
+			p.load(input);
 		} catch (IOException e) {
 			System.err.println("Failed loading properties file");
 			e.printStackTrace();
 		}
+		
+		return p;
 	}
 	
 	private AbsStatement generateStatement()
@@ -60,11 +71,14 @@ public class Generator implements Visitor
 	{
 		AbsStatement stmt;
 		
+		System.out.println(_configs.getProperty("key"));
+		
+		/*
 		while ((stmt = generateStatement()) != null)
 		{
 			program.addStatement(stmt);
 		}
-		
+		*/
 		return null;
 	}
 

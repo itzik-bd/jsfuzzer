@@ -28,7 +28,8 @@ public class Factory
 		{
 			if (type.isSingleValue())
 			{
-				_literalNodes.put(type.getToken(), new Literal(type));
+				assert(type.getToken() != null);
+				//_literalNodes.put(type.getToken(), new Literal(type));
 			}
 		}
 	}
@@ -44,5 +45,15 @@ public class Factory
 		}
 		
 		return res;
+	}
+	
+	public JSTNode getConstantNode(String name)
+	{
+		return _constantNodes.get(name);
+	}
+	
+	public JSTNode getSingleLiteralNode(String name)
+	{
+		return _literalNodes.get(name);
 	}
 }

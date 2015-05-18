@@ -3,6 +3,7 @@ import java.io.PrintWriter;
 
 import Engines.NodejsEngine;
 import Engines.SpiderMonkeyEngine;
+import Generator.Generator;
 
 public class Main
 {
@@ -10,6 +11,9 @@ public class Main
 	{
 		System.out.println("Hello jsfuzzer\n");
 		
+		Generator.generate(null);
+		
+		/*
 		JST.Program p = testing.sampleASToutput.getSampleAST();
 		
 		String progStr = JST.Vistors.JstToJs.execute(p);
@@ -27,6 +31,7 @@ public class Main
 		
 		NodejsEngine nodejs = new NodejsEngine();
 		nodejs.runFile(jsFile);
+		*/
 	}
 	
 }
