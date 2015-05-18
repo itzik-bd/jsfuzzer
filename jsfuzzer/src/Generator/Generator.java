@@ -9,11 +9,9 @@ import JST.Enums.BinaryOps;
 import JST.Enums.LiteralTypes;
 import JST.Enums.TrinaryOps;
 import JST.Enums.UnaryOps;
-import JST.Helper.Factory;
 import JST.Helper.Rand;
-import JST.Interfaces.Visitor;
 
-public class Generator implements Visitor
+public class Generator
 {	
 	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
 	private Properties _configs;
@@ -21,11 +19,10 @@ public class Generator implements Visitor
 	public static Program generate(Properties configs)
 	{
 		Generator gen = new Generator(configs);
-		Program prog = new Program();
 		Context context = new Context(); // global scope
 		
 		// generate program
-		prog.accept(gen, context);
+		Program prog = gen.createProgram(context);
 		
 		return prog;
 	}
@@ -51,7 +48,120 @@ public class Generator implements Visitor
 	
 	// ===============================================================================	
 	
-	public ArrayExpression createArrayExpression(Context context) 
+	private Program createProgram(Context context)
+	{
+		Program prog = new Program();
+		AbsStatement stmt;
+		
+		while ((stmt = generateStatement()) != null)
+		{
+			prog.addStatement(stmt);
+		}
+		
+		return prog;
+	}
+
+	private If createIf(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private While createWhile(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private DoWhile createDoWhile(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private For createFor(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private ForEach createForEach(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Switch createSwitch(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private CaseBlock createCaseBlock(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private FunctionDefinition createFunctionDefinition(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private VarDecleration createVarDecleration(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private VarDeclerator createVarDeclerator(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Continue createContinue(Context context)
+	{
+		return ((Continue) _factoryJST.getConstantNode("continue"));
+	}
+	
+	private Break createBreak(Context context)
+	{
+		return ((Break) _factoryJST.getConstantNode("break"));
+	}
+
+	private Return createReturn(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private StatementsBlock createStatementsBlock(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Assignment createAssignment(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private CompoundAssignment createCompoundAssignment(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private Call createCall(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private FunctionExpression createFunctionExpression(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private MemberExpression createMemberExpression(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private ObjectExpression createObjectExpression(Context context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private ArrayExpression createArrayExpression(Context context) 
 	{
 		//TODO: test length parameter
 		int p = Integer.parseInt(_configs.getProperty("array_length_parameter"));
@@ -64,25 +174,25 @@ public class Generator implements Visitor
 		return null;
 	}
 	
-	public Identifier createIdentifier(Context context) 
+	private Identifier createIdentifier(Context context) 
 	{
 		// TODO: do
 		return null;
 	}
 	
-	public This createThis(Context context)
+	private This createThis(Context context)
 	{
 		return ((This) _factoryJST.getConstantNode("this"));
 	}
 	
-	public UnaryOp CreateUnaryOp(Context context) 
+	private UnaryOp createUnaryOp(Context context) 
 	{
 		AbsExpression absExp = generateExpression(context);
 		
 		return (new UnaryOp(UnaryOps.getRandomly(), absExp));
 	}
 
-	public BinaryOp CreateBinaryOp(Context context) 
+	private BinaryOp createBinaryOp(Context context) 
 	{		
 		AbsExpression absExp1 = generateExpression(context);
 		AbsExpression absExp2 = generateExpression(context);
@@ -90,7 +200,7 @@ public class Generator implements Visitor
 		return(new BinaryOp(BinaryOps.getRandomly(), absExp1, absExp2));
 	}
 
-	public TrinaryOp CreateTrinaryOp(Context context) 
+	private TrinaryOp createTrinaryOp(Context context) 
 	{		
 		AbsExpression absExp1 = generateExpression(context);
 		AbsExpression absExp2 = generateExpression(context);
@@ -99,7 +209,7 @@ public class Generator implements Visitor
 		return(new TrinaryOp(TrinaryOps.getRandomly(), absExp1, absExp2, absExp3));
 	}
 
-	public Literal createLiteral(Context context) 
+	private Literal createLiteral(Context context) 
 	{
 		LiteralTypes litType = LiteralTypes.getRandomly();
 		
@@ -122,198 +232,6 @@ public class Generator implements Visitor
 
 	private LiteralNumber createLiteralNumber(Context  context) 
 	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-// ===============================================================================	
-	
-	@Override
-	public Object visit(Program program, Object context)
-	{
-		AbsStatement stmt;
-		
-		while ((stmt = generateStatement()) != null)
-		{
-			program.addStatement(stmt);
-		}
-		
-		return null;
-	}
-
-	@Override
-	public Object visit(If ifStatement, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(While whileStatement, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(DoWhile doWhile, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(For forStatement, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(ForEach forEach, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Switch switchStatement, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(CaseBlock caseBlock, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(FunctionDefinition functionDefinition, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(VarDecleration varDecleration, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(VarDeclerator varDeclerator, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Continue continueStatement, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Break breakStatement, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Return returnStatement, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(StatementsBlock stmtBlock, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Assignment assignment, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(CompoundAssignment assignment, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Call call, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(FunctionExpression functionExpression, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(MemberExpression memberExpr, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(ObjectExpression objExpr, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(ArrayExpression arrayExpr, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Identifier id, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(This thisExpr, Object context) 
-	{
-		// Nothing to be done
-		return null;
-	}
-	
-	@Override
-	public Object visit(UnaryOp unaryOp, Object context) 
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public Object visit(BinaryOp binaryOp, Object context) 
-	{
-		// TODO Auto-generated method stub
-		return null;
-	}
-	
-	@Override
-	public Object visit(TrinaryOp trinaryOp, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(Literal literal, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(LiteralString literal, Object context) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Object visit(LiteralNumber literal, Object context) {
 		// TODO Auto-generated method stub
 		return null;
 	}

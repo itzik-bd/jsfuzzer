@@ -37,7 +37,7 @@ public class sampleASToutput
 		List<Identifier> input = new ArrayList<Identifier>();
 		input.add(new Identifier("x"));
 		FunctionDefinition func = new FunctionDefinition(new Identifier("sqr"), input);
-		func.addStatement(new Return(new BinaryOp(new Identifier("x"), BinaryOps.MULTIPLY, new Identifier("x"))));
+		func.addStatement(new Return(new BinaryOp(BinaryOps.MULTIPLY, new Identifier("x"), new Identifier("x"))));
 		prog.addStatement(func);
 		
 
@@ -48,8 +48,8 @@ public class sampleASToutput
 		
 		VarDecleration initvd = new VarDecleration();
 		initvd.addDeclerator(new Identifier("i"), new LiteralNumber("0"));
-		AbsExpression cond = new BinaryOp(new Identifier("i"), BinaryOps.LT, new LiteralNumber("10"));
-		AbsExpression step = new UnaryOp(new Identifier("i"), UnaryOps.PLUSPLUSLEFT);
+		AbsExpression cond = new BinaryOp(BinaryOps.LT, new Identifier("i"), new LiteralNumber("10"));
+		AbsExpression step = new UnaryOp(UnaryOps.PLUSPLUSLEFT, new Identifier("i"));
 		For forStmt = new For(initvd, cond, step);
 		List<AbsExpression> args = new LinkedList<AbsExpression>();
 		args.add(new Identifier("x"));
