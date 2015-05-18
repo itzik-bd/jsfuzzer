@@ -1,9 +1,5 @@
 package Generator;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
 import JST.*;
@@ -12,16 +8,13 @@ import JST.VarDecleration.VarDeclerator;
 import JST.Interfaces.Visitor;
 
 public class Generator implements Visitor
-{
-	private static final String DEFAULT_CONFIG_FILE = "resources/config/config.properties";
-	
+{	
 	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
 	private Properties _configs;
-	 
 	
-	public static Program generate(String propertiesFile)
+	public static Program generate(Properties configs)
 	{
-		Generator gen = new Generator(propertiesFile);
+		Generator gen = new Generator(configs);
 		Program prog = new Program();
 		Context context = new Context(); // global scope
 		
@@ -31,32 +24,9 @@ public class Generator implements Visitor
 		return prog;
 	}
 	
-	public Generator(String propertiesFile)
+	public Generator(Properties configs)
 	{
-		String actualFile = (propertiesFile != null) ? propertiesFile : DEFAULT_CONFIG_FILE;
-		loadProperties(actualFile);
-	}
-	
-	private static Properties loadProperties(String propertiesFile)
-	{
-		Properties p = new Properties();
-		
-		InputStream input = null;
-		try {
-			input = new FileInputStream(propertiesFile);
-		} catch (FileNotFoundException e) {
-			System.err.println("Failed opening properties file for input stream");
-			e.printStackTrace();
-		}
-		
-		try {
-			p.load(input);
-		} catch (IOException e) {
-			System.err.println("Failed loading properties file");
-			e.printStackTrace();
-		}
-		
-		return p;
+		_configs = configs;
 	}
 	
 	private AbsStatement generateStatement()
@@ -71,14 +41,11 @@ public class Generator implements Visitor
 	{
 		AbsStatement stmt;
 		
-		System.out.println(_configs.getProperty("key"));
-		
-		/*
 		while ((stmt = generateStatement()) != null)
 		{
 			program.addStatement(stmt);
 		}
-		*/
+		
 		return null;
 	}
 

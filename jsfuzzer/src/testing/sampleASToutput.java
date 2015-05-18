@@ -1,5 +1,8 @@
 package testing;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +13,19 @@ import JST.Enums.UnaryOps;
 
 public class sampleASToutput 
 {
-	public static Program getSampleAST()
+	public static void saveToFile(String filename) throws FileNotFoundException, UnsupportedEncodingException
+	{
+		JST.Program p = getSampleAST();
+		
+		String progStr = JST.Vistors.JstToJs.execute(p);
+		System.out.println(progStr);
+
+		PrintWriter writer = new PrintWriter(filename, "UTF-8");
+		writer.println(progStr);
+		writer.close();
+	}
+	
+	private static Program getSampleAST()
 	{
 		Program prog = new Program();
 		
