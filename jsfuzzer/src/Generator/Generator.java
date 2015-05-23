@@ -61,19 +61,35 @@ public class Generator
 		return prog;
 	}
 
-	private If createIf(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private If createIf(Context context)
+	{
+		AbsExpression conditionExp = generateExpression(context);
+		StatementsBlock trueOp = createStatementsBlock(context);
+		
+		// decide whether to have an "else" operation
+		if (Rand.getBoolean())
+		{
+			StatementsBlock falseOp = createStatementsBlock(context);
+			return new If(conditionExp, trueOp, falseOp);
+		}
+		
+		return new If(conditionExp, trueOp);
 	}
 
-	private While createWhile(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private While createWhile(Context context)
+	{
+		AbsExpression conditionExp = generateExpression(context);
+		StatementsBlock op = createStatementsBlock(context);
+		
+		return new While(conditionExp, op);
 	}
 
-	private DoWhile createDoWhile(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private DoWhile createDoWhile(Context context)
+	{
+		AbsExpression conditionExp = generateExpression(context);
+		StatementsBlock op = createStatementsBlock(context);
+		
+		return new DoWhile(conditionExp, op);
 	}
 
 	private For createFor(Context context) {
@@ -174,7 +190,7 @@ public class Generator
 		return null;
 	}
 	
-	private Identifier createIdentifier(Context context) 
+	private Identifier createIdentifier(Context context, boolean canBeNew) 
 	{
 		// TODO: do
 		return null;

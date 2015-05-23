@@ -5,7 +5,6 @@ import java.util.Map;
 
 import JST.Identifier;
 import JST.JSTNode;
-import JST.Literal;
 import JST.Enums.LiteralTypes;
 
 public class Factory

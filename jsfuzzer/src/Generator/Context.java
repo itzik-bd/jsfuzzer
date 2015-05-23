@@ -4,7 +4,9 @@ public class Context
 {
 	private final Context _parentContext;
 	
-	private boolean _inWhileLoop;
+	private final SymTable _symTable;
+	
+	private final boolean _inWhileLoop;
 	private final int _contextDepth;
 	
 	/**
@@ -13,6 +15,7 @@ public class Context
 	public Context()
 	{
 		_parentContext = null;
+		_symTable = new SymTable(null);
 		_inWhileLoop = false;
 		_contextDepth = 0;
 	}
@@ -24,13 +27,27 @@ public class Context
 	public Context(Context parent)
 	{
 		_parentContext = parent;
+		_symTable = new SymTable(parent._symTable);
 		_inWhileLoop = parent._inWhileLoop;
 		_contextDepth = parent._contextDepth + 1;
 	}
 	
-	public void setInWhileLoop()
+	/**
+	 * Constructor for inner node in the tree
+	 * @param parent - the parent of the node
+	 * @param inWhileLoop - flag if it's a loop context 
+	 */
+	public Context(Context parent, boolean inWhileLoop)
 	{
-		_inWhileLoop = true;
+		_parentContext = parent;
+		_symTable = new SymTable(parent._symTable);
+		_inWhileLoop = (parent._inWhileLoop == true) ? true : inWhileLoop;
+		_contextDepth = parent._contextDepth + 1;
+	}
+	
+	public SymTable getSymTable()
+	{
+		return _symTable;
 	}
 	
 	public boolean isInWhileLoop()

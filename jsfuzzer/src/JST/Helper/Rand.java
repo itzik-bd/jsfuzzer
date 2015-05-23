@@ -24,5 +24,12 @@ public abstract class Rand
 	{
 		return (_rnd.nextInt(max));
 	}
-
+	
+	/**
+	 *  get a random boolean, distributed equal (p=1/2)
+	 */
+	public static boolean getBoolean()
+	{
+		return (_rnd.nextFloat() > 0.5) ? true : false;
+	}
 }
