@@ -1,15 +1,17 @@
 package Generator;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import JST.*;
-import JST.Switch.CaseBlock;
 import JST.VarDecleration.VarDeclerator;
 import JST.Enums.BinaryOps;
 import JST.Enums.LiteralTypes;
 import JST.Enums.TrinaryOps;
 import JST.Enums.UnaryOps;
 import JST.Helper.Rand;
+import JST.Helper.StdRandom;
 
 public class Generator
 {	
@@ -102,14 +104,69 @@ public class Generator
 		return null;
 	}
 
-	private Switch createSwitch(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private Switch createSwitch(Context context)
+	{
+		//TODO: we may want expr to be an identifier with high prob.
+		AbsExpression expr = generateExpression(context);
+		Switch switchStmt = new Switch(expr);
+		
+		int exp = Integer.parseInt(_configs.getProperty("cases_blocks_num_normal_exp"));
+		int stddev = Integer.parseInt(_configs.getProperty("cases_blocks_num_normal_stddev"));
+		int caseBlocksNum = (int) StdRandom.gaussian(exp, stddev);
+
+		double defaultProb = Double.parseDouble(_configs.getProperty("case_block_include_default_bernoully_p"));
+		boolean includeDefault = false;
+		
+		for(int i = 0; i < caseBlocksNum; i++)
+		{
+			//generate default case only once
+			if(!includeDefault)
+			{
+				if(StdRandom.bernoulli(defaultProb))
+				{
+					includeDefault = true;
+					switchStmt.addCaseOp(createCaseBlock(context, includeDefault));
+				}
+			}
+			
+			switchStmt.addCaseOp(createCaseBlock(context, false));			
+		}
+		
+		return switchStmt;
 	}
 
-	private CaseBlock createCaseBlock(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private CaseBlock createCaseBlock(Context context, boolean includeDefault)
+	{
+		/***** generate cases *****/
+		int exp = Integer.parseInt(_configs.getProperty("cases_num_normal_exp"));
+		int stddev = Integer.parseInt(_configs.getProperty("cases_num_normal_stddev"));
+		int casesNum = (int) StdRandom.gaussian(exp, stddev);
+		
+		//in case we got zero or less cases
+		casesNum = (casesNum > 0) ? casesNum : 1; 
+				
+		List<AbsExpression> cases = new LinkedList<AbsExpression>();
+		for(int i = 0; i < casesNum; i++)
+			cases.add(generateExpression(context));
+		
+		//TODO how do we check that "default" was not generated randomlly?
+		if(includeDefault)
+			cases.add(new LiteralString("default"));
+		
+		
+		/***** generate statements *****/
+		exp = Integer.parseInt(_configs.getProperty("case_block_stmts_num_normal_exp"));
+		stddev = Integer.parseInt(_configs.getProperty("case_block_stmts_num_normal_stddev"));
+		int stmtsNum = (int) StdRandom.gaussian(exp, stddev);
+
+		//in case we got zero or less cases
+		stmtsNum = (stmtsNum > 0) ? stmtsNum : 1; 
+		
+		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
+		for(int i = 0; i < stmtsNum; i++)
+			stmts.add(generateStatement());
+		
+		return new CaseBlock(cases, stmts);
 	}
 
 	private FunctionDefinition createFunctionDefinition(Context context) {
