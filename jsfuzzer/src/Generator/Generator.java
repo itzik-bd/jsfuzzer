@@ -4,9 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import Generator.SymTable.SymEntryType;
 import JST.*;
 import JST.VarDecleration.VarDeclerator;
 import JST.Enums.BinaryOps;
+import JST.Enums.CompoundOps;
 import JST.Enums.LiteralTypes;
 import JST.Enums.TrinaryOps;
 import JST.Enums.UnaryOps;
@@ -153,7 +155,6 @@ public class Generator
 		if(includeDefault)
 			cases.add(new LiteralString("default"));
 		
-		
 		/***** generate statements *****/
 		exp = Integer.parseInt(_configs.getProperty("case_block_stmts_num_normal_exp"));
 		stddev = Integer.parseInt(_configs.getProperty("case_block_stmts_num_normal_stddev"));
@@ -194,24 +195,50 @@ public class Generator
 		return ((Break) _factoryJST.getConstantNode("break"));
 	}
 
-	private Return createReturn(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private Return createReturn(Context context)
+	{
+		double returnValueProb = Double.parseDouble(_configs.getProperty("return_value_bernoully_p"));
+		
+		//decide whether to return a value
+		if(StdRandom.bernoulli(returnValueProb))
+			return new Return(generateExpression(context));
+		
+		return new Return();
 	}
 
-	private StatementsBlock createStatementsBlock(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private StatementsBlock createStatementsBlock(Context context)
+	{
+		//choose the block size
+		double exp = Double.parseDouble(_configs.getProperty("stmts_block_size_normal_exp"));
+		double stddev = Double.parseDouble(_configs.getProperty("stmts_block_size_normal_stddev"));
+		double size = StdRandom.gaussian(exp, stddev);
+		
+		StatementsBlock block = new StatementsBlock();
+		
+		for(int i = 0; i < size; i++)
+			block.addStatement(generateStatement());
+		
+		return block;
 	}
 
-	private Assignment createAssignment(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private Assignment createAssignment(Context context) 
+	{
+		double useExistingVarProb = Double.parseDouble(_configs.getProperty("assignment_use_existing_var_bernoully_p"));
+		
+		Identifier var = createIdentifier(context, useExistingVarProb);
+		AbsExpression expr = generateExpression(context);
+		
+		return new Assignment(var, expr);
 	}
 
-	private CompoundAssignment createCompoundAssignment(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private CompoundAssignment createCompoundAssignment(Context context)
+	{
+		//use only existing variables
+		Identifier var = createIdentifier(context, 1);
+		AbsExpression expr = generateExpression(context);
+		CompoundOps op = CompoundOps.getRandomly();
+		
+		return new CompoundAssignment(var, op, expr);
 	}
 
 	private Call createCall(Context context) {
@@ -247,10 +274,22 @@ public class Generator
 		return null;
 	}
 	
-	private Identifier createIdentifier(Context context, boolean canBeNew) 
+	private Identifier createIdentifier(Context context, double useExistingVarProb) 
 	{
-		// TODO: do
-		return null;
+		Identifier var = null;
+		
+		//decide whether to use an existing variable
+		if(StdRandom.bernoulli(useExistingVarProb))
+		{
+			List<Identifier> existingVars = context.getSymTable().getAvaiableIdentifiers(SymEntryType.VAR);
+			var = existingVars.get(StdRandom.uniform(existingVars.size()));
+		}
+		else
+		{
+			//TODO: get next new usable var name and create new Identifier with it
+		}
+		
+		return var;
 	}
 	
 	private This createThis(Context context)
@@ -293,7 +332,7 @@ public class Generator
 		else if(litType.equals(LiteralTypes.STRING))
 			return (createLiteralString(context));
 		else
-			// This should never happend (no literal is nither of the above)
+			// This should never happen (no literal is neither of the above)
 			return null;
 	}
 

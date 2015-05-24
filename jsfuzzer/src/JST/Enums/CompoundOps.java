@@ -1,5 +1,7 @@
 package JST.Enums;
 
+import JST.Helper.Rand;
+
 public enum CompoundOps
 {
 	PLUS("+", "addition"),
@@ -37,5 +39,12 @@ public enum CompoundOps
 	
 	public String getToken() {
 		return token;
+	}
+	
+	public static CompoundOps getRandomly() 
+	{
+		CompoundOps[] values = values();
+		 
+		return values[Rand.getUniform(values.length)];
 	}
 }
