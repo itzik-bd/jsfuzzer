@@ -36,18 +36,44 @@ public class Generator
 		_configs = configs;
 	}
 	
-	private AbsStatement generateStatement()
+	private AbsStatement generateStatement(Context context)
 	{
-		// TODO :-)
-		// the fun part should be here
+		String stmtType = Rand.getRndStatementType(_configs, context);
+		AbsStatement retStmt;
+		
+		switch(stmtType)
+		{
+			// TODO: finish...
+		}
+		
 		return null;
 	}
 	
 	private AbsExpression generateExpression(Context context)
 	{
-		// TODO :-}
-		// the secondary fun part should be here
-		return null;
+		String exprType = Rand.getRndExpressionType(_configs, context);
+		AbsExpression retExpr;
+		
+		switch(exprType)
+		{
+			case "expr_UnaryOp": retExpr = createUnaryOp(context); break;
+			case "expr_BinaryOp": retExpr = createBinaryOp(context); break;
+			case "expr_TrinaryOp": retExpr = createTrinaryOp(context); break;
+			case "expr_ArrayExpression": retExpr = createArrayExpression(context); break;
+			case "expr_Call": retExpr = createCall(context); break;
+			case "expr_MemberExpression": retExpr = createMemberExpression(context); break;
+			case "expr_This": retExpr = createThis(context); break;
+			case "expr_Literal": retExpr = createLiteral(context); break;
+			case "expr_Identifier":
+				double useExistingVarProb = Double.parseDouble(_configs.getProperty("assignment_use_existing_var_bernoully_p"));
+				retExpr  = createIdentifier(context, useExistingVarProb);
+				break;
+				
+			// Should not get to this
+			default: retExpr = new This();		
+		}
+		
+		return retExpr;
 	}
 	
 	// ===============================================================================	
@@ -57,7 +83,7 @@ public class Generator
 		Program prog = new Program();
 		AbsStatement stmt;
 		
-		while ((stmt = generateStatement()) != null)
+		while ((stmt = generateStatement(context)) != null)
 		{
 			prog.addStatement(stmt);
 		}
@@ -165,7 +191,7 @@ public class Generator
 		
 		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
 		for(int i = 0; i < stmtsNum; i++)
-			stmts.add(generateStatement());
+			stmts.add(generateStatement(context));
 		
 		return new CaseBlock(cases, stmts);
 	}
@@ -216,7 +242,7 @@ public class Generator
 		StatementsBlock block = new StatementsBlock();
 		
 		for(int i = 0; i < size; i++)
-			block.addStatement(generateStatement());
+			block.addStatement(generateStatement(context));
 		
 		return block;
 	}
