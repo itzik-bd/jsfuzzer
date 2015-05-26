@@ -1,5 +1,6 @@
 package Generator;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -36,22 +37,105 @@ public class Generator
 		_configs = configs;
 	}
 	
+	/**
+	 * This is an initial and non complex solution
+	 * Get all probabilities from the conf and chose rendomly with respect to their relations
+	 * @return
+	 */
+	public String getRndExpressionType()
+	{
+		HashMap<String, Integer> hs = new HashMap<String, Integer>();
+		
+		// All properties are relative to the total of all properties
+		hs.put("UnaryOp", Integer.parseInt(_configs.getProperty("expr_UnaryOp")));
+		hs.put("BinaryOp", Integer.parseInt(_configs.getProperty("expr_BinaryOp")));
+		hs.put("TrinaryOp", Integer.parseInt(_configs.getProperty("expr_TrinaryOp")));
+		hs.put("ArrayExpression", Integer.parseInt(_configs.getProperty("expr_ArrayExpression")));
+		hs.put("Call", Integer.parseInt(_configs.getProperty("expr_Call")));
+		hs.put("Identifier", Integer.parseInt(_configs.getProperty("expr_Identifier")));
+		hs.put("Literal", Integer.parseInt(_configs.getProperty("expr_Literal")));
+		hs.put("MemberExpression", Integer.parseInt(_configs.getProperty("expr_MemberExpression")));
+		hs.put("This", Integer.parseInt(_configs.getProperty("expr_This")));
+		hs.put("ObjectExpression", Integer.parseInt(_configs.getProperty("expr_ObjectExpression")));
+		hs.put("FunctionExpression", Integer.parseInt(_configs.getProperty("expr_FunctionExpression")));
+
+		// randomly chose from values
+		return Rand.choseFromProbList(hs);
+	}
+
+	public String getRndStatementType(Context context)
+	{
+		HashMap<String, Integer> hs = new HashMap<String, Integer>();
+		
+		// All properties are relative to the total of all properties
+		hs.put("CompoundAssignment", Integer.parseInt(_configs.getProperty("stmt_CompoundAssignment")));
+		hs.put("FunctionDefinition", Integer.parseInt(_configs.getProperty("stmt_FunctionDefinition")));
+		hs.put("If", Integer.parseInt(_configs.getProperty("stmt_If")));
+		hs.put("OutputStatement", Integer.parseInt(_configs.getProperty("stmt_OutputStatement")));
+		hs.put("StatementsBlock", Integer.parseInt(_configs.getProperty("stmt_StatementsBlock")));
+		hs.put("Switch", Integer.parseInt(_configs.getProperty("stmt_Switch")));
+		hs.put("VarDecleration", Integer.parseInt(_configs.getProperty("stmt_VarDecleration")));
+		hs.put("Assignment", Integer.parseInt(_configs.getProperty("stmt_Assignment")));
+				
+		// Is in loop
+		if (context.isInWhileLoop())
+		{
+			hs.put("Break", Integer.parseInt(_configs.getProperty("stmt_Break")));
+			hs.put("Continue", Integer.parseInt(_configs.getProperty("stmt_Continue")));
+			hs.put("Return", Integer.parseInt(_configs.getProperty("stmt_Return")));
+			
+			// Lower the probability of nested loop
+			int p = Integer.parseInt(_configs.getProperty("stmt_ForEach"));
+			hs.put("ForEach", Integer.parseInt(_configs.getProperty("stmt_ForEach"))/p);
+			hs.put("While", Integer.parseInt(_configs.getProperty("stmt_While"))/p);
+			hs.put("DoWhile", Integer.parseInt(_configs.getProperty("stmt_DoWhile"))/p);
+			hs.put("For", Integer.parseInt(_configs.getProperty("stmt_For"))/p);
+		}
+		else
+		{
+			hs.put("ForEach", Integer.parseInt(_configs.getProperty("stmt_ForEach")));
+			hs.put("While", Integer.parseInt(_configs.getProperty("stmt_While")));
+			hs.put("DoWhile", Integer.parseInt(_configs.getProperty("stmt_DoWhile")));
+			hs.put("For", Integer.parseInt(_configs.getProperty("stmt_For")));
+		}
+						
+		// Sould never get here.
+		return Rand.choseFromProbList(hs);
+	}
+	
 	private AbsStatement generateStatement(Context context)
 	{
-		String stmtType = Rand.getRndStatementType(_configs, context);
+		String stmtType = getRndStatementType(context);
 		AbsStatement retStmt;
 		
 		switch(stmtType)
 		{
-			// TODO: finish...
+			case "CompoundAssignment": retStmt = createCompoundAssignment(context); break;
+			case "FunctionDefinition": retStmt = createFunctionDefinition(context); break;
+			case "If": retStmt = createIf(context); break;
+			case "StatementsBlock": retStmt = createStatementsBlock(context); break;
+			case "Switch": retStmt = createSwitch(context); break;
+			case "VarDecleration": retStmt = createVarDecleration(context); break;
+			case "Break": retStmt = createBreak(context); break;
+			case "Continue": retStmt = createContinue(context); break;
+			case "Return": retStmt = createReturn(context); break;
+			case "ForEach": retStmt = createForEach(context); break;
+			case "While": retStmt = createWhile(context); break;
+			case "DoWhile": retStmt = createDoWhile(context); break;
+			case "For": retStmt = createFor(context); break;
+			case "Assignment": retStmt = createAssignment(context); break;
+			//case "stmt_OutputStatement": retStmt = createOu; break;
+			
+			// Should not happend
+			default: retStmt=null;
 		}
 		
-		return null;
+		return retStmt;
 	}
 	
 	private AbsExpression generateExpression(Context context)
 	{
-		String exprType = Rand.getRndExpressionType(_configs, context);
+		String exprType = getRndExpressionType();
 		AbsExpression retExpr;
 		
 		switch(exprType)
@@ -64,6 +148,9 @@ public class Generator
 			case "expr_MemberExpression": retExpr = createMemberExpression(context); break;
 			case "expr_This": retExpr = createThis(context); break;
 			case "expr_Literal": retExpr = createLiteral(context); break;
+			case "expr_ObjectExpression": retExpr = createObjectExpression(context); break;
+			case "expr_FunctionExpression": retExpr = createFunctionExpression(context); break;
+			
 			case "expr_Identifier":
 				double useExistingVarProb = Double.parseDouble(_configs.getProperty("assignment_use_existing_var_bernoully_p"));
 				retExpr  = createIdentifier(context, useExistingVarProb);
@@ -108,6 +195,7 @@ public class Generator
 
 	private While createWhile(Context context)
 	{
+		// TODO: add an if to make sure the loop stops
 		AbsExpression conditionExp = generateExpression(context);
 		StatementsBlock op = createStatementsBlock(context);
 		
@@ -116,6 +204,7 @@ public class Generator
 
 	private DoWhile createDoWhile(Context context)
 	{
+		// TODO: add an if to make sure the loop stops
 		AbsExpression conditionExp = generateExpression(context);
 		StatementsBlock op = createStatementsBlock(context);
 		
@@ -208,6 +297,7 @@ public class Generator
 
 	private VarDeclerator createVarDeclerator(Context context) {
 		// TODO Auto-generated method stub
+		// This is currently not generated in any place
 		return null;
 	}
 
