@@ -15,6 +15,13 @@ public enum ConfigProperties
 	STMTS_BLOCK_SIZE_NORMAL_EXP("stmts_block_size_normal_exp", Integer.class),
 	STMTS_BLOCK_SIZE_NORMAL_STDDEV("stmts_block_size_normal_stddev", Integer.class),
 	VAR_DECL_NUM_LAMBDA_EXP("var_decl_num_lambda_exp", Double.class),
+	ARRAY_LENGTH_LAMBDA_EXP("array_length_lambda_exp", Double.class),
+	
+	LITERAL_STRING_LAMBDA("literal_string_lambda", Double.class),
+	LITERAL_STRING_MAX_LENGTH("literal_string_max_length", Integer.class),
+
+	LITERAL_NUMBER_MAX_PROBABILITY("literal_number_max_probability", Double.class),
+	LITERAL_NUMBER_LAMBDA("literal_number_lambda", Double.class),
 	
 	EXPR_UNARYOP("expr_UnaryOp", Integer.class),
 	EXPR_BINARYOP("expr_BinaryOp", Integer.class),
@@ -30,6 +37,7 @@ public enum ConfigProperties
 
 	NESTED_LOOPS_FACTOR("nested_loops_factor", Integer.class),
 	
+	STMT_EXPRESSION("stmt_Expression", Integer.class),
 	STMT_COMPOUNDASSIGNMENT("stmt_CompoundAssignment", Integer.class),
 	STMT_FUNCTIONDEFINITION("stmt_FunctionDefinition", Integer.class),
 	STMT_IF("stmt_If", Integer.class),

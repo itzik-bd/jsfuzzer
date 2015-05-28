@@ -1,7 +1,6 @@
 package JST.Interfaces;
 
 import JST.*;
-import JST.VarDecleration.VarDeclerator;
 
 public interface Visitor
 {

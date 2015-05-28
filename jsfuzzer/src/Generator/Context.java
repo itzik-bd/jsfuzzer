@@ -6,7 +6,8 @@ public class Context
 	
 	private final SymTable _symTable;
 	
-	private final boolean _inWhileLoop;
+	private final boolean _inLoop;
+	private final boolean _inFunction;
 	private final int _contextDepth;
 	
 	/**
@@ -16,7 +17,8 @@ public class Context
 	{
 		_parentContext = null;
 		_symTable = new SymTable(null);
-		_inWhileLoop = false;
+		_inLoop = false;
+		_inFunction = false;
 		_contextDepth = 0;
 	}
 	
@@ -28,20 +30,22 @@ public class Context
 	{
 		_parentContext = parent;
 		_symTable = new SymTable(parent._symTable);
-		_inWhileLoop = parent._inWhileLoop;
+		_inLoop = parent._inLoop;
+		_inFunction = parent._inFunction;
 		_contextDepth = parent._contextDepth + 1;
 	}
 	
 	/**
 	 * Constructor for inner node in the tree
 	 * @param parent - the parent of the node
-	 * @param inWhileLoop - flag if it's a loop context 
+	 * @param inLoop - flag if it's a loop context 
 	 */
-	public Context(Context parent, boolean inWhileLoop)
+	public Context(Context parent, Boolean inLoop, Boolean inFunction)
 	{
 		_parentContext = parent;
 		_symTable = new SymTable(parent._symTable);
-		_inWhileLoop = (parent._inWhileLoop == true) ? true : inWhileLoop;
+		_inLoop = (inLoop == null || parent._inLoop == true) ? parent._inLoop : inLoop;
+		_inFunction = (inFunction == null || parent._inFunction == true) ? parent._inFunction: inFunction;
 		_contextDepth = parent._contextDepth + 1;
 	}
 	
@@ -50,9 +54,14 @@ public class Context
 		return _symTable;
 	}
 	
-	public boolean isInWhileLoop()
+	public boolean isInLoop()
 	{
-		return _inWhileLoop;
+		return _inLoop;
+	}
+	
+	public boolean isInFunction()
+	{
+		return _inFunction;
 	}
 	
 	public int getDepth()

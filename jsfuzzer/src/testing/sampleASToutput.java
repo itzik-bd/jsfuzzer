@@ -30,7 +30,7 @@ public class sampleASToutput
 		Program prog = new Program();
 		
 		VarDecleration vd = new VarDecleration();
-		vd.addDeclerator(new Identifier("x"), new LiteralNumber("2"));
+		vd.addDeclerator(new VarDeclerator(new Identifier("x"), new LiteralNumber("2")));
 		prog.addStatement(vd);
 		
 		// create the function
@@ -47,7 +47,7 @@ public class sampleASToutput
 		Call print = new Call(new MemberExpression(new Identifier("console"), new Identifier("log")), argsPrint);
 		
 		VarDecleration initvd = new VarDecleration();
-		initvd.addDeclerator(new Identifier("i"), new LiteralNumber("0"));
+		initvd.addDeclerator(new VarDeclerator(new Identifier("i"), new LiteralNumber("0")));
 		AbsExpression cond = new BinaryOp(BinaryOps.LT, new Identifier("i"), new LiteralNumber("10"));
 		AbsExpression step = new UnaryOp(UnaryOps.PLUSPLUSLEFT, new Identifier("i"));
 		For forStmt = new For(initvd, cond, step);

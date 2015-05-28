@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import JST.*;
-import JST.VarDecleration.VarDeclerator;
 import JST.Interfaces.JSTObject;
 import JST.Interfaces.ObjectKeys;
 import JST.Interfaces.Visitor;
