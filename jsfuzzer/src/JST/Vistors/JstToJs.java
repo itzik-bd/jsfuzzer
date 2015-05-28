@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 
 import JST.*;
 import JST.VarDecleration.VarDeclerator;
+import JST.Interfaces.JSTObject;
 import JST.Interfaces.ObjectKeys;
 import JST.Interfaces.Visitor;
 
@@ -187,13 +188,24 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 
-		ident(s);
-		s.append(listJoinFormat(caseBlock.getCases(), false, "case %s:", " "));
+		s.append(listJoin(caseBlock.getCases(), false));
 		_depth++;
 		s.append(listJoin(caseBlock.getStatements(), true));
 		_depth--;
 		
 		return s.toString();
+	}
+	
+	@Override
+	public Object visit(Case myCase, Object context)
+	{
+		return identString(String.format("case: %s", myCase.getCaseExpr().accept(this, context)));
+	}
+
+	@Override
+	public Object visit(Default myDefault, Object context)
+	{
+		return identString("default");
 	}
 
 	@Override
@@ -433,7 +445,7 @@ public class JstToJs implements Visitor
 	
 	// -------------------------------------------------
 	
-	private String listJoinFormat(List<? extends JSTNode> list, boolean isStatement, String format, String delimiter)
+	private String listJoinFormat(List<? extends JSTObject> list, boolean isStatement, String format, String delimiter)
 	{
 		StringBuilder s = new StringBuilder();
 		
@@ -451,12 +463,12 @@ public class JstToJs implements Visitor
 		return s.toString();
 	}
 	
-	private String listJoin(List<? extends JSTNode> list, boolean isStatement, String delimiter)
+	private String listJoin(List<? extends JSTObject> list, boolean isStatement, String delimiter)
 	{
 		return listJoinFormat(list, isStatement, "%s", delimiter);
 	}
 	
-	private String listJoin(List<? extends JSTNode> list, boolean isStatement)
+	private String listJoin(List<? extends JSTObject> list, boolean isStatement)
 	{
 		return listJoinFormat(list, isStatement, "%s", "");
 	}

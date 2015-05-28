@@ -3,21 +3,22 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
+import JST.Interfaces.Caseable;
 import JST.Interfaces.Visitor;
 
 	public class CaseBlock extends JSTNode
 	{
-		private List<AbsExpression> _cases;
+		private List<Caseable> _cases;
 		
 		private List<AbsStatement> _statements;
 		
-		public CaseBlock(List<AbsExpression> cases, List<AbsStatement> statements)
+		public CaseBlock(List<Caseable> cases, List<AbsStatement> statements)
 		{
 			_cases = cases;
 			_statements = statements;
 		}
-		
-		public CaseBlock(List<AbsExpression> cases)
+					
+		public CaseBlock(List<Caseable> cases)
 		{
 			_cases = cases;
 			_statements = new LinkedList<AbsStatement>();
@@ -28,7 +29,7 @@ import JST.Interfaces.Visitor;
 			_statements.add(stmt);
 		}
 		
-		public List<AbsExpression> getCases()
+		public List<Caseable> getCases()
 		{
 			return _cases;
 		}

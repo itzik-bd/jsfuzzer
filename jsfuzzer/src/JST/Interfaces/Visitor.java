@@ -21,6 +21,8 @@ public interface Visitor
 	
 	public Object visit(Switch switchStatement, Object context);
 	public Object visit(CaseBlock caseBlock, Object context);
+	public Object visit(Case myCase, Object context);
+	public Object visit(Default myDefault, Object context);
 	
 	public Object visit(FunctionDefinition functionDefinition, Object context);
 	

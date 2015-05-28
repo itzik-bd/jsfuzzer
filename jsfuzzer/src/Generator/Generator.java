@@ -259,6 +259,8 @@ public class Generator
 		int stddev = Integer.parseInt(_configs.getProperty("cases_num_normal_stddev"));
 		int casesNum = (int) StdRandom.gaussian(exp, stddev);
 		
+		
+		//TODO : maybe 0 cases
 		//in case we got zero or less cases
 		casesNum = (casesNum > 0) ? casesNum : 1; 
 				
@@ -266,17 +268,17 @@ public class Generator
 		for(int i = 0; i < casesNum; i++)
 			cases.add(generateExpression(context));
 		
-		//TODO how do we check that "default" was not generated randomlly?
 		if(includeDefault)
 			cases.add(new LiteralString("default"));
 		
 		/***** generate statements *****/
 		exp = Integer.parseInt(_configs.getProperty("case_block_stmts_num_normal_exp"));
 		stddev = Integer.parseInt(_configs.getProperty("case_block_stmts_num_normal_stddev"));
+		//TODO: int stmtsNum = getRandNormalNumber(caseBlockStmtsNumNormalExp)
 		int stmtsNum = (int) StdRandom.gaussian(exp, stddev);
 
-		//in case we got zero or less cases
-		stmtsNum = (stmtsNum > 0) ? stmtsNum : 1; 
+		//in case we got negative number of stmts
+		stmtsNum = Math.max(stmtsNum, 0); 
 		
 		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
 		for(int i = 0; i < stmtsNum; i++)

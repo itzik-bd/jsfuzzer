@@ -1,0 +1,73 @@
+package Generator.Config;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+public class Configs
+{
+	private static final String DEFAULT_CONFIG_FILE = "resources/config/config.properties";
+	
+	private Map<ConfigProperties, Object> _configsMap = new HashMap<ConfigProperties, Object>();
+	
+	public static Configs loadConfigFile(String configFile) throws IOException
+	{
+		String actualFile = (configFile != null) ? configFile : DEFAULT_CONFIG_FILE;
+		
+		Configs res = new Configs();
+		boolean errorFound = false;
+		Properties p = new Properties();
+		
+		InputStream input = new FileInputStream(actualFile);
+		p.load(input);
+		input.close();
+		
+		for(ConfigProperties prop : ConfigProperties.values())
+		{
+			String valStr = null;
+			Object valParsed = null;
+			
+			// get properties
+			 valStr = p.getProperty(prop.getName());
+			 if(valStr == null)
+			 {
+				System.err.println(String.format("config property %s doesn't exists", prop.getName()));
+				errorFound = true;
+			 }
+			 else
+			 {
+				// validate types
+				try {
+					valParsed = parseValue(valStr, prop);
+				} catch (Exception e) {
+					System.err.println(String.format("config property %s is not from type %s", prop.getName(), prop.getClassType().getName()));
+					errorFound = true;
+				}
+				
+				// add property to configs map
+				res._configsMap.put(prop, valParsed);
+			 }
+		}
+		
+		// return null if error occurred
+		return errorFound ? null : res;
+	}
+	
+	private static Object parseValue(String valStr, ConfigProperties prop) throws Exception
+	{
+		if (prop.getClassType() == Integer.class)
+		{
+			return Integer.parseInt(valStr);
+		}
+		else if (prop.getClassType() == Double.class)
+		{
+			return Double.parseDouble(valStr);
+		}
+		
+		throw new Exception(String.format("error in enum ConfigProperties: found property %s with unkown type", prop.getName()));
+	}
+	
+}

@@ -21,6 +21,7 @@ public class Factory
 		_constantNodes.put("break", new JST.Break());
 		_constantNodes.put("continue", new JST.Continue());
 		_constantNodes.put("this", new JST.This());
+		_constantNodes.put("default", new JST.Default());
 		
 		// constant literal nodes
 		for(LiteralTypes type : LiteralTypes.values())

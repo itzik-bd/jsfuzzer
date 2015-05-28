@@ -3,6 +3,7 @@ package JST;
 import java.util.LinkedList;
 import java.util.List;
 
+import JST.Interfaces.Caseable;
 import JST.Interfaces.Visitor;
 
 public class Switch extends AbsStatement
@@ -36,7 +37,7 @@ public class Switch extends AbsStatement
 		_casesOperations.add(caseBlock);
 	}
 	
-	public void addCaseOp(List<AbsExpression> cases, List<AbsStatement> stmt)
+	public void addCaseOp(List<Caseable> cases, List<AbsStatement> stmt)
 	{
 		_casesOperations.add(new CaseBlock(cases, stmt));
 	}
