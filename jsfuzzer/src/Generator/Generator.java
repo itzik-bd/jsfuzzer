@@ -394,15 +394,17 @@ public class Generator
 	
 	private ArrayExpression createArrayExpression(Context context) 
 	{
-		//TODO: test length parameter
 		int p = Integer.parseInt(_configs.getProperty("array_length_parameter"));
 		
-		long length = Math.round(StdRandom.exp(p));
+		int length = (int)Math.ceil(StdRandom.exp(p));
+		ArrayExpression retVal = new ArrayExpression(); 
 		
-		// TODO: finish construction
-		//for (long i=0;)
+		for (int i=0 ; i< length ; i++)
+		{
+			retVal.addItem(generateExpression(context));
+		}
 		
-		return null;
+		return retVal;
 	}
 	
 	private Identifier createIdentifier(Context context, double useExistingVarProb) 
@@ -417,7 +419,8 @@ public class Generator
 		}
 		else
 		{
-			//TODO: get next new usable var name and create new Identifier with it
+			String newName = IdNameGenerator.getNextFreeName();
+			var = _factoryJST.getIdentifier(newName);
 		}
 		
 		return var;
@@ -488,8 +491,26 @@ public class Generator
 
 	private LiteralNumber createLiteralNumber(Context  context) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		// return infinity?
+		double infinity = Double.parseDouble(_configs.getProperty("literal_number_max_probability"));
+		if (StdRandom.bernoulli(infinity))
+		{
+			return (new LiteralNumber("9007199254740992"));
+		}
+		else
+		{
+			double lambda = Double.parseDouble(_configs.getProperty("literal_number_lambda"));
+			StringBuilder strBld = new StringBuilder();
+			
+			// Randomize number's length
+			int length = (int) Math.round(StdRandom.exp(lambda));
+			for (int i=0 ; i < length ; i++)
+			{
+				strBld.append(StdRandom.uniform(10));
+			}
+			
+			return (new LiteralNumber(strBld.toString()));
+		}
 	}
 
 }
