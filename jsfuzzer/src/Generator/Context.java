@@ -6,7 +6,7 @@ public class Context
 	
 	private final SymTable _symTable;
 	
-	private final boolean _inLoop;
+	private final int _loopDepth;
 	private final boolean _inFunction;
 	private final int _contextDepth;
 	
@@ -17,7 +17,7 @@ public class Context
 	{
 		_parentContext = null;
 		_symTable = new SymTable(null);
-		_inLoop = false;
+		_loopDepth = 0;
 		_inFunction = false;
 		_contextDepth = 0;
 	}
@@ -30,7 +30,7 @@ public class Context
 	{
 		_parentContext = parent;
 		_symTable = new SymTable(parent._symTable);
-		_inLoop = parent._inLoop;
+		_loopDepth = parent._loopDepth;
 		_inFunction = parent._inFunction;
 		_contextDepth = parent._contextDepth + 1;
 	}
@@ -44,8 +44,8 @@ public class Context
 	{
 		_parentContext = parent;
 		_symTable = new SymTable(parent._symTable);
-		_inLoop = (inLoop == null || parent._inLoop == true) ? parent._inLoop : inLoop;
-		_inFunction = (inFunction == null || parent._inFunction == true) ? parent._inFunction: inFunction;
+		_loopDepth = parent._loopDepth + ((inLoop == null) ? 1 : 0);
+		_inFunction = (inFunction == null || parent._inFunction == true) ? parent._inFunction : inFunction;
 		_contextDepth = parent._contextDepth + 1;
 	}
 	
@@ -56,7 +56,12 @@ public class Context
 	
 	public boolean isInLoop()
 	{
-		return _inLoop;
+		return (_loopDepth > 1);
+	}
+	
+	public int getLoopDepth()
+	{
+		return _loopDepth;
 	}
 	
 	public boolean isInFunction()

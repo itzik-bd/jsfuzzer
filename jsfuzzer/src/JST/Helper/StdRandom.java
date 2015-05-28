@@ -352,7 +352,7 @@ public final class StdRandom {
     }
 
 	//Get probs and chose rendomly with respect to their relations
-	public static String choseFromProbList(HashMap<String,Integer> hs)
+	public static <T> T choseFromProbList(HashMap<T,Integer> hs)
 	{
 		// randomlly get a value in range 0-sumOfProps
 		int max=0;
@@ -362,7 +362,7 @@ public final class StdRandom {
 		
 		// Return the chosen value
 		int sum = 0;
-		for (String exprName : hs.keySet())
+		for (T exprName : hs.keySet())
 		{
 			sum += hs.get(exprName);
 			

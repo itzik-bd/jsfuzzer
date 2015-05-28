@@ -1,5 +1,7 @@
 package Generator;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,6 +13,7 @@ import JST.Enums.*;
 import JST.Helper.StdRandom;
 import JST.Interfaces.Caseable;
 
+@SuppressWarnings("unused")
 public class Generator
 {	
 	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
@@ -32,130 +35,104 @@ public class Generator
 		_configs = configs;
 	}
 	
+	private Method getMethod(String methodName)
+	{
+		Class<?>[] sig = { Context.class };
+		try {
+			return Generator.class.getMethod(methodName, sig);
+		} catch (NoSuchMethodException | SecurityException e) {
+			return null;
+		}
+	}
+	
+	private Object applyMethod(Method method, Context context)
+	{
+		try {
+			return method.invoke(this, context);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
 	/**
 	 * This is an initial and non complex solution
-	 * Get all probabilities from the conf and chose rendomly with respect to their relations
+	 * Get all probabilities from the config and chose randomly with respect to their relations
 	 * @return
 	 */
-	public String getRndExpressionType()
+	private AbsStatement generateStatement(Context context)
 	{
-		HashMap<String, Integer> hs = new HashMap<String, Integer>();
+		HashMap<Method, Integer> hs = new HashMap<Method, Integer>();
 		
 		// All properties are relative to the total of all properties
-		hs.put("UnaryOp", _configs.valInt(ConfigProperties.EXPR_UNARYOP));
-		hs.put("BinaryOp", _configs.valInt(ConfigProperties.EXPR_BINARYOP));
-		hs.put("TrinaryOp", _configs.valInt(ConfigProperties.EXPR_TRINARYOP));
-		hs.put("ArrayExpression", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION));
-		hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL));
-		
-		hs.put("Identifier", _configs.valInt(ConfigProperties.EXPR_IDENTIFIER));
-		hs.put("Literal", _configs.valInt(ConfigProperties.EXPR_LITERAL));
-		hs.put("MemberExpression", _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION));
-		hs.put("This", _configs.valInt(ConfigProperties.EXPR_THIS));
-		hs.put("ObjectExpression", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION));
-		hs.put("FunctionExpression", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION));
-
-		// randomly chose from values
-		return StdRandom.choseFromProbList(hs);
-	}
-
-	public String getRndStatementType(Context context)
-	{
-		HashMap<String, Integer> hs = new HashMap<String, Integer>();
-		
-		// All properties are relative to the total of all properties
-		hs.put("CompoundAssignment", _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT));
-		hs.put("FunctionDefinition", _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
-		hs.put("If", _configs.valInt(ConfigProperties.STMT_IF));
-		hs.put("OutputStatement", _configs.valInt(ConfigProperties.STMT_OUTPUTSTATEMENT));
-		hs.put("StatementsBlock", _configs.valInt(ConfigProperties.STMT_STATEMENTSBLOCK));
-		hs.put("Switch", _configs.valInt(ConfigProperties.STMT_SWITCH));
-		hs.put("VarDecleration", _configs.valInt(ConfigProperties.STMT_VARDECLERATION));
-		hs.put("Assignment", _configs.valInt(ConfigProperties.STMT_ASSIGNMENT));
-		hs.put("Expression", _configs.valInt(ConfigProperties.STMT_EXPRESSION));
+		hs.put(getMethod("createCompoundAssignment"), _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT));
+		hs.put(getMethod("createFunctionDefinition"), _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
+		hs.put(getMethod("createIf"), _configs.valInt(ConfigProperties.STMT_IF));
+		hs.put(getMethod("createOutputStatement"), _configs.valInt(ConfigProperties.STMT_OUTPUTSTATEMENT));
+		hs.put(getMethod("createStatementsBlock"), _configs.valInt(ConfigProperties.STMT_STATEMENTSBLOCK));
+		hs.put(getMethod("createSwitch"), _configs.valInt(ConfigProperties.STMT_SWITCH));
+		hs.put(getMethod("createVarDecleration"), _configs.valInt(ConfigProperties.STMT_VARDECLERATION));
+		hs.put(getMethod("createAssignment"), _configs.valInt(ConfigProperties.STMT_ASSIGNMENT));
+		hs.put(getMethod("createExpression"), _configs.valInt(ConfigProperties.STMT_EXPRESSION));
 				
 		if (context.isInFunction())
 		{
-			hs.put("Return", _configs.valInt(ConfigProperties.STMT_RETURN));
+			hs.put(getMethod("createReturn"), _configs.valInt(ConfigProperties.STMT_RETURN));
 		}
 		
 		// Is in loop
 		if (context.isInLoop())
 		{
-			hs.put("Break", _configs.valInt(ConfigProperties.STMT_BREAK));
-			hs.put("Continue", _configs.valInt(ConfigProperties.STMT_CONTINUE));
+			hs.put(getMethod("createBreak"), _configs.valInt(ConfigProperties.STMT_BREAK));
+			hs.put(getMethod("createContinue"), _configs.valInt(ConfigProperties.STMT_CONTINUE));
 		}
 		
 		// Lower the probability of nested loop
-		int p = _configs.valInt(ConfigProperties.NESTED_LOOPS_FACTOR); // TODO: mult p by loop depth (not saved today)
-		hs.put("ForEach", _configs.valInt(ConfigProperties.STMT_FOREACH)/p);
-		hs.put("While", _configs.valInt(ConfigProperties.STMT_WHILE)/p);
-		hs.put("DoWhile", _configs.valInt(ConfigProperties.STMT_DOWHILE)/p);
-		hs.put("For", _configs.valInt(ConfigProperties.STMT_FOR)/p);
-						
-		// Should never get here.
-		return StdRandom.choseFromProbList(hs);
+		int p = _configs.valInt(ConfigProperties.NESTED_LOOPS_FACTOR) * context.getLoopDepth();
+		
+		hs.put(getMethod("createForEach"), _configs.valInt(ConfigProperties.STMT_FOREACH)/p);
+		hs.put(getMethod("createWhile"), _configs.valInt(ConfigProperties.STMT_WHILE)/p);
+		hs.put(getMethod("createDoWhile"), _configs.valInt(ConfigProperties.STMT_DOWHILE)/p);
+		hs.put(getMethod("createFor"), _configs.valInt(ConfigProperties.STMT_FOR)/p);
+		
+		// randomly choose statement
+		Method createMethod = StdRandom.choseFromProbList(hs);
+		
+		return (AbsStatement) applyMethod(createMethod, context);
 	}
 	
-	private AbsStatement generateStatement(Context context)
-	{
-		String stmtType = getRndStatementType(context);
-		AbsStatement retStmt;
-		
-		switch(stmtType)
-		{
-			case "CompoundAssignment": retStmt = createCompoundAssignment(context); break;
-			case "FunctionDefinition": retStmt = createFunctionDefinition(context); break;
-			case "If": retStmt = createIf(context); break;
-			case "StatementsBlock": retStmt = createStatementsBlock(context); break;
-			case "Switch": retStmt = createSwitch(context); break;
-			case "VarDecleration": retStmt = createVarDecleration(context); break;
-			case "Break": retStmt = createBreak(context); break;
-			case "Continue": retStmt = createContinue(context); break;
-			case "Return": retStmt = createReturn(context); break;
-			case "ForEach": retStmt = createForEach(context); break;
-			case "While": retStmt = createWhile(context); break;
-			case "DoWhile": retStmt = createDoWhile(context); break;
-			case "For": retStmt = createFor(context); break;
-			case "Assignment": retStmt = createAssignment(context); break;
-			
-			case "Expression": retStmt = generateExpression(context); break;
-			//case "stmt_OutputStatement": retStmt = createOu; break;
-			
-			// Should not happend
-			default: retStmt=null;
-		}
-		
-		return retStmt;
-	}
-	
+	/**
+	 * This is an initial and non complex solution
+	 * Get all probabilities from the config and chose randomly with respect to their relations
+	 * @return
+	 */
 	private AbsExpression generateExpression(Context context)
 	{
-		String exprType = getRndExpressionType();
-		AbsExpression retExpr;
+		HashMap<Method, Integer> hs = new HashMap<Method, Integer>();
 		
-		switch(exprType)
-		{
-			case "expr_UnaryOp": retExpr = createUnaryOp(context); break;
-			case "expr_BinaryOp": retExpr = createBinaryOp(context); break;
-			case "expr_TrinaryOp": retExpr = createTrinaryOp(context); break;
-			case "expr_ArrayExpression": retExpr = createArrayExpression(context); break;
-			case "expr_Call": retExpr = createCall(context); break;
-			case "expr_MemberExpression": retExpr = createMemberExpression(context); break;
-			case "expr_This": retExpr = createThis(context); break;
-			case "expr_Literal": retExpr = createLiteral(context); break;
-			case "expr_ObjectExpression": retExpr = createObjectExpression(context); break;
-			case "expr_FunctionExpression": retExpr = createFunctionExpression(context); break;
-			
-			case "expr_Identifier":
-				retExpr  = createIdentifier(context, 1); // 1 = always use defined var
-				break;
-				
-			// Should not get to this
-			default: retExpr = new This();		
-		}
+		// All properties are relative to the total of all properties
+		hs.put(getMethod("createUnaryOp"), _configs.valInt(ConfigProperties.EXPR_UNARYOP));
+		hs.put(getMethod("createBinaryOp"), _configs.valInt(ConfigProperties.EXPR_BINARYOP));
+		hs.put(getMethod("createTrinaryOp"), _configs.valInt(ConfigProperties.EXPR_TRINARYOP));
+		hs.put(getMethod("createArrayExpression"), _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION));
+		hs.put(getMethod("createCall"), _configs.valInt(ConfigProperties.EXPR_CALL));
 		
-		return retExpr;
+		hs.put(getMethod("createIdentifier"), _configs.valInt(ConfigProperties.EXPR_IDENTIFIER));
+		hs.put(getMethod("createLiteral"), _configs.valInt(ConfigProperties.EXPR_LITERAL));
+		hs.put(getMethod("createMemberExpression"), _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION));
+		hs.put(getMethod("createThis"), _configs.valInt(ConfigProperties.EXPR_THIS));
+		hs.put(getMethod("createObjectExpression"), _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION));
+		hs.put(getMethod("createFunctionExpression"), _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION));
+
+		// randomly choose expression
+		Method createMethod = StdRandom.choseFromProbList(hs);
+		
+		return (AbsExpression) applyMethod(createMethod, context); // TODO: createIdentifier has 2 args!
 	}
 	
 	// ===============================================================================	
