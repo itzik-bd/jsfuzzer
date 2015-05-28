@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
+import Generator.Config.ConfigProperties;
+import Generator.SymTable.SymEntry;
 import Generator.SymTable.SymEntryType;
 import Generator.Config.ConfigProperties;
 import Generator.Config.Configs;
@@ -21,15 +23,19 @@ import JST.Interfaces.Caseable;
 public class Generator
 {	
 	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
+<<<<<<< HEAD
 	private Configs _configs;
+=======
+	private Properties _configs;
+	private Context _rootContext = new Context(); // global scope
+>>>>>>> vardeclerator in generator
 	
 	public static Program generate(Configs configs)
 	{
 		Generator gen = new Generator(configs);
-		Context context = new Context(); // global scope
 		
 		// generate program
-		Program prog = gen.createProgram(context);
+		Program prog = gen.createProgram();
 		
 		return prog;
 	}
@@ -171,12 +177,12 @@ public class Generator
 	
 	// ===============================================================================	
 	
-	private Program createProgram(Context context)
+	private Program createProgram()
 	{
 		Program prog = new Program();
 		AbsStatement stmt;
 		
-		while ((stmt = generateStatement(context)) != null)
+		while ((stmt = generateStatement(_rootContext)) != null)
 		{
 			prog.addStatement(stmt);
 		}
@@ -314,15 +320,33 @@ public class Generator
 		return null;
 	}
 
-	private VarDecleration createVarDecleration(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private VarDecleration createVarDecleration(Context context)
+	{
+		int decleratorsNum = Math.ceil(StdRandom.exp());
+		VarDecleration varDecleration = new VarDecleration();
+		
+		for (int i=0; i<decleratorsNum ; i++)
+		{
+			varDecleration.addDeclerator(createVarDeclerator(context));
+		}
+		
+		return varDecleration;
 	}
 
-	private VarDeclerator createVarDeclerator(Context context) {
-		// TODO Auto-generated method stub
-		// This is currently not generated in any place
-		return null;
+	private VarDeclerator createVarDeclerator(Context context)
+	{
+		Identifier id;
+		
+		// check if the identifier is defined in the current scope
+		do
+		{
+			Identifier id = createIdentifier(context, _configs.valInt(ConfigProperties.VAR_DECL_NUM_LAMBDA_EXP));	
+		} while (context.getSymTable().contains(id));
+		
+		// add identifier to current scope
+		context.getSymTable().newEntry(id, SymEntryType.VAR);
+		
+		return new VarDeclerator(id, generateExpression(context));
 	}
 
 	private Continue createContinue(Context context)
@@ -361,14 +385,28 @@ public class Generator
 		return block;
 	}
 
+	/*
+	 * This function draws an identifier to be assigned.
+	 * Currently we are allowing the identifier not to be defined in higher scopes,
+	 * which in such case it will be defined in the root scope.
+	 * 
+	 * TODO: think if this behavior is sound for future analysis. 
+	 */
 	private Assignment createAssignment(Context context) 
 	{
 		double useExistingVarProb = Double.parseDouble(_configs.getProperty("assignment_use_existing_var_bernoully_p"));
 		
-		Identifier var = createIdentifier(context, useExistingVarProb);
+		Identifier id = createIdentifier(context, useExistingVarProb);
 		AbsExpression expr = generateExpression(context);
 		
-		return new Assignment(var, expr);
+		// make sure identifier is defined (if not add it to top level scope)
+		SymEntry entry = context.getSymTable().lookup(id);
+		if (entry == null)
+		{
+			_rootContext.getSymTable().newEntry(id, SymEntryType.VAR);
+		}
+		
+		return new Assignment(id, expr);
 	}
 
 	private CompoundAssignment createCompoundAssignment(Context context)

@@ -33,7 +33,7 @@ public class SymTable
 			_entriesFunc.put(id, new SymEntry(id, type));
 	}
 	
-	/* Check if the identifier is defined in the current symbol table only! */
+	/** Check if the identifier is defined in the current symbol table only! */
 	public boolean contains(Identifier id)
 	{
 		return (_entriesVar.containsKey(id) || _entriesFunc.containsKey(id));

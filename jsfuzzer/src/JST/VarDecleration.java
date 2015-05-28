@@ -14,16 +14,11 @@ public class VarDecleration extends AbsStatement
 		_decleratorList = new LinkedList<VarDeclerator>();
 	}
 
-	public void addDeclerator(Identifier id, AbsExpression expr)
+	public void addDeclerator(VarDeclerator varDeclerator)
 	{
-		_decleratorList.add(new VarDeclerator(id, expr));
+		_decleratorList.add(varDeclerator);
 	}
 
-	public void addDeclerator(Identifier id)
-	{
-		addDeclerator(id, null);
-	}
-	
 	public List<VarDeclerator> getDecleratorList()
 	{
 		return _decleratorList;
