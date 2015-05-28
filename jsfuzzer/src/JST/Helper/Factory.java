@@ -9,14 +9,12 @@ import JST.Enums.LiteralTypes;
 
 public class Factory
 {
-	private Map<String, JSTNode> _constantNodes;
-	private Map<String, JSTNode> _literalNodes;
-	private Map<String, Identifier> _identifierNodes;
+	private Map<String, JSTNode> _constantNodes = new HashMap<String, JSTNode>();
+	private Map<String, JSTNode> _literalNodes = new HashMap<String, JSTNode>();
+	private Map<String, Identifier> _identifierNodes = new HashMap<String, Identifier>();
 	
 	public Factory()
-	{
-		_constantNodes = new HashMap<String, JSTNode>();
-		
+	{		
 		// constant nodes
 		_constantNodes.put("break", new JST.Break());
 		_constantNodes.put("continue", new JST.Continue());
@@ -28,8 +26,7 @@ public class Factory
 		{
 			if (type.isSingleValue())
 			{
-				assert(type.getToken() != null);
-				//_literalNodes.put(type.getToken(), new Literal(type));
+				_literalNodes.put(type.getToken(), new JST.Literal(type));
 			}
 		}
 	}
