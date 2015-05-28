@@ -13,7 +13,6 @@ import JST.Enums.CompoundOps;
 import JST.Enums.LiteralTypes;
 import JST.Enums.TrinaryOps;
 import JST.Enums.UnaryOps;
-import JST.Helper.Rand;
 import JST.Helper.StdRandom;
 
 public class Generator
@@ -60,7 +59,7 @@ public class Generator
 		hs.put("FunctionExpression", Integer.parseInt(_configs.getProperty("expr_FunctionExpression")));
 
 		// randomly chose from values
-		return Rand.choseFromProbList(hs);
+		return StdRandom.choseFromProbList(hs);
 	}
 
 	public String getRndStatementType(Context context)
@@ -76,6 +75,7 @@ public class Generator
 		hs.put("Switch", Integer.parseInt(_configs.getProperty("stmt_Switch")));
 		hs.put("VarDecleration", Integer.parseInt(_configs.getProperty("stmt_VarDecleration")));
 		hs.put("Assignment", Integer.parseInt(_configs.getProperty("stmt_Assignment")));
+		hs.put("Expression", Integer.parseInt(_configs.getProperty("stmt_Expression")));
 				
 		// Is in loop
 		if (context.isInWhileLoop())
@@ -100,7 +100,7 @@ public class Generator
 		}
 						
 		// Sould never get here.
-		return Rand.choseFromProbList(hs);
+		return StdRandom.choseFromProbList(hs);
 	}
 	
 	private AbsStatement generateStatement(Context context)
@@ -124,6 +124,8 @@ public class Generator
 			case "DoWhile": retStmt = createDoWhile(context); break;
 			case "For": retStmt = createFor(context); break;
 			case "Assignment": retStmt = createAssignment(context); break;
+			
+			case "Expression": retStmt = generateExpression(context); break;
 			//case "stmt_OutputStatement": retStmt = createOu; break;
 			
 			// Should not happend
@@ -184,7 +186,7 @@ public class Generator
 		StatementsBlock trueOp = createStatementsBlock(context);
 		
 		// decide whether to have an "else" operation
-		if (Rand.getBoolean())
+		if (StdRandom.bernoulli())
 		{
 			StatementsBlock falseOp = createStatementsBlock(context);
 			return new If(conditionExp, trueOp, falseOp);
@@ -216,9 +218,19 @@ public class Generator
 		return null;
 	}
 
-	private ForEach createForEach(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private ForEach createForEach(Context context) 
+	{
+		// Temporary solution (could also be a var decleration)
+		Identifier id = createIdentifier(context, 1);
+		
+		// Temporary solution (could also be any existing iteratable var)
+		ArrayExpression arr = createArrayExpression(context);
+		
+		// Generate StatementsBlock
+		Context newCont = new Context(context, true);
+		StatementsBlock stmtsBlock = createStatementsBlock(newCont);
+		
+		return (new ForEach(id, arr, stmtsBlock));
 	}
 
 	private Switch createSwitch(Context context)
@@ -287,7 +299,8 @@ public class Generator
 		return new CaseBlock(cases, stmts);
 	}
 
-	private FunctionDefinition createFunctionDefinition(Context context) {
+	private FunctionDefinition createFunctionDefinition(Context context) 
+	{
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -384,7 +397,7 @@ public class Generator
 		//TODO: test length parameter
 		int p = Integer.parseInt(_configs.getProperty("array_length_parameter"));
 		
-		long length = Math.round(Rand.getExponential(p));
+		long length = Math.round(StdRandom.exp(p));
 		
 		// TODO: finish construction
 		//for (long i=0;)
@@ -456,8 +469,21 @@ public class Generator
 
 	private LiteralString createLiteralString(Context context) 
 	{
-		// TODO Auto-generated method stub
-		return null;
+		double lambda = Double.parseDouble(_configs.getProperty("literal_string_lambda"));
+		int maxLength = Integer.parseInt(_configs.getProperty("literal_string_max_length"));
+		StringBuilder strBld = new StringBuilder();
+		
+		// Randomize string's length
+		int length = (int) Math.round(StdRandom.exp(lambda));
+		if (length > maxLength)
+			length = maxLength;
+		
+		for (int i=0 ; i < length ; i++)
+		{
+			strBld.append((char) StdRandom.uniform(128));
+		}
+		
+		return (new LiteralString(strBld.toString()));
 	}
 
 	private LiteralNumber createLiteralNumber(Context  context) 

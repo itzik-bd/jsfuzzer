@@ -1,6 +1,6 @@
 package JST.Enums;
 
-import JST.Helper.Rand;
+import JST.Helper.*;
 
 public enum BinaryOps {
 
@@ -61,6 +61,6 @@ public enum BinaryOps {
 	{
 		BinaryOps[] values = values();
 		 
-		return values[Rand.getUniform(values.length)];
+		return values[StdRandom.uniform(values.length)];
 	}
 }

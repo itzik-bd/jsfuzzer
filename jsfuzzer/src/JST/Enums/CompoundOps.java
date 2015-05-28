@@ -1,6 +1,6 @@
 package JST.Enums;
 
-import JST.Helper.Rand;
+import JST.Helper.*;
 
 public enum CompoundOps
 {
@@ -45,6 +45,6 @@ public enum CompoundOps
 	{
 		CompoundOps[] values = values();
 		 
-		return values[Rand.getUniform(values.length)];
+		return values[StdRandom.uniform(values.length)];
 	}
 }

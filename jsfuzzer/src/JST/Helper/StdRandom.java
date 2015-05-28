@@ -47,6 +47,7 @@ package JST.Helper;
  *
  *************************************************************************/
 
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -349,4 +350,27 @@ public final class StdRandom {
             a[r] = temp;
         }
     }
+
+	//Get probs and chose rendomly with respect to their relations
+	public static String choseFromProbList(HashMap<String,Integer> hs)
+	{
+		// randomlly get a value in range 0-sumOfProps
+		int max=0;
+		for (Integer val : hs.values())
+			max +=  val;
+		int r = uniform(max);
+		
+		// Return the chosen value
+		int sum = 0;
+		for (String exprName : hs.keySet())
+		{
+			sum += hs.get(exprName);
+			
+			if (sum > r)
+				return exprName;
+		}
+		
+		// Should never get here
+		return null;
+	}
 }
