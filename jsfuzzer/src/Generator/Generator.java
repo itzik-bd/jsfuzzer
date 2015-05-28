@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Properties;
 
 import Generator.SymTable.SymEntryType;
+import Generator.Config.ConfigProperties;
+import Generator.Config.Configs;
 import JST.*;
 import JST.VarDecleration.VarDeclerator;
 import JST.Enums.BinaryOps;
@@ -14,13 +16,14 @@ import JST.Enums.LiteralTypes;
 import JST.Enums.TrinaryOps;
 import JST.Enums.UnaryOps;
 import JST.Helper.StdRandom;
+import JST.Interfaces.Caseable;
 
 public class Generator
 {	
 	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
-	private Properties _configs;
+	private Configs _configs;
 	
-	public static Program generate(Properties configs)
+	public static Program generate(Configs configs)
 	{
 		Generator gen = new Generator(configs);
 		Context context = new Context(); // global scope
@@ -31,7 +34,7 @@ public class Generator
 		return prog;
 	}
 	
-	public Generator(Properties configs)
+	public Generator(Configs configs)
 	{
 		_configs = configs;
 	}
@@ -46,11 +49,12 @@ public class Generator
 		HashMap<String, Integer> hs = new HashMap<String, Integer>();
 		
 		// All properties are relative to the total of all properties
-		hs.put("UnaryOp", Integer.parseInt(_configs.getProperty("expr_UnaryOp")));
-		hs.put("BinaryOp", Integer.parseInt(_configs.getProperty("expr_BinaryOp")));
-		hs.put("TrinaryOp", Integer.parseInt(_configs.getProperty("expr_TrinaryOp")));
-		hs.put("ArrayExpression", Integer.parseInt(_configs.getProperty("expr_ArrayExpression")));
-		hs.put("Call", Integer.parseInt(_configs.getProperty("expr_Call")));
+		hs.put("UnaryOp", _configs.valInt(ConfigProperties.EXPR_UNARYOP));
+		hs.put("BinaryOp", _configs.valInt(ConfigProperties.EXPR_BINARYOP));
+		hs.put("TrinaryOp", _configs.valInt(ConfigProperties.EXPR_TRINARYOP));
+		hs.put("ArrayExpression", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION));
+		hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL));
+		
 		hs.put("Identifier", Integer.parseInt(_configs.getProperty("expr_Identifier")));
 		hs.put("Literal", Integer.parseInt(_configs.getProperty("expr_Literal")));
 		hs.put("MemberExpression", Integer.parseInt(_configs.getProperty("expr_MemberExpression")));
@@ -271,17 +275,17 @@ public class Generator
 		int stddev = Integer.parseInt(_configs.getProperty("cases_num_normal_stddev"));
 		int casesNum = (int) StdRandom.gaussian(exp, stddev);
 		
-		
 		//TODO : maybe 0 cases
 		//in case we got zero or less cases
 		casesNum = (casesNum > 0) ? casesNum : 1; 
 				
-		List<AbsExpression> cases = new LinkedList<AbsExpression>();
+		List<Caseable> cases = new LinkedList<Caseable>();
 		for(int i = 0; i < casesNum; i++)
-			cases.add(generateExpression(context));
+			cases.add(createCase(context));
 		
+		//TODO how do we check that "default" was not generated randomlly?
 		if(includeDefault)
-			cases.add(new LiteralString("default"));
+			cases.add((Default)_factoryJST.getConstantNode("default"));
 		
 		/***** generate statements *****/
 		exp = Integer.parseInt(_configs.getProperty("case_block_stmts_num_normal_exp"));
@@ -297,6 +301,11 @@ public class Generator
 			stmts.add(generateStatement(context));
 		
 		return new CaseBlock(cases, stmts);
+	}
+	
+	private Case createCase(Context context)
+	{
+		return new Case(generateExpression(context));
 	}
 
 	private FunctionDefinition createFunctionDefinition(Context context) 
