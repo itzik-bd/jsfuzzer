@@ -5,6 +5,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import Generator.Config.*;
 import Generator.SymTable.*;
@@ -16,13 +17,20 @@ import JST.Interfaces.Caseable;
 @SuppressWarnings("unused")
 public class Generator
 {	
-	private JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
-	private Configs _configs;
-	private Context _rootContext = new Context(); // global scope
+	private final JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
+	private final Configs _configs;
 	
-	public static Program generate(Configs configs)
+	private final Program _program = new Program(); // generated program instance
+	private final Context _rootContext = new Context(); // global scope
+	
+	private final boolean _verbose;
+	private int _depth = 0;
+	
+	public static Program generate(Configs configs, boolean verbose)
 	{
-		Generator gen = new Generator(configs);
+		Generator gen = new Generator(configs, verbose);
+		
+		StdRandom.setSeed(1436423645); // TODO: remove set seed after development
 		
 		// generate program
 		Program prog = gen.createProgram();
@@ -30,34 +38,78 @@ public class Generator
 		return prog;
 	}
 	
-	public Generator(Configs configs)
+	public Generator(Configs configs, boolean verbose)
 	{
 		_configs = configs;
+		_verbose = verbose;
 	}
 	
-	private Method getMethod(String methodName)
-	{
-		Class<?>[] sig = { Context.class };
-		try {
-			return Generator.class.getMethod(methodName, sig);
-		} catch (NoSuchMethodException | SecurityException e) {
-			return null;
-		}
-	}
+	// ===============================================================================
 	
-	private Object applyMethod(Method method, Context context)
-	{
-		try {
-			return method.invoke(this, context);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+	private void traceIn(String str)
+	{	
+		if (_verbose)
+		{
+			StringBuffer s = new StringBuffer();
+			
+			s.append(String.format("%5d", _depth));
+			for (int i=0; i<_depth ; i++)
+				s.append(" ");
+			s.append(str);
+			System.out.println(s);
 		}
 		
-		return null;
+		_depth++;
+	}
+	
+	private void traceOut()
+	{
+		_depth--;
+	}
+	
+	private JSTNode applyMethod(String methodName, Context context)
+	{
+		JSTNode node;
+
+		switch (methodName)
+		{
+		case "ForEach": node = createForEach(context); break;
+		case "Switch": node = createSwitch(context); break;
+		case "For": node = createFor(context); break;
+		case "If": node = createIf(context); break;
+		case "DoWhile": node = createDoWhile(context); break;
+		case "Case": node = createCase(context); break;
+		case "While": node = createWhile(context); break;
+		case "Break": node = createBreak(context); break;
+		case "Return": node = createReturn(context); break;
+		case "Call": node = createCall(context); break;
+		case "This": node = createThis(context); break;
+		case "UnaryOp": node = createUnaryOp(context); break;
+		case "Literal": node = createLiteral(context); break;
+		case "CaseBlock": node = createCaseBlock(context); break;
+		case "FunctionDefinition": node = createFunctionDefinition(context); break;
+		case "Continue": node = createContinue(context); break;
+		case "ArrayExpression": node = createArrayExpression(context); break;
+		case "Identifier": node = createIdentifier(context); break;
+		case "VarDeclerator": node = createVarDeclerator(context); break;
+		case "Assignment": node = createAssignment(context); break;
+		case "StatementsBlock": node = createStatementsBlock(context); break;
+		case "FunctionExpression": node = createFunctionExpression(context); break;
+		case "MemberExpression": node = createMemberExpression(context); break;
+		case "CompoundAssignment": node = createCompoundAssignment(context); break;
+		case "ObjectExpression": node = createObjectExpression(context); break;
+		case "VarDecleration":node = createVarDecleration(context); break;
+		case "LiteralNumber": node = createLiteralNumber(context); break;
+		case "TrinaryOp": node = createTrinaryOp(context); break;
+		case "BinaryOp": node = createBinaryOp(context); break;
+		case "LiteralString": node = createLiteralString(context); break;
+		
+		case "Expression": node = generateExpression(context); break;
+		
+		default: throw new IllegalArgumentException("JSTnode '"+methodName+"'was not found");
+		}
+		
+		return node;
 	}
 	
 	/**
@@ -67,41 +119,41 @@ public class Generator
 	 */
 	private AbsStatement generateStatement(Context context)
 	{
-		HashMap<Method, Integer> hs = new HashMap<Method, Integer>();
+		HashMap<String, Integer> hs = new HashMap<String, Integer>();
 		
 		// All properties are relative to the total of all properties
-		hs.put(getMethod("createCompoundAssignment"), _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT));
-		hs.put(getMethod("createFunctionDefinition"), _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
-		hs.put(getMethod("createIf"), _configs.valInt(ConfigProperties.STMT_IF));
-		hs.put(getMethod("createOutputStatement"), _configs.valInt(ConfigProperties.STMT_OUTPUTSTATEMENT));
-		hs.put(getMethod("createStatementsBlock"), _configs.valInt(ConfigProperties.STMT_STATEMENTSBLOCK));
-		hs.put(getMethod("createSwitch"), _configs.valInt(ConfigProperties.STMT_SWITCH));
-		hs.put(getMethod("createVarDecleration"), _configs.valInt(ConfigProperties.STMT_VARDECLERATION));
-		hs.put(getMethod("createAssignment"), _configs.valInt(ConfigProperties.STMT_ASSIGNMENT));
-		hs.put(getMethod("createExpression"), _configs.valInt(ConfigProperties.STMT_EXPRESSION));
+		hs.put("CompoundAssignment", _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT));
+		//hs.put("FunctionDefinition", _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
+		hs.put("If", _configs.valInt(ConfigProperties.STMT_IF));
+		//hs.put("OutputStatement", _configs.valInt(ConfigProperties.STMT_OUTPUTSTATEMENT));
+		hs.put("StatementsBlock", _configs.valInt(ConfigProperties.STMT_STATEMENTSBLOCK));
+		hs.put("Switch", _configs.valInt(ConfigProperties.STMT_SWITCH));
+		hs.put("VarDecleration", _configs.valInt(ConfigProperties.STMT_VARDECLERATION));
+		hs.put("Assignment", _configs.valInt(ConfigProperties.STMT_ASSIGNMENT));
+		hs.put("Expression", _configs.valInt(ConfigProperties.STMT_EXPRESSION));
 				
 		if (context.isInFunction())
 		{
-			hs.put(getMethod("createReturn"), _configs.valInt(ConfigProperties.STMT_RETURN));
+			hs.put("Return", _configs.valInt(ConfigProperties.STMT_RETURN));
 		}
 		
 		// Is in loop
 		if (context.isInLoop())
 		{
-			hs.put(getMethod("createBreak"), _configs.valInt(ConfigProperties.STMT_BREAK));
-			hs.put(getMethod("createContinue"), _configs.valInt(ConfigProperties.STMT_CONTINUE));
+			hs.put("Break", _configs.valInt(ConfigProperties.STMT_BREAK));
+			hs.put("Continue", _configs.valInt(ConfigProperties.STMT_CONTINUE));
 		}
 		
 		// Lower the probability of nested loop
-		int p = _configs.valInt(ConfigProperties.NESTED_LOOPS_FACTOR) * context.getLoopDepth();
+		int p = _configs.valInt(ConfigProperties.NESTED_LOOPS_FACTOR) * (context.getLoopDepth()+1); // depth must starts from 1 (not 0)
 		
-		hs.put(getMethod("createForEach"), _configs.valInt(ConfigProperties.STMT_FOREACH)/p);
-		hs.put(getMethod("createWhile"), _configs.valInt(ConfigProperties.STMT_WHILE)/p);
-		hs.put(getMethod("createDoWhile"), _configs.valInt(ConfigProperties.STMT_DOWHILE)/p);
-		hs.put(getMethod("createFor"), _configs.valInt(ConfigProperties.STMT_FOR)/p);
+		hs.put("ForEach", _configs.valInt(ConfigProperties.STMT_FOREACH)/p);
+		hs.put("While", _configs.valInt(ConfigProperties.STMT_WHILE)/p);
+		hs.put("DoWhile", _configs.valInt(ConfigProperties.STMT_DOWHILE)/p);
+		//hs.put("For", _configs.valInt(ConfigProperties.STMT_FOR)/p);
 		
 		// randomly choose statement
-		Method createMethod = StdRandom.choseFromProbList(hs);
+		String createMethod = StdRandom.choseFromProbList(hs);
 		
 		return (AbsStatement) applyMethod(createMethod, context);
 	}
@@ -113,45 +165,55 @@ public class Generator
 	 */
 	private AbsExpression generateExpression(Context context)
 	{
-		HashMap<Method, Integer> hs = new HashMap<Method, Integer>();
+		HashMap<String, Double> hs = new HashMap<String, Double>();
 		
-		// All properties are relative to the total of all properties
-		hs.put(getMethod("createUnaryOp"), _configs.valInt(ConfigProperties.EXPR_UNARYOP));
-		hs.put(getMethod("createBinaryOp"), _configs.valInt(ConfigProperties.EXPR_BINARYOP));
-		hs.put(getMethod("createTrinaryOp"), _configs.valInt(ConfigProperties.EXPR_TRINARYOP));
-		hs.put(getMethod("createArrayExpression"), _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION));
-		hs.put(getMethod("createCall"), _configs.valInt(ConfigProperties.EXPR_CALL));
+		double factorDepth = Math.pow(_configs.valDouble(ConfigProperties.FACTOR_DEPTH), _depth);
 		
-		hs.put(getMethod("createIdentifier"), _configs.valInt(ConfigProperties.EXPR_IDENTIFIER));
-		hs.put(getMethod("createLiteral"), _configs.valInt(ConfigProperties.EXPR_LITERAL));
-		hs.put(getMethod("createMemberExpression"), _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION));
-		hs.put(getMethod("createThis"), _configs.valInt(ConfigProperties.EXPR_THIS));
-		hs.put(getMethod("createObjectExpression"), _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION));
-		hs.put(getMethod("createFunctionExpression"), _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION));
+		// leafs - probability increase as depth grows
+		hs.put("Identifier", _configs.valInt(ConfigProperties.EXPR_IDENTIFIER)/factorDepth);
+		hs.put("Literal", _configs.valInt(ConfigProperties.EXPR_LITERAL)/factorDepth);
+		hs.put("This", _configs.valInt(ConfigProperties.EXPR_THIS)/factorDepth);
+		
+		// non-leafs - probability decrease as depth grows
+		hs.put("UnaryOp", _configs.valInt(ConfigProperties.EXPR_UNARYOP)*factorDepth);
+		hs.put("BinaryOp", _configs.valInt(ConfigProperties.EXPR_BINARYOP)*factorDepth);
+		hs.put("TrinaryOp", _configs.valInt(ConfigProperties.EXPR_TRINARYOP)*factorDepth);
+		
+		//hs.put("ArrayExpression", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
+		//hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
+		//hs.put("MemberExpression", _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
+		//hs.put("ObjectExpression", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
+		//hs.put("FunctionExpression", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);
 
 		// randomly choose expression
-		Method createMethod = StdRandom.choseFromProbList(hs);
+		String createMethod = StdRandom.choseFromProbList(hs);
 		
-		return (AbsExpression) applyMethod(createMethod, context); // TODO: createIdentifier has 2 args!
+		return (AbsExpression) applyMethod(createMethod, context);
 	}
 	
 	// ===============================================================================	
 	
 	private Program createProgram()
 	{
-		Program prog = new Program();
-		AbsStatement stmt;
+		traceIn("Program");
 		
-		while ((stmt = generateStatement(_rootContext)) != null)
-		{
-			prog.addStatement(stmt);
-		}
+		// choose how many statements the program will have
+		// actually, the actual number may be a bit greater (statements may added during runtime)
+		double lambda = _configs.valDouble(ConfigProperties.PROGRAM_SIZE_LAMBDA);
+		int size = (int) Math.ceil(StdRandom.exp(lambda));
 		
-		return prog;
+		for (int i=0 ; i<size ; i++)
+			_program.addStatement(generateStatement(_rootContext));
+		
+		traceOut();
+		return _program;
 	}
 
 	private If createIf(Context context)
 	{
+		traceIn("If");
+		
+		If ifStmt;
 		AbsExpression conditionExp = generateExpression(context);
 		StatementsBlock trueOp = createStatementsBlock(context);
 		
@@ -159,28 +221,43 @@ public class Generator
 		if (StdRandom.bernoulli())
 		{
 			StatementsBlock falseOp = createStatementsBlock(context);
-			return new If(conditionExp, trueOp, falseOp);
+			ifStmt = new If(conditionExp, trueOp, falseOp);
 		}
 		
-		return new If(conditionExp, trueOp);
+		ifStmt = new If(conditionExp, trueOp);
+		
+		traceOut();
+		return ifStmt;
 	}
 
 	private While createWhile(Context context)
 	{
+		traceIn("While");
+		While whileStmt;
+		
 		// TODO: add an if to make sure the loop stops
 		AbsExpression conditionExp = generateExpression(context);
 		StatementsBlock op = createStatementsBlock(context);
 		
-		return new While(conditionExp, op);
+		whileStmt = new While(conditionExp, op);
+		
+		traceOut();
+		return whileStmt;
 	}
 
 	private DoWhile createDoWhile(Context context)
 	{
+		traceIn("DoWhile");
+		DoWhile doWhileStmt;
+		
 		// TODO: add an if to make sure the loop stops
 		AbsExpression conditionExp = generateExpression(context);
 		StatementsBlock op = createStatementsBlock(context);
 		
-		return new DoWhile(conditionExp, op);
+		doWhileStmt = new DoWhile(conditionExp, op);
+		
+		traceOut();
+		return doWhileStmt;
 	}
 
 	private For createFor(Context context) {
@@ -190,24 +267,34 @@ public class Generator
 
 	private ForEach createForEach(Context context) 
 	{
+		traceIn("ForEach");
+		ForEach forEachStmt;
+		
 		// Temporary solution (could also be a var decleration)
-		Identifier id = createIdentifier(context, 1);
+		context.identifierUseExistingVarProb = 1;
+		Identifier id = createIdentifier(context);
 		
 		// Temporary solution (could also be any existing iteratable var)
 		ArrayExpression arr = createArrayExpression(context);
 		
 		// Generate StatementsBlock
 		Context newCont = new Context(context, true, null);
-		StatementsBlock stmtsBlock = createStatementsBlock(newCont);
+		StatementsBlock stmtsBlock = createStatementsBlock(newCont); // TODO: make sure all createStatementsBlock get new context!!!!
 		
-		return (new ForEach(id, arr, stmtsBlock));
+		forEachStmt = new ForEach(id, arr, stmtsBlock);
+		
+		traceOut();
+		return forEachStmt;
 	}
 
 	private Switch createSwitch(Context context)
 	{
+		traceIn("Switch");
+		Switch switchStmt;
+		
 		//TODO: we may want expr to be an identifier with high prob.
 		AbsExpression expr = generateExpression(context);
-		Switch switchStmt = new Switch(expr);
+		switchStmt = new Switch(expr);
 		
 		int exp = _configs.valInt(ConfigProperties.CASES_BLOCKS_NUM_NORMAL_EXP);
 		int stddev = _configs.valInt(ConfigProperties.CASES_BLOCKS_NUM_NORMAL_STDDEV);
@@ -223,19 +310,24 @@ public class Generator
 			{
 				if(StdRandom.bernoulli(defaultProb))
 				{
-					includeDefault = true;
-					switchStmt.addCaseOp(createCaseBlock(context, includeDefault));
+					context.caseBlockIncludeDefault = true;
+					switchStmt.addCaseOp(createCaseBlock(context));
 				}
 			}
 			
-			switchStmt.addCaseOp(createCaseBlock(context, false));			
+			context.caseBlockIncludeDefault = false;
+			switchStmt.addCaseOp(createCaseBlock(context));			
 		}
 		
+		traceOut();
 		return switchStmt;
 	}
 
-	private CaseBlock createCaseBlock(Context context, boolean includeDefault)
+	private CaseBlock createCaseBlock(Context context)
 	{
+		traceIn("CaseBlock");
+		CaseBlock caseBlock;
+		
 		/***** generate cases *****/
 		int exp = _configs.valInt(ConfigProperties.CASE_NUM_NORMAL_EXP);
 		int stddev = _configs.valInt(ConfigProperties.CASES_NUM_NORMAL_STDDEV);
@@ -249,27 +341,25 @@ public class Generator
 		for(int i = 0; i < casesNum; i++)
 			cases.add(createCase(context));
 
-		if(includeDefault)
+		if(context.caseBlockIncludeDefault)
 			cases.add((Default)_factoryJST.getConstantNode("default"));
 		
-		/***** generate statements *****/
-		exp = _configs.valInt(ConfigProperties.CASE_BLOCK_STMTS_NUM_NORMAL_EXP);
-		stddev = _configs.valInt(ConfigProperties.CASE_BLOCK_STMTS_NUM_NORMAL_STDDEV);
-		int stmtsNum = (int) StdRandom.gaussian(exp, stddev);
-
-		//in case we got negative number of stmts
-		stmtsNum = Math.max(stmtsNum, 0); 
+		// generate operation - statement block
+		StatementsBlock stmtBlock = createStatementsBlock(context);
 		
-		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
-		for(int i = 0; i < stmtsNum; i++)
-			stmts.add(generateStatement(context));
+		caseBlock = new CaseBlock(cases, stmtBlock);
 		
-		return new CaseBlock(cases, stmts);
+		traceOut();
+		return caseBlock;
 	}
 	
 	private Case createCase(Context context)
 	{
-		return new Case(generateExpression(context));
+		traceIn("Case");
+		Case caseObj = new Case(generateExpression(context));
+		
+		traceOut();
+		return caseObj;
 	}
 
 	private FunctionDefinition createFunctionDefinition(Context context) 
@@ -280,68 +370,109 @@ public class Generator
 
 	private VarDecleration createVarDecleration(Context context)
 	{
+		traceIn("VarDecleration");
+		VarDecleration varDecleration;
+		
 		double lambda = _configs.valDouble(ConfigProperties.VAR_DECL_NUM_LAMBDA_EXP);
 		int decleratorsNum = (int) Math.ceil(StdRandom.exp(lambda));
-		VarDecleration varDecleration = new VarDecleration();
+		varDecleration = new VarDecleration();
 		
 		for (int i=0; i<decleratorsNum ; i++)
 		{
 			varDecleration.addDeclerator(createVarDeclerator(context));
 		}
 		
+		traceOut();
 		return varDecleration;
 	}
 
 	private VarDeclerator createVarDeclerator(Context context)
 	{
+		traceIn("VarDeclerator");
+		VarDeclerator varDeclerator;
+		
 		Identifier id;
+		
+		// decide on probability if define new var
+		if (context.varDecleratorForceNewIdentifier)
+			context.identifierUseExistingVarProb = 0;
+		else
+			context.identifierUseExistingVarProb = _configs.valDouble(ConfigProperties.VAR_DECL_NUM_LAMBDA_EXP);
 		
 		// check if the identifier is defined in the current scope
 		do
 		{
-			id = createIdentifier(context, _configs.valInt(ConfigProperties.VAR_DECL_NUM_LAMBDA_EXP));	
+			id = createIdentifier(context);	
 		} while (context.getSymTable().contains(id));
 		
 		// add identifier to current scope
 		context.getSymTable().newEntry(id, SymEntryType.VAR);
 		
-		return new VarDeclerator(id, generateExpression(context));
+		// generate expression to be assigned to the var
+		context.identifierUseExistingVarProb = 1; // all vars must be exist
+		AbsExpression exp = generateExpression(context);
+		
+		varDeclerator = new VarDeclerator(id, exp);
+		
+		traceOut();
+		return varDeclerator;
 	}
 
 	private Continue createContinue(Context context)
 	{
-		return ((Continue) _factoryJST.getConstantNode("continue"));
+		traceIn("Continue");
+		Continue continueStmt = (Continue) _factoryJST.getConstantNode("continue");
+		
+		traceOut();
+		return continueStmt;
 	}
 	
 	private Break createBreak(Context context)
 	{
-		return ((Break) _factoryJST.getConstantNode("break"));
+		traceIn("Break");
+		Break breakStmt = ((Break) _factoryJST.getConstantNode("break"));
+		
+		traceOut();
+		return breakStmt;
 	}
 
 	private Return createReturn(Context context)
 	{
+		traceIn("Return");
+		Return returnStmt;
+		
 		double returnValueProb = _configs.valDouble(ConfigProperties.RETURN_VALUE_BERNOULLY_P);
 		
 		//decide whether to return a value
 		if(StdRandom.bernoulli(returnValueProb))
-			return new Return(generateExpression(context));
+			returnStmt = new Return(generateExpression(context));
+		else
+			returnStmt = new Return();
 		
-		return new Return();
+		traceOut();
+		return returnStmt;
 	}
 
 	private StatementsBlock createStatementsBlock(Context context)
 	{
-		//choose the block size
-		double exp = _configs.valDouble(ConfigProperties.STMTS_BLOCK_SIZE_NORMAL_EXP);
-		double stddev = _configs.valDouble(ConfigProperties.STMTS_BLOCK_SIZE_NORMAL_STDDEV);
-		double size = StdRandom.gaussian(exp, stddev);
+		traceIn("StatementsBlock");
+		StatementsBlock stmtBlock = new StatementsBlock();
 		
-		StatementsBlock block = new StatementsBlock();
+		int size = 0;
+		
+		if (_depth <= _configs.valInt(ConfigProperties.MAX_JST_DEPTH))
+		{
+			//choose the block size
+			double factorDepth = Math.pow(_configs.valDouble(ConfigProperties.FACTOR_DEPTH), _depth);
+			double lambda = _configs.valDouble(ConfigProperties.STMTS_BLOCK_SIZE_LAMBDA) / factorDepth;
+			size = (int) Math.ceil(StdRandom.exp(lambda));
+		}
 		
 		for(int i = 0; i < size; i++)
-			block.addStatement(generateStatement(context));
+			stmtBlock.addStatement(generateStatement(context));
 		
-		return block;
+		traceOut();
+		return stmtBlock;
 	}
 
 	/*
@@ -353,9 +484,13 @@ public class Generator
 	 */
 	private Assignment createAssignment(Context context) 
 	{
+		traceIn("Assignment");
+		Assignment assignment;
+		
 		double useExistingVarProb = _configs.valDouble(ConfigProperties.ASSIGNMENT_USE_EXISTING_VAR_BERNOULLY_P);
 		
-		Identifier id = createIdentifier(context, useExistingVarProb);
+		context.identifierUseExistingVarProb = useExistingVarProb;
+		Identifier id = createIdentifier(context);
 		AbsExpression expr = generateExpression(context);
 		
 		// make sure identifier is defined (if not add it to top level scope)
@@ -365,17 +500,27 @@ public class Generator
 			_rootContext.getSymTable().newEntry(id, SymEntryType.VAR);
 		}
 		
-		return new Assignment(id, expr);
+		assignment = new Assignment(id, expr);
+		
+		traceOut();
+		return assignment;
 	}
 
 	private CompoundAssignment createCompoundAssignment(Context context)
 	{
+		traceIn("CompoundAssignment");
+		CompoundAssignment compAsssignment;
+		
 		//use only existing variables
-		Identifier var = createIdentifier(context, 1);
+		context.identifierUseExistingVarProb = 1;
+		Identifier var = createIdentifier(context);
 		AbsExpression expr = generateExpression(context);
 		CompoundOps op = CompoundOps.getRandomly();
 		
-		return new CompoundAssignment(var, op, expr);
+		compAsssignment = new CompoundAssignment(var, op, expr);
+		
+		traceOut();
+		return compAsssignment;
 	}
 
 	private Call createCall(Context context) {
@@ -400,84 +545,131 @@ public class Generator
 	
 	private ArrayExpression createArrayExpression(Context context) 
 	{
-		int p = _configs.valInt(ConfigProperties.ARRAY_LENGTH_LAMBDA_EXP);
+		traceIn("ArrayExpression");
+		ArrayExpression arrayExp = new ArrayExpression();
+		
+		double p = _configs.valDouble(ConfigProperties.ARRAY_LENGTH_LAMBDA_EXP);
 		
 		int length = (int)Math.ceil(StdRandom.exp(p));
-		ArrayExpression retVal = new ArrayExpression(); 
 		
 		for (int i=0 ; i< length ; i++)
 		{
-			retVal.addItem(generateExpression(context));
+			arrayExp.addItem(generateExpression(context));
 		}
 		
-		return retVal;
+		traceOut();
+		return arrayExp;
 	}
 	
-	private Identifier createIdentifier(Context context, double useExistingVarProb) 
+	private Identifier createIdentifier(Context context) 
 	{
-		Identifier var = null;
-		
+		traceIn("Identifier");
+		Identifier id;
+
 		//decide whether to use an existing variable
-		if(StdRandom.bernoulli(useExistingVarProb))
+		if(StdRandom.bernoulli(context.identifierUseExistingVarProb))
 		{
 			List<Identifier> existingVars = context.getSymTable().getAvaiableIdentifiers(SymEntryType.VAR);
-			var = existingVars.get(StdRandom.uniform(existingVars.size()));
+			int totalVars = existingVars.size();
+			
+			// if no var is defined then - create new var decleration at root scope!
+			if (totalVars == 0)
+			{
+				_rootContext.varDecleratorForceNewIdentifier = true;
+				_program.addStatement(createVarDecleration(_rootContext));
+				_rootContext.varDecleratorForceNewIdentifier = false;
+				
+				// re-get available vars
+				existingVars = context.getSymTable().getAvaiableIdentifiers(SymEntryType.VAR);
+				totalVars = existingVars.size();
+			}
+			
+			id = existingVars.get(StdRandom.uniform(totalVars));
 		}
 		else
 		{
 			String newName = IdNameGenerator.getNextVarFreeName();
-			var = _factoryJST.getIdentifier(newName);
+			id = _factoryJST.getIdentifier(newName);
 		}
 		
-		return var;
+		traceOut();
+		return id;
 	}
 	
 	private This createThis(Context context)
 	{
-		return ((This) _factoryJST.getConstantNode("this"));
+		traceIn("This");
+		This thisExp = ((This) _factoryJST.getConstantNode("this"));
+		
+		traceOut();
+		return thisExp;
 	}
 	
 	private UnaryOp createUnaryOp(Context context) 
 	{
+		traceIn("UnaryOp");
+		UnaryOp unOp;
+		
 		AbsExpression absExp = generateExpression(context);
 		
-		return (new UnaryOp(UnaryOps.getRandomly(), absExp));
+		unOp = new UnaryOp(UnaryOps.getRandomly(), absExp);
+		
+		traceOut();
+		return unOp;
 	}
 
 	private BinaryOp createBinaryOp(Context context) 
-	{		
+	{
+		traceIn("BinaryOp");
+		BinaryOp binOp;
+		
 		AbsExpression absExp1 = generateExpression(context);
 		AbsExpression absExp2 = generateExpression(context);
 	
-		return(new BinaryOp(BinaryOps.getRandomly(), absExp1, absExp2));
+		binOp = new BinaryOp(BinaryOps.getRandomly(), absExp1, absExp2);
+		
+		traceOut();
+		return binOp;
 	}
 
 	private TrinaryOp createTrinaryOp(Context context) 
-	{		
+	{
+		traceIn("TrinaryOp");
+		TrinaryOp triOp;
+		
 		AbsExpression absExp1 = generateExpression(context);
 		AbsExpression absExp2 = generateExpression(context);
 		AbsExpression absExp3 = generateExpression(context);
 	
-		return(new TrinaryOp(TrinaryOps.getRandomly(), absExp1, absExp2, absExp3));
+		triOp = new TrinaryOp(TrinaryOps.getRandomly(), absExp1, absExp2, absExp3);
+		
+		traceOut();
+		return triOp;
 	}
 
 	private Literal createLiteral(Context context) 
 	{
+		traceIn("Literal");
+		Literal lit = null;
+		
 		LiteralTypes litType = LiteralTypes.getRandomly();
 		
 		if (litType.isSingleValue())
-			return (new Literal(litType));
+			lit = (new Literal(litType));
 		else if(litType.equals(LiteralTypes.NUMBER))
-			return (createLiteralNumber(context));
+			lit = (createLiteralNumber(context));
 		else if(litType.equals(LiteralTypes.STRING))
-			return (createLiteralString(context));
-		else
-			// This should never happen (no literal is neither of the above)
-			return null;
+			lit = (createLiteralString(context));
+		
+		traceOut();
+		return lit;
 	}
 
 	private LiteralString createLiteralString(Context context) 
 	{
+		traceIn("LiteralString");
+		LiteralString litStr;
+		
 		double lambda = _configs.valDouble(ConfigProperties.LITERAL_STRING_LAMBDA);
 		int maxLength = _configs.valInt(ConfigProperties.LITERAL_STRING_MAX_LENGTH);
 		StringBuilder strBld = new StringBuilder();
@@ -492,16 +684,22 @@ public class Generator
 			strBld.append((char) StdRandom.uniform(128));
 		}
 		
-		return (new LiteralString(strBld.toString()));
+		litStr = new LiteralString(strBld.toString());
+		
+		traceOut();
+		return litStr;
 	}
 
 	private LiteralNumber createLiteralNumber(Context  context) 
 	{
+		traceIn("LiteralNumber");
+		LiteralNumber litNum;
+		
 		// return infinity?
 		double infinity = _configs.valDouble(ConfigProperties.LITERAL_NUMBER_MAX_PROBABILITY);
 		if (StdRandom.bernoulli(infinity))
 		{
-			return (new LiteralNumber("9007199254740992"));
+			litNum = (new LiteralNumber("9007199254740992"));
 		}
 		else
 		{
@@ -515,8 +713,11 @@ public class Generator
 				strBld.append(StdRandom.uniform(10));
 			}
 			
-			return (new LiteralNumber(strBld.toString()));
+			litNum = new LiteralNumber(strBld.toString());
 		}
+		
+		traceOut();
+		return litNum;
 	}
 
 }

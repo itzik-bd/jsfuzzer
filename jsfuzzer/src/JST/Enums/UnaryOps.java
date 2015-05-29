@@ -13,7 +13,7 @@ public enum UnaryOps {
 	PLUSPLUSLEFT("++%s", "plus plus"),
 	MINUSMINUSLEFT("--%s", "minus minus"),
 	PLUSPLUSRIGHT("%s++", "plus plus"),
-	MINUSMINUSRIGHT("%--s", "minus minus"),
+	MINUSMINUSRIGHT("%s--", "minus minus"),
 	
 	DELETE("delete %s", "delete object"),
 	TYPEOF("typeof %s", "type of"),

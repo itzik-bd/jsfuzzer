@@ -1,6 +1,5 @@
 package JST;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import JST.Interfaces.Caseable;
@@ -9,24 +8,12 @@ import JST.Interfaces.Visitor;
 	public class CaseBlock extends JSTNode
 	{
 		private List<Caseable> _cases;
+		private StatementsBlock _stmtsBlock;
 		
-		private List<AbsStatement> _statements;
-		
-		public CaseBlock(List<Caseable> cases, List<AbsStatement> statements)
+		public CaseBlock(List<Caseable> cases, StatementsBlock stmtBlock)
 		{
 			_cases = cases;
-			_statements = statements;
-		}
-					
-		public CaseBlock(List<Caseable> cases)
-		{
-			_cases = cases;
-			_statements = new LinkedList<AbsStatement>();
-		}
-		
-		public void addStatement(AbsStatement stmt)
-		{
-			_statements.add(stmt);
+			_stmtsBlock = stmtBlock;
 		}
 		
 		public List<Caseable> getCases()
@@ -34,9 +21,9 @@ import JST.Interfaces.Visitor;
 			return _cases;
 		}
 		
-		public List<AbsStatement> getStatements()
+		public StatementsBlock getStatementBlock()
 		{
-			return _statements;
+			return _stmtsBlock;
 		}
 		
 		@Override

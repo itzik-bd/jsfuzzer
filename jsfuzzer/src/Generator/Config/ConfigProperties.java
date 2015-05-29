@@ -4,16 +4,12 @@ public enum ConfigProperties
 {
 	CASE_NUM_NORMAL_EXP("cases_num_normal_exp", Integer.class),
 	CASES_NUM_NORMAL_STDDEV("cases_num_normal_stddev",Integer.class),
-	CASE_BLOCK_STMTS_NUM_NORMAL_EXP("case_block_stmts_num_normal_exp",Integer.class),
-	CASE_BLOCK_STMTS_NUM_NORMAL_STDDEV("case_block_stmts_num_normal_stddev",Integer.class),
 	CASES_BLOCKS_NUM_NORMAL_EXP("cases_blocks_num_normal_exp",Integer.class),
 	CASES_BLOCKS_NUM_NORMAL_STDDEV("cases_blocks_num_normal_stddev", Integer.class),
 	CASE_BLOCK_INCLUDE_DEFAULT_BERNOULLY_P("case_block_include_default_bernoully_p", Double.class),
 	RETURN_VALUE_BERNOULLY_P("return_value_bernoully_p", Double.class),
 	ASSIGNMENT_USE_EXISTING_VAR_BERNOULLY_P("assignment_use_existing_var_bernoully_p", Double.class),
-	STMTS_BLOCK_NORMAL_EXP("stmts_block_size_normal_exp", Integer.class),
-	STMTS_BLOCK_SIZE_NORMAL_EXP("stmts_block_size_normal_exp", Integer.class),
-	STMTS_BLOCK_SIZE_NORMAL_STDDEV("stmts_block_size_normal_stddev", Integer.class),
+	STMTS_BLOCK_SIZE_LAMBDA("stmts_block_size_lambda", Double.class),
 	VAR_DECL_NUM_LAMBDA_EXP("var_decl_num_lambda_exp", Double.class),
 	ARRAY_LENGTH_LAMBDA_EXP("array_length_lambda_exp", Double.class),
 	
@@ -52,7 +48,12 @@ public enum ConfigProperties
 	STMT_WHILE("stmt_While", Integer.class),
 	STMT_DOWHILE("stmt_DoWhile", Integer.class),
 	STMT_FOR("stmt_For", Integer.class),
-	STMT_ASSIGNMENT("stmt_Assignment", Integer.class);
+	STMT_ASSIGNMENT("stmt_Assignment", Integer.class),
+	
+	PROGRAM_SIZE_LAMBDA("program_size_lambda", Double.class),
+	
+	FACTOR_DEPTH("factor_depth", Double.class),
+	MAX_JST_DEPTH("max_jst_depth", Integer.class);
 
 	
 	private String _name;

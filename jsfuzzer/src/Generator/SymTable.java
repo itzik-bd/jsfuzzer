@@ -58,15 +58,42 @@ public class SymTable
 	
 	public List<Identifier> getAvaiableIdentifiers(SymEntryType type)
 	{
-		List<Identifier> resList = (_parent != null) ? _parent.getAvaiableIdentifiers(type) : new ArrayList<Identifier>();
+		List<Identifier> resList = new ArrayList<Identifier>();
 		
-		if (type.equals(SymEntryType.VAR) || type == null)
-			resList.addAll(_entriesVar.keySet());
+		SymTable currentSymTable = this;
 		
-		if (type.equals(SymEntryType.FUNC) || type == null)
-			resList.addAll(_entriesFunc.keySet());
+		while (currentSymTable != null)
+		{
+			if (type.equals(SymEntryType.VAR) || type == null)
+				resList.addAll(currentSymTable._entriesVar.keySet());
+			
+			if (type.equals(SymEntryType.FUNC) || type == null)
+				resList.addAll(currentSymTable._entriesFunc.keySet());
+			
+			// climb up to the root
+			currentSymTable = currentSymTable._parent;
+		}
 		
 		return resList;
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuffer s = new StringBuffer();
+		
+		for (SymEntry e : _entriesVar.values())
+			s.append(e+"\n");
+		for (SymEntry e : _entriesFunc.values())
+			s.append(e+"\n");
+		
+		if (_parent != null)
+		{
+			s.append("--------------\n");
+			s.append(_parent);
+		}
+		
+		return s.toString();
 	}
 	
 	public class SymEntry
@@ -88,6 +115,12 @@ public class SymTable
 		public SymEntryType getType()
 		{
 			return _type;
+		}
+	
+		@Override
+		public String toString()
+		{
+			return String.format("%10s %s", _type, _id.getName());
 		}
 	}
 	

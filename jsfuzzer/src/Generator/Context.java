@@ -10,6 +10,11 @@ public class Context
 	private final boolean _inFunction;
 	private final int _contextDepth;
 	
+	// vars that can be changed
+	public double identifierUseExistingVarProb = 1;
+	public boolean varDecleratorForceNewIdentifier = false;
+	public boolean caseBlockIncludeDefault = false;
+	
 	/**
 	 * Constructor for root of the tree 
 	 */
@@ -25,28 +30,24 @@ public class Context
 	/**
 	 * Constructor for inner node in the tree
 	 * @param parent - the parent of the node
-	 */
-	public Context(Context parent)
-	{
-		_parentContext = parent;
-		_symTable = new SymTable(parent._symTable);
-		_loopDepth = parent._loopDepth;
-		_inFunction = parent._inFunction;
-		_contextDepth = parent._contextDepth + 1;
-	}
-	
-	/**
-	 * Constructor for inner node in the tree
-	 * @param parent - the parent of the node
 	 * @param inLoop - flag if it's a loop context 
 	 */
 	public Context(Context parent, Boolean inLoop, Boolean inFunction)
 	{
 		_parentContext = parent;
 		_symTable = new SymTable(parent._symTable);
-		_loopDepth = parent._loopDepth + ((inLoop == null) ? 1 : 0);
+		_loopDepth = parent._loopDepth + ((inLoop.equals(true)) ? 1 : 0);
 		_inFunction = (inFunction == null || parent._inFunction == true) ? parent._inFunction : inFunction;
 		_contextDepth = parent._contextDepth + 1;
+	}
+	
+	/**
+	 * Constructor for inner node in the tree
+	 * @param parent - the parent of the node
+	 */
+	public Context(Context parent)
+	{
+		this(parent, null, null);
 	}
 	
 	public SymTable getSymTable()

@@ -187,9 +187,9 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 
-		s.append(listJoin(caseBlock.getCases(), false));
+		s.append(listJoin(caseBlock.getCases(), false) + " ");
 		_depth++;
-		s.append(listJoin(caseBlock.getStatements(), true));
+		s.append(caseBlock.getStatementBlock().accept(this, true));
 		_depth--;
 		
 		return s.toString();
@@ -198,13 +198,13 @@ public class JstToJs implements Visitor
 	@Override
 	public Object visit(Case myCase, Object context)
 	{
-		return identString(String.format("case: %s", myCase.getCaseExpr().accept(this, context)));
+		return identString(String.format("case %s:", myCase.getCaseExpr().accept(this, context)));
 	}
 
 	@Override
 	public Object visit(Default myDefault, Object context)
 	{
-		return identString("default");
+		return identString("default:");
 	}
 
 	@Override

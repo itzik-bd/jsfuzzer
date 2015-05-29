@@ -351,20 +351,21 @@ public final class StdRandom {
         }
     }
 
+    // TODO: matan look at my change
 	//Get probs and chose rendomly with respect to their relations
-	public static <T> T choseFromProbList(HashMap<T,Integer> hs)
+	public static <T> T choseFromProbList(HashMap<T, ? extends Number> hs)
 	{
 		// randomlly get a value in range 0-sumOfProps
 		int max=0;
-		for (Integer val : hs.values())
-			max +=  val;
+		for (Number val : hs.values())
+			max += val.doubleValue();
 		int r = uniform(max);
 		
 		// Return the chosen value
 		int sum = 0;
 		for (T exprName : hs.keySet())
 		{
-			sum += hs.get(exprName);
+			sum += hs.get(exprName).doubleValue();
 			
 			if (sum > r)
 				return exprName;
