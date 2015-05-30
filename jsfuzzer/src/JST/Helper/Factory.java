@@ -11,6 +11,7 @@ public class Factory
 {
 	private Map<String, JSTNode> _constantNodes = new HashMap<String, JSTNode>();
 	private Map<String, JSTNode> _literalNodes = new HashMap<String, JSTNode>();
+	private Map<String, Identifier> _funcIdentifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _identifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _loopIdentifierNodes = new HashMap<String, Identifier>();
 
@@ -54,6 +55,19 @@ public class Factory
 		{
 			res = new Identifier(name);
 			_loopIdentifierNodes.put(name, res);
+		}
+		
+		return res;
+	}
+	
+	public Identifier getFuncIdentifier(String name)
+	{
+		Identifier res = _funcIdentifierNodes.get(name);
+		
+		if (res == null)
+		{
+			res = new Identifier(name);
+			_funcIdentifierNodes.put(name, res);
 		}
 		
 		return res;

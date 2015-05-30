@@ -12,6 +12,8 @@ public enum ConfigProperties
 	STMTS_BLOCK_SIZE_LAMBDA("stmts_block_size_lambda", Double.class),
 	VAR_DECL_NUM_LAMBDA_EXP("var_decl_num_lambda_exp", Double.class),
 	ARRAY_LENGTH_LAMBDA_EXP("array_length_lambda_exp", Double.class),
+	FUNC_PARAMS_NUM_LAMBDA_EXP("func_params_num_lambda_exp", Double.class),
+	FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P("func_param_use_existing_var_bernoully_p", Double.class),
 	
 	LITERAL_STRING_LAMBDA("literal_string_lambda", Double.class),
 	LITERAL_STRING_MAX_LENGTH("literal_string_max_length", Integer.class),

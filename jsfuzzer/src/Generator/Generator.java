@@ -123,7 +123,7 @@ public class Generator
 		
 		// All properties are relative to the total of all properties
 		hs.put("CompoundAssignment", _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT));
-		//hs.put("FunctionDefinition", _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
+		hs.put("FunctionDefinition", _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
 		hs.put("If", _configs.valInt(ConfigProperties.STMT_IF));
 		//hs.put("OutputStatement", _configs.valInt(ConfigProperties.STMT_OUTPUTSTATEMENT));
 		hs.put("Switch", _configs.valInt(ConfigProperties.STMT_SWITCH));
@@ -252,10 +252,12 @@ public class Generator
 		While whileStmt;
 		
 		AbsExpression conditionExp = generateExpression(context);
+		
+		//in while loops, the context they define is the same as the stmtblock
+		List<AbsStatement> stmts = getLoopCounterStmts(context, null, true);
+
 		StatementsBlock op = createStatementsBlock(context);
 		
-		List<AbsStatement> stmts = getLoopCounterStmts(context, true);
-		 
 		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
 		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
 
@@ -273,10 +275,12 @@ public class Generator
 		DoWhile doWhileStmt;
 		
 		AbsExpression conditionExp = generateExpression(context);
+
+		//in while loops, the context they define is the same as the stmtblock
+		List<AbsStatement> stmts = getLoopCounterStmts(context, null, true);
+		
 		StatementsBlock op = createStatementsBlock(context);
 		
-		List<AbsStatement> stmts = getLoopCounterStmts(context, true);
-		 
 		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
 		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
 
@@ -291,27 +295,36 @@ public class Generator
 	private For createFor(Context context)
 	{
 		traceIn("For");
-	
-		StatementsBlock stmtsBlock = createStatementsBlock(context);
 		
-		List<AbsStatement> forStmts = getLoopCounterStmts(context, false);
+		Context newContext = new Context(context, true, null);
+
+		List<AbsStatement> forStmts = getLoopCounterStmts(context, newContext, false);
+
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext);
 		
 		//create for loop: for(var new_var=0; new_var<random_number; new_var++)
 		For forLoop = new For(forStmts.get(0), (AbsExpression)forStmts.get(1), (AbsExpression)forStmts.get(2), stmtsBlock);
 		
+		traceOut();
 		return forLoop;
 	}
 	
 	/** returns three new stmts, loopCounter init, stopping condition, and step.
 	 *  if isWhileLoop, the stopping condition will be "if (condition) break;" */
-	private List<AbsStatement> getLoopCounterStmts(Context context, boolean isWhileLoop)
+	private List<AbsStatement> getLoopCounterStmts(Context context, Context loopContext, boolean isWhileLoop)
 	{
 		//explicitly create a var decleration: var new_loop_var = 0;
 		String newName = IdNameGenerator.getNextLoopVarFreeName();
 		Identifier loopCounter = _factoryJST.getLoopIdentifier(newName);
 		VarDecleration loopCounterDecl = new VarDecleration();
 		loopCounterDecl.addDeclerator(new VarDeclerator(loopCounter, new LiteralNumber("0")));
-
+		
+		//in while, the var will be declared in outside scope, else - inside loop (for) scope
+		if(isWhileLoop)
+			context.getSymTable().newEntry(loopCounter, SymEntryType.VAR);
+		else
+			loopContext.getSymTable().newEntry(loopCounter, SymEntryType.VAR);
+		
 		//explicitly create binaryOp: new_var < max_iterations 
 		int loopIterationsLimit = getRandomLoopIterationsLimit();
 		LiteralNumber loopIterationsLiteral = new LiteralNumber(new Integer(loopIterationsLimit).toString());
@@ -398,6 +411,8 @@ public class Generator
 			switchStmt.addCaseOp(createCaseBlock(context));			
 		}
 		
+		//TODO: do we need to start a new context for switch? for case?
+		
 		traceOut();
 		return switchStmt;
 	}
@@ -444,7 +459,28 @@ public class Generator
 	private FunctionDefinition createFunctionDefinition(Context context) 
 	{
 		// TODO Auto-generated method stub
-		return null;
+		String funcName = IdNameGenerator.getNextFunctionFreeName();
+		Identifier functionId = _factoryJST.getFuncIdentifier(funcName);
+		context.getSymTable().newEntry(functionId, SymEntryType.FUNC);
+		
+		double lambda = _configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP);
+		int paramsNum = (int) Math.ceil(StdRandom.exp(lambda));
+		
+		//the context defined by the function
+		Context newContext = new Context(context, null, true);
+		
+		double prevVal = newContext.identifierUseExistingVarProb;
+		newContext.identifierUseExistingVarProb =  _configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P);
+
+		List<Identifier> params = new LinkedList<Identifier>();
+		for(int i = 0; i < paramsNum; i++)
+			params.add(createIdentifier(newContext));
+		
+		newContext.identifierUseExistingVarProb = prevVal;
+		
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext);
+		
+		return new FunctionDefinition(functionId, params, stmtsBlock, paramsNum);
 	}
 
 	private VarDecleration createVarDecleration(Context context)
@@ -573,9 +609,12 @@ public class Generator
 		
 		double useExistingVarProb = _configs.valDouble(ConfigProperties.ASSIGNMENT_USE_EXISTING_VAR_BERNOULLY_P);
 		
+		double prevVal = context.identifierUseExistingVarProb;
 		context.identifierUseExistingVarProb = useExistingVarProb;
 		Identifier id = createIdentifier(context);
 		AbsExpression expr = generateExpression(context);
+		
+		context.identifierUseExistingVarProb = prevVal;
 		
 		// make sure identifier is defined (if not add it to top level scope)
 		SymEntry entry = context.getSymTable().lookup(id);

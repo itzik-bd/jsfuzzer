@@ -36,9 +36,9 @@ public class sampleASToutput
 		// create the function
 		List<Identifier> input = new ArrayList<Identifier>();
 		input.add(new Identifier("x"));
-		FunctionDefinition func = new FunctionDefinition(new Identifier("sqr"), input);
-		func.addStatement(new Return(new BinaryOp(BinaryOps.MULTIPLY, new Identifier("x"), new Identifier("x"))));
-		prog.addStatement(func);
+//		FunctionDefinition func = new FunctionDefinition(new Identifier("sqr"), input);
+//		func.addStatement(new Return(new BinaryOp(BinaryOps.MULTIPLY, new Identifier("x"), new Identifier("x"))));
+//		prog.addStatement(func);
 		
 
 		
