@@ -12,6 +12,7 @@ import JST.*;
 import JST.Enums.*;
 import JST.Helper.StdRandom;
 import JST.Interfaces.Caseable;
+import JST.Interfaces.ProgramUnit;
 
 @SuppressWarnings("unused")
 public class Generator
@@ -29,7 +30,7 @@ public class Generator
 	{
 		Generator gen = new Generator(configs, verbose);
 		
-		StdRandom.setSeed(1436423645); // TODO: remove set seed after development
+		//StdRandom.setSeed(1436423645); // TODO: remove set seed after development
 		
 		// generate program
 		Program prog = gen.createProgram();
@@ -148,7 +149,7 @@ public class Generator
 		hs.put("ForEach", _configs.valInt(ConfigProperties.STMT_FOREACH)/p);
 		hs.put("While", _configs.valInt(ConfigProperties.STMT_WHILE)/p);
 		hs.put("DoWhile", _configs.valInt(ConfigProperties.STMT_DOWHILE)/p);
-		//hs.put("For", _configs.valInt(ConfigProperties.STMT_FOR)/p);
+		hs.put("For", _configs.valInt(ConfigProperties.STMT_FOR)/p);
 		
 		// randomly choose statement
 		String createMethod = StdRandom.choseFromProbList(hs);
@@ -250,11 +251,17 @@ public class Generator
 		traceIn("While");
 		While whileStmt;
 		
-		// TODO: add an if to make sure the loop stops
 		AbsExpression conditionExp = generateExpression(context);
 		StatementsBlock op = createStatementsBlock(context);
 		
+		List<AbsStatement> stmts = getLoopCounterStmts(context, true);
+		 
+		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
+		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
+
 		whileStmt = new While(conditionExp, op);
+		
+		whileStmt.setLoopCounterInit((VarDecleration)stmts.get(0)); //set the loop counter init
 		
 		traceOut();
 		return whileStmt;
@@ -265,19 +272,77 @@ public class Generator
 		traceIn("DoWhile");
 		DoWhile doWhileStmt;
 		
-		// TODO: add an if to make sure the loop stops
 		AbsExpression conditionExp = generateExpression(context);
 		StatementsBlock op = createStatementsBlock(context);
 		
+		List<AbsStatement> stmts = getLoopCounterStmts(context, true);
+		 
+		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
+		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
+
 		doWhileStmt = new DoWhile(conditionExp, op);
+		
+		doWhileStmt.setLoopCounterInit((VarDecleration)stmts.get(0)); //set the loop counter init
 		
 		traceOut();
 		return doWhileStmt;
 	}
 
-	private For createFor(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private For createFor(Context context)
+	{
+		traceIn("For");
+	
+		StatementsBlock stmtsBlock = createStatementsBlock(context);
+		
+		List<AbsStatement> forStmts = getLoopCounterStmts(context, false);
+		
+		//create for loop: for(var new_var=0; new_var<random_number; new_var++)
+		For forLoop = new For(forStmts.get(0), (AbsExpression)forStmts.get(1), (AbsExpression)forStmts.get(2), stmtsBlock);
+		
+		return forLoop;
+	}
+	
+	/** returns three new stmts, loopCounter init, stopping condition, and step.
+	 *  if isWhileLoop, the stopping condition will be "if (condition) break;" */
+	private List<AbsStatement> getLoopCounterStmts(Context context, boolean isWhileLoop)
+	{
+		//explicitly create a var decleration: var new_loop_var = 0;
+		String newName = IdNameGenerator.getNextLoopVarFreeName();
+		Identifier loopCounter = _factoryJST.getLoopIdentifier(newName);
+		VarDecleration loopCounterDecl = new VarDecleration();
+		loopCounterDecl.addDeclerator(new VarDeclerator(loopCounter, new LiteralNumber("0")));
+
+		//explicitly create binaryOp: new_var < max_iterations 
+		int loopIterationsLimit = getRandomLoopIterationsLimit();
+		LiteralNumber loopIterationsLiteral = new LiteralNumber(new Integer(loopIterationsLimit).toString());
+		BinaryOp loopStopCond = new BinaryOp(BinaryOps.LT, loopCounter, loopIterationsLiteral); 
+		
+		//explicitly create If: if(new_var < max_iterations) break;
+		StatementsBlock stmtsBlock = new StatementsBlock();
+		stmtsBlock.addStatement((AbsStatement)_factoryJST.getConstantNode("break"));
+		If ifStoppingCondition = new If(new UnaryOp(UnaryOps.LNEG, loopStopCond), stmtsBlock);	
+		
+		//explicitly create UnaryOp: new_var++
+		UnaryOp loopStepExpr = new UnaryOp(UnaryOps.PLUSPLUSRIGHT, loopCounter);
+		
+		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
+		stmts.add(loopCounterDecl);
+		
+		if(isWhileLoop)
+			stmts.add(ifStoppingCondition);
+		else
+			stmts.add(loopStopCond);
+		
+		stmts.add(loopStepExpr);
+		
+		return stmts;
+	}
+	
+	private int getRandomLoopIterationsLimit()
+	{
+		int exp = _configs.valInt(ConfigProperties.LOOP_MAX_ITERATIONS_NORMAL_EXP);
+		int stddev = _configs.valInt(ConfigProperties.LOOP_MAX_ITERATIONS_NORMAL_STDDEV);
+		return (int) StdRandom.gaussian(exp, stddev);
 	}
 
 	private ForEach createForEach(Context context) 

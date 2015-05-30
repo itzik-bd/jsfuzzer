@@ -130,6 +130,8 @@ public class JstToJs implements Visitor
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
+		s.append(whileStatement.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
+		ident(s);
 		s.append(String.format("while (%s) ", whileStatement.getCondition().accept(this, false)));
 		_depth++;
 		s.append(whileStatement.getStatementsBlock().accept(this, true));
@@ -143,6 +145,8 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 		
+		ident(s);
+		s.append(doWhile.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
 		ident(s);
 		s.append("do ");
 		_depth++;

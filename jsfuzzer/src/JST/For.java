@@ -9,11 +9,17 @@ public class For extends AbsStatement
 	private AbsExpression _stepExpression;
 	private StatementsBlock _stmtsBlock;
 	
-	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression) {
+	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression, StatementsBlock stmtsBlock)
+	{
 		_initStatement = initStatement;
 		_conditionExpression = conditionExpression;
 		_stepExpression = stepExpression;		
-		_stmtsBlock = new StatementsBlock();
+		_stmtsBlock = stmtsBlock;		
+	}
+	
+	public For(AbsStatement initStatement, AbsExpression conditionExpression, AbsExpression stepExpression)
+	{		
+		this(initStatement, conditionExpression, stepExpression, new StatementsBlock());
 	}
 	
 	public AbsStatement getInitStatement() {

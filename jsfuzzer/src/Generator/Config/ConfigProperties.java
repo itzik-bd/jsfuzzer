@@ -53,7 +53,10 @@ public enum ConfigProperties
 	PROGRAM_SIZE_LAMBDA("program_size_lambda", Double.class),
 	
 	FACTOR_DEPTH("factor_depth", Double.class),
-	MAX_JST_DEPTH("max_jst_depth", Integer.class);
+	MAX_JST_DEPTH("max_jst_depth", Integer.class),
+	
+	LOOP_MAX_ITERATIONS_NORMAL_EXP("loop_max_iterations_normal_exp", Integer.class),
+	LOOP_MAX_ITERATIONS_NORMAL_STDDEV("loop_max_iterations_normal_stddev", Integer.class);
 
 	
 	private String _name;
