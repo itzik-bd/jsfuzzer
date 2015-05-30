@@ -6,6 +6,8 @@ public interface Visitor
 {
 	public Object visit(Program program, Object context);
 	
+	public Object visit(Comment program, Object context);
+	
 	/* Statement Nodes */
 	
 	public Object visit(If ifStatement, Object context);

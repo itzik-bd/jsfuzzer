@@ -36,7 +36,7 @@ public class Context
 	{
 		_parentContext = parent;
 		_symTable = new SymTable(parent._symTable);
-		_loopDepth = parent._loopDepth + ((inLoop.equals(true)) ? 1 : 0);
+		_loopDepth = parent._loopDepth + ((inLoop != null &&  inLoop == true) ? 1 : 0);
 		_inFunction = (inFunction == null || parent._inFunction == true) ? parent._inFunction : inFunction;
 		_contextDepth = parent._contextDepth + 1;
 	}

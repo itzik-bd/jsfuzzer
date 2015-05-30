@@ -31,10 +31,10 @@ public class Configs
 			Object valParsed = null;
 			
 			// get properties
-			 valStr = p.getProperty(prop.getName());
+			 valStr = p.getProperty(prop.toString());
 			 if(valStr == null)
 			 {
-				System.err.println(String.format("config property %s doesn't exists", prop.getName()));
+				System.err.println(String.format("config property %s doesn't exists", prop));
 				errorFound = true;
 			 }
 			 else
@@ -43,7 +43,7 @@ public class Configs
 				try {
 					valParsed = parseValue(valStr, prop);
 				} catch (Exception e) {
-					System.err.println(String.format("config property %s is not from type %s", prop.getName(), prop.getClassType().getName()));
+					System.err.println(String.format("config property %s is not from type %s", prop, prop.getClassType().getName()));
 					errorFound = true;
 				}
 				
@@ -67,7 +67,7 @@ public class Configs
 			return Double.parseDouble(valStr);
 		}
 		
-		throw new Exception(String.format("error in enum ConfigProperties: found property %s with unkown type", prop.getName()));
+		throw new Exception(String.format("error in enum ConfigProperties: found property %s with unkown type", prop));
 	}
 	
 	public int valInt(ConfigProperties prop)
@@ -78,5 +78,20 @@ public class Configs
 	public double valDouble(ConfigProperties prop)
 	{
 		return (double) _configsMap.get(prop);
-	}	
+	}
+	
+	@Override
+	public String toString()
+	{
+		StringBuffer s = new StringBuffer();
+		
+		s.append("Configuration used:\n\n");
+		
+		for (Map.Entry<ConfigProperties, Object> pair : _configsMap.entrySet())
+		{
+			s.append(pair.getKey() + "=" + pair.getValue() + "\n");
+		}
+		
+		return s.toString();
+	}
 }

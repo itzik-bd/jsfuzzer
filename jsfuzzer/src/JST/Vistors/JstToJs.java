@@ -55,7 +55,35 @@ public class JstToJs implements Visitor
 	@Override
 	public Object visit(Program program, Object isStatement)
 	{
-		return listJoin(program.getStatements(), true);
+		return listJoin(program.getStatements(), true).substring(1);
+	}
+	
+	@Override
+	public Object visit(Comment comment, Object isStatement)
+	{
+		String[] commentLines = comment.getComment().split("\\r?\\n");;
+		StringBuffer s = new StringBuffer();
+		
+		if (commentLines.length == 1)
+		{
+			s.append("/* " + commentLines[0] + " */");
+		}
+		else if (commentLines.length > 1)
+		{
+			ident(s);
+			s.append("/*"); // begin comment
+			
+			for (String line : commentLines)
+			{
+				ident(s);
+				s.append(" * " + line);
+			}
+			
+			ident(s);
+			s.append(" */"); // end comment
+		}
+		
+		return s.toString();
 	}
 
 	@Override

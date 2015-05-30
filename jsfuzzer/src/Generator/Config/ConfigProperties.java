@@ -65,7 +65,7 @@ public enum ConfigProperties
 		_classType = classType;
 	}
 	
-	public String getName()
+	public String toString()
 	{
 		return _name;
 	}
