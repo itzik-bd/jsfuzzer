@@ -1,3 +1,4 @@
+package Main;
 import java.io.IOException;
 
 import Generator.Generator;
@@ -9,7 +10,7 @@ public class JsFuzzer
 	private String _outputFile = null;
 	private String _configsFile = null;
 	
-	public static void main(String[] args)
+	public static void main(String... args)
 	{
 		// if no arguments exists then print usage message and exit
 //		if (args.length == 0) {
