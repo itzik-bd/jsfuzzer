@@ -9,12 +9,12 @@ a.aa
 a[3]
 a[3+5]
 */
-public class MemberExpression extends AbsExpression implements Assignable
+public class MemberExp extends AbsExpression implements Assignable
 {
 	private AbsExpression _base;
 	private AbsExpression _location;
 	
-	public MemberExpression(AbsExpression base, AbsExpression location)
+	public MemberExp(AbsExpression base, AbsExpression location)
 	{
 		_base = base;
 		_location = location;

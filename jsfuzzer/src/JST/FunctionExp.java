@@ -5,18 +5,18 @@ import java.util.List;
 
 import JST.Interfaces.Visitor;
 
-public class FunctionExpression extends AbsExpression
+public class FunctionExp extends AbsExpression
 {
 	private List<Identifier> _formals;
 	private StatementsBlock _stmtsBlock;
 	
-	public FunctionExpression(List<Identifier> formals)
+	public FunctionExp(List<Identifier> formals)
 	{
 		_formals = formals;
 		_stmtsBlock = new StatementsBlock();
 	}
 	
-	public FunctionExpression()
+	public FunctionExp()
 	{
 		this(new LinkedList<Identifier>());
 	}

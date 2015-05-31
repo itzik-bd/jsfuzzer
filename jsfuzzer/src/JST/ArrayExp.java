@@ -8,11 +8,11 @@ import JST.Interfaces.Visitor;
 /* Example:
  * [a,4+y,x/3]
  */
-public class ArrayExpression extends AbsExpression
+public class ArrayExp extends AbsExpression
 {
 	private List<AbsExpression> _itemsList;
 	
-	public ArrayExpression()
+	public ArrayExp()
 	{
 		_itemsList = new ArrayList<AbsExpression>();
 	}

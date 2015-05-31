@@ -1,6 +1,6 @@
 package JST.Enums;
 
-import JST.Helper.*;
+import Utils.StdRandom;
 
 public enum CompoundOps
 {
@@ -18,31 +18,23 @@ public enum CompoundOps
 	BITAND("&", "bitwise and"),
 	BITOR("|", "bitwise or");
 	
-	private String token;
-	
-	private String description;
+	private String _token;
+	private String _description;
 
-	private CompoundOps(String token, String description)
-	{
-		this.token = token;
-		this.description = description;
+	private CompoundOps(String token, String description) {
+		this._token = token;
+		this._description = description;
 	}
 	
-	/**
-	 * Returns a description of the operator.
-	 * 
-	 * @return The description.
-	 */
 	public String getDescription() {
-		return description;
+		return _description;
 	}
 	
 	public String getToken() {
-		return token;
+		return _token;
 	}
 	
-	public static CompoundOps getRandomly() 
-	{
+	public static CompoundOps getRandomly()	{
 		CompoundOps[] values = values();
 		 
 		return values[StdRandom.uniform(values.length)];

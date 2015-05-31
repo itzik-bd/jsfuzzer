@@ -21,9 +21,8 @@ public enum ConfigProperties
 	LITERAL_NUMBER_MAX_PROBABILITY("literal_number_max_probability", Double.class),
 	LITERAL_NUMBER_LAMBDA("literal_number_lambda", Double.class),
 	
-	EXPR_UNARYOP("expr_UnaryOp", Integer.class),
-	EXPR_BINARYOP("expr_BinaryOp", Integer.class),
-	EXPR_TRINARYOP("expr_TrinaryOp", Integer.class),
+	EXPR_EXPRESSIONOP("expr_ExpressionOp", Integer.class),
+
 	EXPR_ARRAYEXPRESSION("expr_ArrayExpression", Integer.class),
 	EXPR_CALL("expr_Call", Integer.class),
 	EXPR_IDENTIFIER("expr_Identifier", Integer.class),
@@ -60,7 +59,6 @@ public enum ConfigProperties
 	LOOP_MAX_ITERATIONS_NORMAL_EXP("loop_max_iterations_normal_exp", Integer.class),
 	LOOP_MAX_ITERATIONS_NORMAL_STDDEV("loop_max_iterations_normal_stddev", Integer.class);
 
-	
 	private String _name;
 	private Class<?> _classType;
 	

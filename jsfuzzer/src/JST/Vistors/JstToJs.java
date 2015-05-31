@@ -1,5 +1,6 @@
 package JST.Vistors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -87,7 +88,7 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(FunctionDefinition functionDefinition, Object isStatement)
+	public Object visit(FunctionDef functionDefinition, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
@@ -323,7 +324,7 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(ArrayExpression arrayExp, Object isStatement)
+	public Object visit(ArrayExp arrayExp, Object isStatement)
 	{
 		String res = String.format("[%s]", listJoin(arrayExp.getItemsList(), false, ", "));
 		
@@ -334,7 +335,7 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(FunctionExpression functionExpression, Object isStatement)
+	public Object visit(FunctionExp functionExpression, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
@@ -359,7 +360,7 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(MemberExpression memberExpr, Object isStatement)
+	public Object visit(MemberExp memberExpr, Object isStatement)
 	{
 		String res;
 		
@@ -374,7 +375,7 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(ObjectExpression objExpr, Object isStatement)
+	public Object visit(ObjectExp objExpr, Object isStatement)
 	{
 		StringBuffer s = new StringBuffer();
 		
@@ -409,9 +410,14 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(UnaryOp unaryOp, Object isStatement)
+	public Object visit(OperationExp expOp, Object isStatement)
 	{
-		String res = "(" + unaryOp.getOperator().formatOp((String)unaryOp.getOperand().accept(this, false)) + ")";
+		
+		List<String> operandResults = new ArrayList<String>();
+		for (AbsExpression exp : expOp.getOperandList())
+			operandResults.add((String) exp.accept(this, false));
+		
+		String res = "(" + expOp.getOperator().formatOp(operandResults) + ")";
 		
 		if (isTrue(isStatement))
 			res = identString(res + ";");
@@ -419,28 +425,6 @@ public class JstToJs implements Visitor
 		return res;
 	}
 
-	@Override
-	public Object visit(BinaryOp binaryOp, Object isStatement)
-	{
-		String res = "(" + binaryOp.getOperator().formatOp((String)binaryOp.getFirstOperand().accept(this, false), (String)binaryOp.getSecondOperand().accept(this, false)) + ")";
-		
-		if (isTrue(isStatement))
-			res = identString(res + ";");
-		
-		return res;
-	}
-
-	@Override
-	public Object visit(TrinaryOp trinaryOp, Object isStatement)
-	{
-		String res = "(" + trinaryOp.getOperator().formatOp((String)trinaryOp.getFirstOperand().accept(this, false), (String)trinaryOp.getSecondOperand().accept(this, false), (String)trinaryOp.getThirdOperand().accept(this, false)) + ")";
-		
-		if (isTrue(isStatement))
-			res = identString(res + ";");
-		
-		return res;
-	}
-	
 	@Override
 	public Object visit(Literal literal, Object isStatement)
 	{

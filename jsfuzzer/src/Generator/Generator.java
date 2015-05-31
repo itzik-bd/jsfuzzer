@@ -10,9 +10,11 @@ import Generator.Config.*;
 import Generator.SymTable.*;
 import JST.*;
 import JST.Enums.*;
-import JST.Helper.StdRandom;
 import JST.Interfaces.Caseable;
 import JST.Interfaces.ProgramUnit;
+import JST.Interfaces.Visitor;
+import Utils.StdRandom;
+import Utils.StringCounter;
 
 @SuppressWarnings("unused")
 public class Generator
@@ -23,6 +25,10 @@ public class Generator
 	private final Program _program = new Program(); // generated program instance
 	private final Context _rootContext = new Context(); // global scope
 	
+	private final StringCounter _counterVar = new StringCounter("var%d");
+	private final StringCounter _counterFunc = new StringCounter("func%d");
+	private final StringCounter _counterLoopVar = new StringCounter("loop_var%d");
+	
 	private final boolean _verbose;
 	private int _depth = 0;
 	
@@ -30,7 +36,7 @@ public class Generator
 	{
 		Generator gen = new Generator(configs, verbose);
 		
-		//StdRandom.setSeed(1436423645); // TODO: remove set seed after development
+		StdRandom.setSeed(1436423645); // TODO: remove set seed after development
 		
 		// generate program
 		Program prog = gen.createProgram();
@@ -84,7 +90,6 @@ public class Generator
 		case "Return": node = createReturn(context); break;
 		case "Call": node = createCall(context); break;
 		case "This": node = createThis(context); break;
-		case "UnaryOp": node = createUnaryOp(context); break;
 		case "Literal": node = createLiteral(context); break;
 		case "CaseBlock": node = createCaseBlock(context); break;
 		case "FunctionDefinition": node = createFunctionDefinition(context); break;
@@ -100,8 +105,7 @@ public class Generator
 		case "ObjectExpression": node = createObjectExpression(context); break;
 		case "VarDecleration":node = createVarDecleration(context); break;
 		case "LiteralNumber": node = createLiteralNumber(context); break;
-		case "TrinaryOp": node = createTrinaryOp(context); break;
-		case "BinaryOp": node = createBinaryOp(context); break;
+		case "ExpressionOp": node = createExpressionOp(context); break;
 		case "LiteralString": node = createLiteralString(context); break;
 		
 		case "Expression": node = generateExpression(context); break;
@@ -159,7 +163,7 @@ public class Generator
 	
 	/**
 	 * This is an initial and non complex solution
-	 * Get all probabilities from the config and chose randomly with respect to their relations
+	 * Get all pr  obabilities from the config and chose randomly with respect to their relations
 	 * @return
 	 */
 	private AbsExpression generateExpression(Context context)
@@ -174,9 +178,7 @@ public class Generator
 		hs.put("This", _configs.valInt(ConfigProperties.EXPR_THIS)/factorDepth);
 		
 		// non-leafs - probability decrease as depth grows
-		hs.put("UnaryOp", _configs.valInt(ConfigProperties.EXPR_UNARYOP)*factorDepth);
-		hs.put("BinaryOp", _configs.valInt(ConfigProperties.EXPR_BINARYOP)*factorDepth);
-		hs.put("TrinaryOp", _configs.valInt(ConfigProperties.EXPR_TRINARYOP)*factorDepth);
+		hs.put("ExpressionOp", _configs.valInt(ConfigProperties.EXPR_EXPRESSIONOP)*factorDepth);
 		
 		//hs.put("ArrayExpression", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
 		//hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
@@ -314,7 +316,7 @@ public class Generator
 	private List<AbsStatement> getLoopCounterStmts(Context context, Context loopContext, boolean isWhileLoop)
 	{
 		//explicitly create a var decleration: var new_loop_var = 0;
-		String newName = IdNameGenerator.getNextLoopVarFreeName();
+		String newName = _counterLoopVar.getNext();
 		Identifier loopCounter = _factoryJST.getLoopIdentifier(newName);
 		VarDecleration loopCounterDecl = new VarDecleration();
 		loopCounterDecl.addDeclerator(new VarDeclerator(loopCounter, new LiteralNumber("0")));
@@ -328,15 +330,15 @@ public class Generator
 		//explicitly create binaryOp: new_var < max_iterations 
 		int loopIterationsLimit = getRandomLoopIterationsLimit();
 		LiteralNumber loopIterationsLiteral = new LiteralNumber(new Integer(loopIterationsLimit).toString());
-		BinaryOp loopStopCond = new BinaryOp(BinaryOps.LT, loopCounter, loopIterationsLiteral); 
+		OperationExp loopStopCond = new OperationExp(Operator.LT, loopCounter, loopIterationsLiteral); 
 		
 		//explicitly create If: if(new_var < max_iterations) break;
 		StatementsBlock stmtsBlock = new StatementsBlock();
 		stmtsBlock.addStatement((AbsStatement)_factoryJST.getConstantNode("break"));
-		If ifStoppingCondition = new If(new UnaryOp(UnaryOps.LNEG, loopStopCond), stmtsBlock);	
+		If ifStoppingCondition = new If(new OperationExp(Operator.LNEG, loopStopCond), stmtsBlock);	
 		
 		//explicitly create UnaryOp: new_var++
-		UnaryOp loopStepExpr = new UnaryOp(UnaryOps.PLUSPLUSRIGHT, loopCounter);
+		OperationExp loopStepExpr = new OperationExp(Operator.PLUSPLUSRIGHT, loopCounter);
 		
 		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
 		stmts.add(loopCounterDecl);
@@ -368,7 +370,7 @@ public class Generator
 		Identifier id = createIdentifier(context);
 		
 		// Temporary solution (could also be any existing iteratable var)
-		ArrayExpression arr = createArrayExpression(context);
+		ArrayExp arr = createArrayExpression(context);
 		
 		// Generate StatementsBlock
 		StatementsBlock stmtsBlock = createStatementsBlock(context);
@@ -456,10 +458,10 @@ public class Generator
 		return caseObj;
 	}
 
-	private FunctionDefinition createFunctionDefinition(Context context) 
+	private FunctionDef createFunctionDefinition(Context context) 
 	{
 		// TODO Auto-generated method stub
-		String funcName = IdNameGenerator.getNextFunctionFreeName();
+		String funcName = _counterFunc.getNext();
 		Identifier functionId = _factoryJST.getFuncIdentifier(funcName);
 		context.getSymTable().newEntry(functionId, SymEntryType.FUNC);
 		
@@ -480,7 +482,7 @@ public class Generator
 		
 		StatementsBlock stmtsBlock = createStatementsBlock(newContext);
 		
-		return new FunctionDefinition(functionId, params, stmtsBlock, paramsNum);
+		return new FunctionDef(functionId, params, stmtsBlock, paramsNum);
 	}
 
 	private VarDecleration createVarDecleration(Context context)
@@ -651,25 +653,25 @@ public class Generator
 		return null;
 	}
 
-	private FunctionExpression createFunctionExpression(Context context) {
+	private FunctionExp createFunctionExpression(Context context) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private MemberExpression createMemberExpression(Context context) {
+	private MemberExp createMemberExpression(Context context) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	private ObjectExpression createObjectExpression(Context context) {
+	private ObjectExp createObjectExpression(Context context) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	private ArrayExpression createArrayExpression(Context context) 
+	private ArrayExp createArrayExpression(Context context) 
 	{
 		traceIn("ArrayExpression");
-		ArrayExpression arrayExp = new ArrayExpression();
+		ArrayExp arrayExp = new ArrayExp();
 		
 		double p = _configs.valDouble(ConfigProperties.ARRAY_LENGTH_LAMBDA_EXP);
 		
@@ -711,7 +713,7 @@ public class Generator
 		}
 		else
 		{
-			String newName = IdNameGenerator.getNextVarFreeName();
+			String newName = _counterVar.getNext();
 			id = _factoryJST.getIdentifier(newName);
 		}
 		
@@ -727,47 +729,24 @@ public class Generator
 		traceOut();
 		return thisExp;
 	}
-	
-	private UnaryOp createUnaryOp(Context context) 
-	{
-		traceIn("UnaryOp");
-		UnaryOp unOp;
-		
-		AbsExpression absExp = generateExpression(context);
-		
-		unOp = new UnaryOp(UnaryOps.getRandomly(), absExp);
-		
-		traceOut();
-		return unOp;
-	}
 
-	private BinaryOp createBinaryOp(Context context) 
+	private OperationExp createExpressionOp(Context context) 
 	{
-		traceIn("BinaryOp");
-		BinaryOp binOp;
+		traceIn("ExpressionOp");
+		OperationExp expressionOp;
 		
-		AbsExpression absExp1 = generateExpression(context);
-		AbsExpression absExp2 = generateExpression(context);
+		Operator operator = Operator.getRandomly();
+		
+		// generate operands array
+		AbsExpression[] operandsArray = new AbsExpression[operator.getNumOperands()];
+		
+		for(int i=0 ; i<operandsArray.length ; i++)
+			operandsArray[i] = generateExpression(context);
 	
-		binOp = new BinaryOp(BinaryOps.getRandomly(), absExp1, absExp2);
+		expressionOp = new OperationExp(operator, operandsArray);
 		
 		traceOut();
-		return binOp;
-	}
-
-	private TrinaryOp createTrinaryOp(Context context) 
-	{
-		traceIn("TrinaryOp");
-		TrinaryOp triOp;
-		
-		AbsExpression absExp1 = generateExpression(context);
-		AbsExpression absExp2 = generateExpression(context);
-		AbsExpression absExp3 = generateExpression(context);
-	
-		triOp = new TrinaryOp(TrinaryOps.getRandomly(), absExp1, absExp2, absExp3);
-		
-		traceOut();
-		return triOp;
+		return expressionOp;
 	}
 
 	private Literal createLiteral(Context context) 

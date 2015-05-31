@@ -8,8 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import JST.*;
-import JST.Enums.BinaryOps;
-import JST.Enums.UnaryOps;
+import JST.Enums.Operator;
 
 public class sampleASToutput 
 {
@@ -44,12 +43,12 @@ public class sampleASToutput
 		
 		List<AbsExpression> argsPrint = new LinkedList<AbsExpression>();
 		argsPrint.add(new Identifier("x"));
-		Call print = new Call(new MemberExpression(new Identifier("console"), new Identifier("log")), argsPrint);
+		Call print = new Call(new MemberExp(new Identifier("console"), new Identifier("log")), argsPrint);
 		
 		VarDecleration initvd = new VarDecleration();
 		initvd.addDeclerator(new VarDeclerator(new Identifier("i"), new LiteralNumber("0")));
-		AbsExpression cond = new BinaryOp(BinaryOps.LT, new Identifier("i"), new LiteralNumber("10"));
-		AbsExpression step = new UnaryOp(UnaryOps.PLUSPLUSLEFT, new Identifier("i"));
+		AbsExpression cond = new OperationExp(Operator.LT, new Identifier("i"), new LiteralNumber("10"));
+		AbsExpression step = new OperationExp(Operator.PLUSPLUSLEFT, new Identifier("i"));
 		For forStmt = new For(initvd, cond, step);
 		List<AbsExpression> args = new LinkedList<AbsExpression>();
 		args.add(new Identifier("x"));

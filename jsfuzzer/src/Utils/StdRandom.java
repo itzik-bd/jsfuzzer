@@ -1,4 +1,4 @@
-package JST.Helper;
+package Utils;
 
 /*************************************************************************
  *  Compilation:  javac StdRandom.java

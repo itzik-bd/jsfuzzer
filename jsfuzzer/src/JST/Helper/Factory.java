@@ -15,7 +15,6 @@ public class Factory
 	private Map<String, Identifier> _identifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _loopIdentifierNodes = new HashMap<String, Identifier>();
 
-	
 	public Factory()
 	{		
 		// constant nodes

@@ -25,7 +25,7 @@ public interface Visitor
 	public Object visit(Case myCase, Object context);
 	public Object visit(Default myDefault, Object context);
 	
-	public Object visit(FunctionDefinition functionDefinition, Object context);
+	public Object visit(FunctionDef functionDefinition, Object context);
 	
 	public Object visit(VarDecleration varDecleration, Object context);
 	public Object visit(VarDeclerator varDeclerator, Object context);
@@ -46,23 +46,19 @@ public interface Visitor
 	
 	public Object visit(Call call, Object context);
 
-	public Object visit(FunctionExpression functionExpression, Object context);
+	public Object visit(FunctionExp functionExpression, Object context);
 
-	public Object visit(MemberExpression memberExpr, Object context);
+	public Object visit(MemberExp memberExpr, Object context);
 
-	public Object visit(ObjectExpression objExpr, Object context);
+	public Object visit(ObjectExp objExpr, Object context);
 	
-	public Object visit(ArrayExpression arrayExpr, Object context);
+	public Object visit(ArrayExp arrayExpr, Object context);
 	
 	public Object visit(Identifier id, Object context);
 	
 	public Object visit(This thisExpr, Object context);
 
-	public Object visit(UnaryOp unaryOp, Object context);
-
-	public Object visit(BinaryOp binaryOp, Object context);
-
-	public Object visit(TrinaryOp trinaryOp, Object context);
+	public Object visit(OperationExp binaryOp, Object context);
 
 	public Object visit(Literal literal, Object context);
 	public Object visit(LiteralString literal, Object context);

@@ -5,14 +5,14 @@ import java.util.List;
 
 import JST.Interfaces.Visitor;
 
-public class FunctionDefinition extends AbsStatement
+public class FunctionDef extends AbsStatement
 {
 	private Identifier _id;
 	private List<Identifier> _formals;
 	private StatementsBlock _stmtsBlock;
 	private int _paramsNum;
 	
-	public FunctionDefinition(Identifier id, List<Identifier> formals, StatementsBlock stmtsBlock, int paramsNum)
+	public FunctionDef(Identifier id, List<Identifier> formals, StatementsBlock stmtsBlock, int paramsNum)
 	{
 		_id = id;
 		_formals = formals;
@@ -20,7 +20,7 @@ public class FunctionDefinition extends AbsStatement
 		_paramsNum = paramsNum;
 	}
 	
-	public FunctionDefinition(Identifier id)
+	public FunctionDef(Identifier id)
 	{
 		this(id, new LinkedList<Identifier>(), new StatementsBlock(), 0);
 	}
