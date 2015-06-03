@@ -735,7 +735,7 @@ public class Generator
 		traceIn("ExpressionOp");
 		OperationExp expressionOp;
 		
-		Operator operator = Operator.getRandomly();
+		Operator operator = Operator.getRandomly(null); // TODO: use it more smart - send desired return type
 		
 		// generate operands array
 		AbsExpression[] operandsArray = new AbsExpression[operator.getNumOperands()];
