@@ -1,6 +1,8 @@
 package Generator;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -161,12 +163,20 @@ public class Generator
 		return (AbsStatement) applyMethod(createMethod, context);
 	}
 	
+	 /**  
+	 * @return call to generateExpression(context, null)
+	 */
+	private AbsExpression generateExpression(Context context)
+	{
+		 return generateExpression(context, null);
+	}
+	
 	/**
 	 * This is an initial and non complex solution
 	 * Get all pr  obabilities from the config and chose randomly with respect to their relations
 	 * @return
 	 */
-	private AbsExpression generateExpression(Context context)
+	private AbsExpression generateExpression(Context context, Map<String, Double> specialProbs)
 	{
 		HashMap<String, Double> hs = new HashMap<String, Double>();
 		
@@ -186,6 +196,16 @@ public class Generator
 		//hs.put("ObjectExpression", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
 		//hs.put("FunctionExpression", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);
 
+		
+		// Change special values acording to the input map
+		for (String probName : specialProbs.keySet())
+		{
+			if (hs.containsKey(probName))
+			{
+				hs.replace(probName, specialProbs.get(probName));
+			}
+		}
+		
 		// randomly choose expression
 		String createMethod = StdRandom.choseFromProbList(hs);
 		
@@ -386,7 +406,11 @@ public class Generator
 		traceIn("Switch");
 		Switch switchStmt;
 		
-		//TODO: we may want expr to be an identifier with high prob.
+		// Make Identifier more probable for this generateExpression()
+		int dentifierProb = _configs.valInt(ConfigProperties.IN_SWITCH_IDENTIGIER_PROB);
+		Map<String, Integer> specialProbs = new HashMap<String, Integer>();
+		specialProbs.put("Identifier", dentifierProb);
+		
 		AbsExpression expr = generateExpression(context);
 		switchStmt = new Switch(expr);
 		
@@ -460,13 +484,16 @@ public class Generator
 
 	private FunctionDef createFunctionDefinition(Context context) 
 	{
-		// TODO Auto-generated method stub
+		// Randomize function name
 		String funcName = _counterFunc.getNext();
 		Identifier functionId = _factoryJST.getFuncIdentifier(funcName);
-		context.getSymTable().newEntry(functionId, SymEntryType.FUNC);
 		
+		// Randomizr number of parameters 
 		double lambda = _configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP);
 		int paramsNum = (int) Math.ceil(StdRandom.exp(lambda));
+		
+		// Add function to symTable
+		context.getSymTable().newEntry(functionId, SymEntryType.FUNC, paramsNum);
 		
 		//the context defined by the function
 		Context newContext = new Context(context, null, true);
@@ -479,7 +506,7 @@ public class Generator
 			params.add(createIdentifier(newContext));
 		
 		newContext.identifierUseExistingVarProb = prevVal;
-		
+				
 		StatementsBlock stmtsBlock = createStatementsBlock(newContext);
 		
 		return new FunctionDef(functionId, params, stmtsBlock, paramsNum);
@@ -648,9 +675,22 @@ public class Generator
 		return compAsssignment;
 	}
 
-	private Call createCall(Context context) {
-		// TODO Auto-generated method stub
-		return null;
+	private Call createCall(Context context) 
+	{
+		SymTable symbols = context.getSymTable();
+		
+		List<Identifier> functions = symbols.getAvaiableIdentifiers(SymEntryType.FUNC);
+		int funcIndex = StdRandom.uniform(functions.size());
+		Identifier funcId = functions.get(funcIndex);
+		
+		// create list of parameter
+		int paramNum = symbols.getParameterNum(funcId);
+		List<AbsExpression> params = new ArrayList<AbsExpression>();
+		// TODO mabye make identifier more likely (like in switch)
+		for (int i = 0 ; i < paramNum ; i++)
+			params.add(generateExpression(context));
+		
+		return (new Call(funcId, params));
 	}
 
 	private FunctionExp createFunctionExpression(Context context) {

@@ -12,15 +12,17 @@ public class SymTable
 	private final SymTable _parent;
 	private final Map<Identifier, SymEntry> _entriesVar;
 	private final Map<Identifier, SymEntry> _entriesFunc;
+	private final Map<Identifier, Integer> _functionParams;
 	
 	public SymTable(SymTable parent)
 	{
 		_parent = parent;
 		_entriesVar = new HashMap<Identifier, SymEntry>();
 		_entriesFunc = new HashMap<Identifier, SymEntry>();
+		_functionParams = new HashMap<Identifier, Integer>();
 	}
-	
-	public void newEntry(Identifier id, SymEntryType type)
+
+	public void newEntry(Identifier id, SymEntryType type, Integer paramNumber)
 	{
 		// make sure that id is not exists
 		if (contains(id))
@@ -31,6 +33,15 @@ public class SymTable
 			_entriesVar.put(id, new SymEntry(id, type));
 		else if (type.equals(SymEntryType.FUNC))
 			_entriesFunc.put(id, new SymEntry(id, type));
+		
+		// add number of parameters
+		if (type.equals(SymEntryType.FUNC) && paramNumber != null)
+			_functionParams.put(id, paramNumber);
+	}
+	
+	public void newEntry(Identifier id, SymEntryType type)
+	{
+		newEntry(id, type, null);
 	}
 	
 	/** Check if the identifier is defined in the current symbol table only! */
@@ -75,6 +86,14 @@ public class SymTable
 		}
 		
 		return resList;
+	}
+	
+	/**
+	 * @return how many parameters does functionId recieves
+	 */
+	public int getParameterNum(Identifier functionId)
+	{
+		return (_functionParams.get(functionId));
 	}
 	
 	@Override

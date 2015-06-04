@@ -21,6 +21,7 @@ public enum ConfigProperties
 	LITERAL_NUMBER_MAX_PROBABILITY("literal_number_max_probability", Double.class),
 	LITERAL_NUMBER_LAMBDA("literal_number_lambda", Double.class),
 	
+	IN_SWITCH_IDENTIGIER_PROB("in_switch_identifier_prob", Integer.class),
 	EXPR_EXPRESSIONOP("expr_ExpressionOp", Integer.class),
 
 	EXPR_ARRAYEXPRESSION("expr_ArrayExpression", Integer.class),
