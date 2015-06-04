@@ -1,5 +1,6 @@
 package Generator;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
@@ -136,71 +137,81 @@ public class Generator
 
 	While createWhile(Context context, createParams params)
 	{
-		traceIn("While");
-		While whileStmt;
-		
-		AbsExpression conditionExp = _logic.generateExpression(context, null);
-		
-		//in while loops, the context they define is the same as the stmtblock
-		List<AbsStatement> stmts = getLoopCounterStmts(context, null, true);
-
-		StatementsBlock op = createStatementsBlock(context, null);
-		
-		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
-		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
-
-		whileStmt = new While(conditionExp, op);
-		
-		whileStmt.setLoopCounterInit((VarDecleration)stmts.get(0)); //set the loop counter init
-		
-		traceOut();
-		return whileStmt;
+		return (While) commonWhile (While.class, context);		
 	}
 
 	DoWhile createDoWhile(Context context, createParams params)
 	{
-		traceIn("DoWhile");
-		DoWhile doWhileStmt;
-		
-		AbsExpression conditionExp = _logic.generateExpression(context, null);
-
-		//in while loops, the context they define is the same as the stmtblock
-		List<AbsStatement> stmts = getLoopCounterStmts(context, null, true);
-		
-		StatementsBlock op = createStatementsBlock(context, null);
-		
-		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
-		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
-
-		doWhileStmt = new DoWhile(conditionExp, op);
-		
-		doWhileStmt.setLoopCounterInit((VarDecleration)stmts.get(0)); //set the loop counter init
-		
-		traceOut();
-		return doWhileStmt;
+		return (DoWhile) commonWhile (While.class, context);
 	}
 
-	// TODO: put loopvar inside the body
+	/** handles the createWhile/createDoWhile, and returns the instance by the class param */
+	private AbsWhileLoop commonWhile(Class<? extends AbsWhileLoop> classWhile, Context context)
+	{
+		traceIn(classWhile.getName());
+		AbsWhileLoop whileLoop = null;
+				
+		//the new context defined by the loop
+		Context newContext = new Context(context, true, null);
+		
+		AbsExpression conditionExp = _logic.generateExpression(newContext, null); //the while condition
+		
+		//first: loopVarDecl (added to the previous scope), second: stopping cond and step
+		//loopVar will be added to the prev scope
+		List<AbsStatement> stmts = getLoopCounterStmts(newContext); 
+		
+		VarDecleration loopCounterDecl = (VarDecleration) stmts.get(0);
+		If stopAndStepCond = (If) stmts.get(1);
+		
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
+		
+		stmtsBlock.addStatementAtIndex(0, stopAndStepCond); //inject stopping condition + counter step
+
+		try {
+			//create new while/doWhile instance 
+			whileLoop = classWhile.getConstructor(AbsExpression.class, StatementsBlock.class ,VarDecleration.class)
+					.newInstance(conditionExp, stmtsBlock, loopCounterDecl);
+		} catch (InstantiationException | IllegalAccessException
+				| IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			e.printStackTrace();
+		}
+		
+		traceOut();
+		return whileLoop;
+	}
+
 	For createFor(Context context, createParams params)
 	{
 		traceIn("For");
 		
 		Context newContext = new Context(context, true, null);
-
-		List<AbsStatement> forStmts = getLoopCounterStmts(context, newContext, false);
-
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
 		
-		//create for loop: for(var new_var=0; new_var<random_number; new_var++)
-		For forLoop = new For(forStmts.get(0), (AbsExpression)forStmts.get(1), (AbsExpression)forStmts.get(2), stmtsBlock);
+		AbsStatement initStmt = _logic.generateStatement(newContext, null);
+		AbsExpression conditionExpr = _logic.generateExpression(newContext, null);
+		AbsExpression stepExpr = _logic.generateExpression(newContext, null);
+
+		//first: loopVarDecl (added to the previous scope), second: stopping cond and step
+		//loopVar will be added to the prev scope
+		List<AbsStatement> stmts = getLoopCounterStmts(newContext); 
+		
+		VarDecleration loopCounterDecl = (VarDecleration) stmts.get(0);
+		If stopAndStepCond = (If) stmts.get(1);
+		
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
+		stmtsBlock.addStatementAtIndex(0, stopAndStepCond); //inject stopping condition + counter step
+		
+		//TODO: currently first for stmt is always VarDecleration. may want to change it
+		//create for loop: for(random var decl; random expr; random expr)
+		For forLoop = new For(initStmt, conditionExpr, stepExpr, stmtsBlock, loopCounterDecl);
 		
 		traceOut();
 		return forLoop;
 	}
 	
-	/** returns three new stmts, loopCounter init, stopping condition, and step.
-	 *  if isWhileLoop, the stopping condition will be "if (condition) break;" */
-	private List<AbsStatement> getLoopCounterStmts(Context context, Context loopContext, boolean isWhileLoop)
+	/** returns two new stmts, loopCounter init, stopping condition and step (in one stmt).
+	 *  IMPORTANT: param context is the context the loop defines */
+	private List<AbsStatement> getLoopCounterStmts(Context context)
 	{
 		//explicitly create a var decleration: var new_loop_var = 0;
 		String newName = _counterLoopVar.getNext();
@@ -208,34 +219,22 @@ public class Generator
 		VarDecleration loopCounterDecl = new VarDecleration();
 		loopCounterDecl.addDeclerator(new VarDeclerator(loopCounter, new LiteralNumber("0")));
 		
-		//in while, the var will be declared in outside scope, else - inside loop (for) scope
-		if(isWhileLoop)
-			context.getSymTable().newEntry(new SymEntryVar(loopCounter));
-		else
-			loopContext.getSymTable().newEntry(new SymEntryVar(loopCounter));
+		//the var will be declared in outside scope
+		context.getParent().getSymTable().newEntry(new SymEntryVar(loopCounter));
 		
-		//explicitly create binaryOp: new_var < max_iterations 
+		//explicitly create binaryOp: new_var++ < max_iterations 
 		int loopIterationsLimit = getRandomLoopIterationsLimit();
 		LiteralNumber loopIterationsLiteral = new LiteralNumber(new Integer(loopIterationsLimit).toString());
-		OperationExp loopStopCond = new OperationExp(Operator.LT, loopCounter, loopIterationsLiteral); 
+		OperationExp loopStopCond = new OperationExp(Operator.LT, new OperationExp(Operator.PLUSPLUSRIGHT, loopCounter), loopIterationsLiteral); 
 		
-		//explicitly create If: if(new_var < max_iterations) break;
+		//explicitly create If: if(new_var++ < max_iterations) break;
 		StatementsBlock stmtsBlock = new StatementsBlock();
 		stmtsBlock.addStatement((AbsStatement)_factoryJST.getConstantNode("break"));
 		If ifStoppingCondition = new If(new OperationExp(Operator.LNEG, loopStopCond), stmtsBlock);	
-		
-		//explicitly create UnaryOp: new_var++
-		OperationExp loopStepExpr = new OperationExp(Operator.PLUSPLUSRIGHT, loopCounter);
-		
+				
 		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
-		stmts.add(loopCounterDecl);
-		
-		if(isWhileLoop)
-			stmts.add(ifStoppingCondition);
-		else
-			stmts.add(loopStopCond);
-		
-		stmts.add(loopStepExpr);
+		stmts.add(loopCounterDecl);		
+		stmts.add(ifStoppingCondition);
 		
 		return stmts;
 	}
@@ -355,7 +354,7 @@ public class Generator
 		String funcName = _counterFunc.getNext();
 		Identifier functionId = _factoryJST.getFuncIdentifier(funcName);
 		
-		// Randomizr number of parameters 
+		// Randomize number of parameters 
 		double lambda = _configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP);
 		int paramsNum = (int) Math.ceil(StdRandom.exp(lambda));
 		
@@ -368,10 +367,17 @@ public class Generator
 		double prevVal = newContext.identifierUseExistingVarProb;
 		newContext.identifierUseExistingVarProb =  _configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P);
 
-		// TODO: check that no 2 identifiers the same
 		List<Identifier> funcParams = new LinkedList<Identifier>();
 		for(int i = 0; i < paramsNum; i++)
-			funcParams.add(createIdentifier(newContext, null));
+		{
+			Identifier id;
+			//keep generate id's until 
+			do {
+				id = createIdentifier(newContext, null);
+			} while (funcParams.contains(id));
+			
+			funcParams.add(id);
+		}
 		
 		newContext.identifierUseExistingVarProb = prevVal;
 				
@@ -463,7 +469,7 @@ public class Generator
 		return returnStmt;
 	}
 
-	// TODO: add new arg: list of SymEntry to add to the new context right after created 
+	/**IMPORTANT: context is the context defined by this StatementBlock */
 	StatementsBlock createStatementsBlock(Context context, createParams params)
 	{
 		traceIn("StatementsBlock");
@@ -480,12 +486,9 @@ public class Generator
 			size = (int) Math.ceil(StdRandom.exp(lambda));
 		}
 		
-		// create new context
-		Context newContext = new Context(context, null, null); // TODO: set flags (loop/function)
-		
 		// generate statements
-		stmtBlock.addStatement(_logic.generateStatement(newContext, null, size));
-		
+		stmtBlock.addStatement(_logic.generateStatement(context, null, size));
+
 		traceOut();
 		return stmtBlock;
 	}

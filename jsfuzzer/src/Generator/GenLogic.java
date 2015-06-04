@@ -47,9 +47,7 @@ public class GenLogic
 		case "Identifier": node = _gen.createIdentifier(context, params); break;
 		case "VarDeclerator": node = _gen.createVarDeclerator(context, params); break;
 		case "Assignment": node = _gen.createAssignment(context, params); break;
-		case "StatementsBlock": 
-			// TODO: create new conetxt and pass to create method
-			node = _gen.createStatementsBlock(context, params); break;
+		case "StatementsBlock": node = _gen.createStatementsBlock(new Context(context), params); break;
 		case "FunctionExpression": node = _gen.createFunctionExpression(context, params); break;
 		case "MemberExpression": node = _gen.createMemberExpression(context, params); break;
 		case "CompoundAssignment": node = _gen.createCompoundAssignment(context, params); break;

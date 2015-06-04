@@ -1,35 +1,18 @@
 package JST;
 
-public abstract class AbsWhileLoop extends AbsStatement
+public abstract class AbsWhileLoop extends AbsLoop
 {
 	private AbsExpression _condition;
-	private StatementsBlock _stmtsBlock;
+
 	
-	private VarDecleration _loopCounterInit;
-	
-	public AbsWhileLoop(AbsExpression condition, StatementsBlock stmtsBlock)
+	public AbsWhileLoop(AbsExpression condition, StatementsBlock stmtsBlock, VarDecleration loopCounterInit)
 	{
+		super(stmtsBlock, loopCounterInit);
 		_condition = condition;
-		_stmtsBlock = stmtsBlock;
 	}
 	
 	public AbsExpression getCondition()
 	{
 		return _condition;
-	}
-	
-	public StatementsBlock getStatementsBlock()
-	{
-		return _stmtsBlock;
-	}
-	
-	public VarDecleration getLoopCounterInit ()
-	{
-		return _loopCounterInit;
-	}
-
-	public void setLoopCounterInit(VarDecleration loopCounterInit)
-	{
-		_loopCounterInit = loopCounterInit;
 	}
 }

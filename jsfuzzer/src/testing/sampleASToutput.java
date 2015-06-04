@@ -49,12 +49,12 @@ public class sampleASToutput
 		initvd.addDeclerator(new VarDeclerator(new Identifier("i"), new LiteralNumber("0")));
 		AbsExpression cond = new OperationExp(Operator.LT, new Identifier("i"), new LiteralNumber("10"));
 		AbsExpression step = new OperationExp(Operator.PLUSPLUSLEFT, new Identifier("i"));
-		For forStmt = new For(initvd, cond, step);
+		//For forStmt = new For(initvd, cond, step);
 		List<AbsExpression> args = new LinkedList<AbsExpression>();
 		args.add(new Identifier("x"));
-		forStmt.addStatement(new Assignment(new Identifier("x"), new Call(new Identifier("sqr"), args)));
-		forStmt.addStatement(print);
-		prog.addStatement(forStmt);		
+		//forStmt.addStatement(new Assignment(new Identifier("x"), new Call(new Identifier("sqr"), args)));
+		//forStmt.addStatement(print);
+		//prog.addStatement(forStmt);		
 		
 
 		prog.addStatement(print);

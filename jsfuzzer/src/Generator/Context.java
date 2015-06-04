@@ -31,7 +31,12 @@ public class Context
 	 * Constructor for inner node in the tree
 	 * 
 	 * @param parent - the parent of the node
+<<<<<<< HEAD
 	 * @param inLoop - flag if it's a loop context
+=======
+	 * @param inLoop - flag if its a loop context - null means use the parent's inLoop
+	 * @param inFunction - flag if its a function context - null means use the parent's inFunction  
+>>>>>>> StmtBlock gets it's context by param
 	 */
 	public Context(Context parent, Boolean inLoop, Boolean inFunction) {
 		_parentContext = parent;
