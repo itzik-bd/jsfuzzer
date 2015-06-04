@@ -352,7 +352,7 @@ public final class StdRandom {
     }
 
 	//Get probs and chose rendomly with respect to their relations
-	public static <T> T choseFromProbList(HashMap<T, ? extends Number> hs)
+	public static <T> T choseFromProbList(HashMap<T, Double> hs)
 	{
 		// randomlly get a value in range 0-sumOfProps
 		double max=0;
@@ -372,5 +372,9 @@ public final class StdRandom {
 		
 		// Should never get here
 		return null;
+	}
+	
+	public static int expCeiled(double lambda) {
+		return (int) Math.ceil(exp(lambda));
 	}
 }

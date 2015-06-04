@@ -11,11 +11,6 @@ public class Context
 	private final boolean _inFunction;
 	private final int _contextDepth;
 
-	// vars that can be changed
-	public double identifierUseExistingVarProb = 1;
-	public boolean varDecleratorForceNewIdentifier = false;
-	public boolean caseBlockIncludeDefault = false;
-
 	/**
 	 * Constructor for root of the tree
 	 */

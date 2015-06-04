@@ -130,7 +130,6 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 		
-		ident(s);
 		s.append(whileStatement.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
 		ident(s);
 		s.append(String.format("while (%s) ", whileStatement.getCondition().accept(this, false)));
@@ -146,7 +145,6 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 		
-		ident(s);
 		s.append(doWhile.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
 		ident(s);
 		s.append("do ");
@@ -164,6 +162,7 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 		
+		s.append(forStatement.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
 		ident(s);
 		s.append(String.format("for (%s ; %s ; %s) ", forStatement.getInitStatement().accept(this, false), forStatement.getConditionExpression().accept(this, false), forStatement.getStepExpression().accept(this, false)));
 		_depth++;
@@ -387,7 +386,9 @@ public class JstToJs implements Visitor
 		for (Entry<ObjectKeys, AbsExpression> entry : objExpr.getMap().entrySet()) {
 			ident(s);
 			s.append(String.format("%s: %s", entry.getKey().accept(this, false), entry.getValue().accept(this, false)));
+			s.append(",");
 		}
+		s.setLength(s.length()-1);
 		_depth--;
 		ident(s);
 		s.append("}");
