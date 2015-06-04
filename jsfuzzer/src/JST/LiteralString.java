@@ -1,9 +1,10 @@
 package JST;
 
 import JST.Enums.LiteralTypes;
+import JST.Interfaces.ObjectKeys;
 import JST.Interfaces.Visitor;
 
-public class LiteralString extends Literal 
+public class LiteralString extends Literal implements ObjectKeys
 {
 	String _value;
 	

@@ -1,4 +1,4 @@
-package Generator;
+package Generator.SymTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,26 +22,24 @@ public class SymTable
 		_functionParams = new HashMap<Identifier, Integer>();
 	}
 
-	public void newEntry(Identifier id, SymEntryType type, Integer paramNumber)
+	public void newEntry(SymEntry entry)
 	{
+		Identifier id = entry.getIdentifier();
+		
 		// make sure that id is not exists
 		if (contains(id))
 			throw new RuntimeException(String.format("Identifier %s is already exists", id.getName()));
 		
 		// add according to type
-		if (type.equals(SymEntryType.VAR))
-			_entriesVar.put(id, new SymEntry(id, type));
-		else if (type.equals(SymEntryType.FUNC))
-			_entriesFunc.put(id, new SymEntry(id, type));
-		
-		// add number of parameters
-		if (type.equals(SymEntryType.FUNC) && paramNumber != null)
-			_functionParams.put(id, paramNumber);
-	}
-	
-	public void newEntry(Identifier id, SymEntryType type)
-	{
-		newEntry(id, type, null);
+		switch (entry.getType())
+		{
+		case VAR:
+			_entriesVar.put(id, entry);
+			break;
+		case FUNC:
+			_entriesFunc.put(id, entry);
+			break;
+		}
 	}
 	
 	/** Check if the identifier is defined in the current symbol table only! */
@@ -113,38 +111,5 @@ public class SymTable
 		}
 		
 		return s.toString();
-	}
-	
-	public class SymEntry
-	{
-		private Identifier _id;
-		private SymEntryType _type;
-		
-		public SymEntry(Identifier id, SymEntryType type)
-		{
-			_id = id;
-			_type = type;
-		}
-		
-		public Identifier getIdentifier()
-		{
-			return _id;
-		}
-		
-		public SymEntryType getType()
-		{
-			return _type;
-		}
-	
-		@Override
-		public String toString()
-		{
-			return String.format("%10s %s", _type, _id.getName());
-		}
-	}
-	
-	public enum SymEntryType
-	{
-		FUNC, VAR;
 	}
 }

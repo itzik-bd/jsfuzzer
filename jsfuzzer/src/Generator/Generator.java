@@ -100,7 +100,9 @@ public class Generator
 		case "Identifier": node = createIdentifier(context); break;
 		case "VarDeclerator": node = createVarDeclerator(context); break;
 		case "Assignment": node = createAssignment(context); break;
-		case "StatementsBlock": node = createStatementsBlock(context); break;
+		case "StatementsBlock": 
+			// TODO: create new conetxt and pass to create method
+			node = createStatementsBlock(context); break;
 		case "FunctionExpression": node = createFunctionExpression(context); break;
 		case "MemberExpression": node = createMemberExpression(context); break;
 		case "CompoundAssignment": node = createCompoundAssignment(context); break;
@@ -202,7 +204,7 @@ public class Generator
 		{
 			if (hs.containsKey(probName))
 			{
-				hs.replace(probName, specialProbs.get(probName));
+				hs.put(probName, specialProbs.get(probName));
 			}
 		}
 		
@@ -314,6 +316,7 @@ public class Generator
 		return doWhileStmt;
 	}
 
+	// TODO: put loopvar inside the body
 	private For createFor(Context context)
 	{
 		traceIn("For");
@@ -343,9 +346,9 @@ public class Generator
 		
 		//in while, the var will be declared in outside scope, else - inside loop (for) scope
 		if(isWhileLoop)
-			context.getSymTable().newEntry(loopCounter, SymEntryType.VAR);
+			context.getSymTable().newEntry(new SymEntryVar(loopCounter));
 		else
-			loopContext.getSymTable().newEntry(loopCounter, SymEntryType.VAR);
+			loopContext.getSymTable().newEntry(new SymEntryVar(loopCounter));
 		
 		//explicitly create binaryOp: new_var < max_iterations 
 		int loopIterationsLimit = getRandomLoopIterationsLimit();
@@ -492,15 +495,16 @@ public class Generator
 		double lambda = _configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP);
 		int paramsNum = (int) Math.ceil(StdRandom.exp(lambda));
 		
-		// Add function to symTable
-		context.getSymTable().newEntry(functionId, SymEntryType.FUNC, paramsNum);
+		// add function to current scope
+		context.getSymTable().newEntry(new SymEntryFunc(functionId, paramsNum));
 		
-		//the context defined by the function
+		// create the context defined by the function
 		Context newContext = new Context(context, null, true);
 		
 		double prevVal = newContext.identifierUseExistingVarProb;
 		newContext.identifierUseExistingVarProb =  _configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P);
 
+		// TODO: check that no 2 identifiers the same
 		List<Identifier> params = new LinkedList<Identifier>();
 		for(int i = 0; i < paramsNum; i++)
 			params.add(createIdentifier(newContext));
@@ -550,7 +554,7 @@ public class Generator
 		} while (context.getSymTable().contains(id));
 		
 		// add identifier to current scope
-		context.getSymTable().newEntry(id, SymEntryType.VAR);
+		context.getSymTable().newEntry(new SymEntryVar(id));
 		
 		// generate expression to be assigned to the var
 		context.identifierUseExistingVarProb = 1; // all vars must be exist
@@ -597,6 +601,7 @@ public class Generator
 		return returnStmt;
 	}
 
+	// TODO: add new arg: list of SymEntry to add to the new context right after created 
 	private StatementsBlock createStatementsBlock(Context context)
 	{
 		traceIn("StatementsBlock");
@@ -649,7 +654,7 @@ public class Generator
 		SymEntry entry = context.getSymTable().lookup(id);
 		if (entry == null)
 		{
-			_rootContext.getSymTable().newEntry(id, SymEntryType.VAR);
+			_rootContext.getSymTable().newEntry(new SymEntryVar(id));
 		}
 		
 		assignment = new Assignment(id, expr);
@@ -703,6 +708,7 @@ public class Generator
 		return null;
 	}
 
+	// TODO: implement
 	private ObjectExp createObjectExpression(Context context) {
 		// TODO Auto-generated method stub
 		return null;

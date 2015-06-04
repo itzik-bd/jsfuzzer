@@ -1,5 +1,7 @@
 package Generator;
 
+import Generator.SymTable.SymTable;
+
 public class Context
 {
 	private final Context _parentContext;
