@@ -18,6 +18,10 @@ public class Program extends JSTNode
 		_statements.add(s);
 	}
 	
+	public void addStatement(List<? extends ProgramUnit> s) {
+		_statements.addAll(s);
+	}
+	
 	@Override
 	public Object accept(Visitor visitor, Object context) {
 		return visitor.visit(this, context);

@@ -1,6 +1,5 @@
 package JST;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import JST.Interfaces.Visitor;
@@ -12,14 +11,9 @@ public class ArrayExp extends AbsExpression
 {
 	private List<AbsExpression> _itemsList;
 	
-	public ArrayExp()
+	public ArrayExp(List<AbsExpression> itemsList)
 	{
-		_itemsList = new ArrayList<AbsExpression>();
-	}
-	
-	public void addItem(AbsExpression exp)
-	{
-		_itemsList.add(exp);
+		_itemsList = itemsList;
 	}
 	
 	public List<AbsExpression> getItemsList()

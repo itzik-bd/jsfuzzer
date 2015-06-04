@@ -12,11 +12,15 @@ public class OperationExp extends AbsExpression
 	private List<AbsExpression> _operandList;
 	
 	public OperationExp(Operator operator, AbsExpression... operandsList) {
-		if (operator.getNumOperands() != operandsList.length)
+		this(operator, Arrays.asList(operandsList));
+	}
+	
+	public OperationExp(Operator operator, List<AbsExpression> operandsList) {
+		if (operator.getNumOperands() != operandsList.size())
 			throw new IllegalArgumentException("operands list size is not compatible with the operator " + operator);
 		
 		_operator = operator;
-		_operandList = Arrays.asList(operandsList);
+		_operandList = operandsList;
 	}
 
 	public Operator getOperator() {

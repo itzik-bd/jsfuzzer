@@ -6,30 +6,27 @@ import java.util.List;
 import JST.Interfaces.ProgramUnit;
 import JST.Interfaces.Visitor;
 
-public class StatementsBlock extends AbsStatement
-{
+public class StatementsBlock extends AbsStatement {
 	private List<ProgramUnit> _statements = new LinkedList<ProgramUnit>();
-	
 
-	public List<ProgramUnit> getStatements() 
-	{
+	public List<ProgramUnit> getStatements() {
 		return _statements;
 	}
-	
-	public void addStatement(ProgramUnit s) 
-	{
+
+	public void addStatement(ProgramUnit s) {
 		_statements.add(s);
 	}
-	
-	public void addStatementAtIndex(int index, ProgramUnit s) 
-	{
+
+	public void addStatement(List<? extends ProgramUnit> s) {
+		_statements.addAll(s);
+	}
+
+	public void addStatementAtIndex(int index, ProgramUnit s) {
 		_statements.add(index, s);
 	}
-	
-	
+
 	@Override
-	public Object accept(Visitor visitor, Object context) 
-	{
+	public Object accept(Visitor visitor, Object context) {
 		return visitor.visit(this, context);
 	}
 }
