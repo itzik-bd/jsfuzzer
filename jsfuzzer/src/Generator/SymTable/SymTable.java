@@ -12,14 +12,12 @@ public class SymTable
 	private final SymTable _parent;
 	private final Map<Identifier, SymEntry> _entriesVar;
 	private final Map<Identifier, SymEntry> _entriesFunc;
-	private final Map<Identifier, Integer> _functionParams;
 	
 	public SymTable(SymTable parent)
 	{
 		_parent = parent;
 		_entriesVar = new HashMap<Identifier, SymEntry>();
 		_entriesFunc = new HashMap<Identifier, SymEntry>();
-		_functionParams = new HashMap<Identifier, Integer>();
 	}
 
 	public void newEntry(SymEntry entry)
@@ -65,33 +63,25 @@ public class SymTable
 		return null;
 	}
 	
-	public List<Identifier> getAvaiableIdentifiers(SymEntryType type)
+	public List<SymEntry> getAvaiableEntries(SymEntryType type)
 	{
-		List<Identifier> resList = new ArrayList<Identifier>();
+		List<SymEntry> resList = new ArrayList<SymEntry>();
 		
 		SymTable currentSymTable = this;
 		
 		while (currentSymTable != null)
 		{
 			if (type.equals(SymEntryType.VAR) || type == null)
-				resList.addAll(currentSymTable._entriesVar.keySet());
+				resList.addAll(currentSymTable._entriesVar.values());
 			
 			if (type.equals(SymEntryType.FUNC) || type == null)
-				resList.addAll(currentSymTable._entriesFunc.keySet());
+				resList.addAll(currentSymTable._entriesFunc.values());
 			
 			// climb up to the root
 			currentSymTable = currentSymTable._parent;
 		}
 		
 		return resList;
-	}
-	
-	/**
-	 * @return how many parameters does functionId recieves
-	 */
-	public int getParameterNum(Identifier functionId)
-	{
-		return (_functionParams.get(functionId));
 	}
 	
 	@Override

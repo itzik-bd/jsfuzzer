@@ -10,19 +10,17 @@ public class FunctionDef extends AbsStatement
 	private Identifier _id;
 	private List<Identifier> _formals;
 	private StatementsBlock _stmtsBlock;
-	private int _paramsNum;
 	
-	public FunctionDef(Identifier id, List<Identifier> formals, StatementsBlock stmtsBlock, int paramsNum)
+	public FunctionDef(Identifier id, List<Identifier> formals, StatementsBlock stmtsBlock)
 	{
 		_id = id;
 		_formals = formals;
 		_stmtsBlock = stmtsBlock;
-		_paramsNum = paramsNum;
 	}
 	
 	public FunctionDef(Identifier id)
 	{
-		this(id, new LinkedList<Identifier>(), new StatementsBlock(), 0);
+		this(id, new LinkedList<Identifier>(), new StatementsBlock());
 	}
 	
 	public Identifier getId()
@@ -48,16 +46,6 @@ public class FunctionDef extends AbsStatement
 	public StatementsBlock getStatementsBlock()
 	{
 		return _stmtsBlock;
-	}
-	
-	public int getParamsNum()
-	{
-		return _paramsNum;
-	}
-	
-	public void setParamsNum(int num)
-	{
-		_paramsNum = num;
 	}
 	
 	@Override

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import Generator.Config.*;
-import Generator.Logic.GenLogic;
+import Generator.Params.createParams;
 import Generator.SymTable.*;
 import JST.*;
 import JST.Enums.*;
@@ -104,7 +104,7 @@ public class Generator
 		int size = (int) Math.ceil(StdRandom.exp(lambda));
 		
 		// generate statements
-		_program.addStatement(_logic.generateStatement(_rootContext, size));
+		_program.addStatement(_logic.generateStatement(_rootContext, null, size));
 		
 		// attach configuration used to generate program
 		_program.addStatement(new Comment(_configs.toString()));
@@ -113,18 +113,18 @@ public class Generator
 		return _program;
 	}
 
-	public If createIf(Context context)
+	If createIf(Context context, createParams params)
 	{
 		traceIn("If");
 		
 		If ifStmt;
-		AbsExpression conditionExp = _logic.generateExpression(context);
-		StatementsBlock trueOp = createStatementsBlock(context);
+		AbsExpression conditionExp = _logic.generateExpression(context, null);
+		StatementsBlock trueOp = createStatementsBlock(context, null);
 		
 		// decide whether to have an "else" operation
 		if (StdRandom.bernoulli())
 		{
-			StatementsBlock falseOp = createStatementsBlock(context);
+			StatementsBlock falseOp = createStatementsBlock(context, null);
 			ifStmt = new If(conditionExp, trueOp, falseOp);
 		}
 		
@@ -134,17 +134,17 @@ public class Generator
 		return ifStmt;
 	}
 
-	public While createWhile(Context context)
+	While createWhile(Context context, createParams params)
 	{
 		traceIn("While");
 		While whileStmt;
 		
-		AbsExpression conditionExp = _logic.generateExpression(context);
+		AbsExpression conditionExp = _logic.generateExpression(context, null);
 		
 		//in while loops, the context they define is the same as the stmtblock
 		List<AbsStatement> stmts = getLoopCounterStmts(context, null, true);
 
-		StatementsBlock op = createStatementsBlock(context);
+		StatementsBlock op = createStatementsBlock(context, null);
 		
 		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
 		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
@@ -157,17 +157,17 @@ public class Generator
 		return whileStmt;
 	}
 
-	public DoWhile createDoWhile(Context context)
+	DoWhile createDoWhile(Context context, createParams params)
 	{
 		traceIn("DoWhile");
 		DoWhile doWhileStmt;
 		
-		AbsExpression conditionExp = _logic.generateExpression(context);
+		AbsExpression conditionExp = _logic.generateExpression(context, null);
 
 		//in while loops, the context they define is the same as the stmtblock
 		List<AbsStatement> stmts = getLoopCounterStmts(context, null, true);
 		
-		StatementsBlock op = createStatementsBlock(context);
+		StatementsBlock op = createStatementsBlock(context, null);
 		
 		op.addStatementAtIndex(0, stmts.get(2)); //inject counter step
 		op.addStatementAtIndex(1, stmts.get(1)); //inject stopping condition (if.. break) 
@@ -181,7 +181,7 @@ public class Generator
 	}
 
 	// TODO: put loopvar inside the body
-	public For createFor(Context context)
+	For createFor(Context context, createParams params)
 	{
 		traceIn("For");
 		
@@ -189,7 +189,7 @@ public class Generator
 
 		List<AbsStatement> forStmts = getLoopCounterStmts(context, newContext, false);
 
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext);
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
 		
 		//create for loop: for(var new_var=0; new_var<random_number; new_var++)
 		For forLoop = new For(forStmts.get(0), (AbsExpression)forStmts.get(1), (AbsExpression)forStmts.get(2), stmtsBlock);
@@ -247,20 +247,20 @@ public class Generator
 		return (int) StdRandom.gaussian(exp, stddev);
 	}
 
-	public ForEach createForEach(Context context) 
+	ForEach createForEach(Context context, createParams params) 
 	{
 		traceIn("ForEach");
 		ForEach forEachStmt;
 		
 		// Temporary solution (could also be a var decleration)
 		context.identifierUseExistingVarProb = 1;
-		Identifier id = createIdentifier(context);
+		Identifier id = createIdentifier(context, null);
 		
 		// Temporary solution (could also be any existing iteratable var)
-		ArrayExp arr = createArrayExpression(context);
+		ArrayExp arr = createArrayExpression(context, null);
 		
 		// Generate StatementsBlock
-		StatementsBlock stmtsBlock = createStatementsBlock(context);
+		StatementsBlock stmtsBlock = createStatementsBlock(context, null);
 		
 		forEachStmt = new ForEach(id, arr, stmtsBlock);
 		
@@ -268,7 +268,7 @@ public class Generator
 		return forEachStmt;
 	}
 
-	public Switch createSwitch(Context context)
+	Switch createSwitch(Context context, createParams params)
 	{
 		traceIn("Switch");
 		Switch switchStmt;
@@ -278,7 +278,7 @@ public class Generator
 		Map<String, Integer> specialProbs = new HashMap<String, Integer>();
 		specialProbs.put("Identifier", dentifierProb);
 		
-		AbsExpression expr = _logic.generateExpression(context);
+		AbsExpression expr = _logic.generateExpression(context, null);
 		switchStmt = new Switch(expr);
 		
 		int exp = _configs.valInt(ConfigProperties.CASES_BLOCKS_NUM_NORMAL_EXP);
@@ -296,12 +296,12 @@ public class Generator
 				if(StdRandom.bernoulli(defaultProb))
 				{
 					context.caseBlockIncludeDefault = true;
-					switchStmt.addCaseOp(createCaseBlock(context));
+					switchStmt.addCaseOp(createCaseBlock(context, null));
 				}
 			}
 			
 			context.caseBlockIncludeDefault = false;
-			switchStmt.addCaseOp(createCaseBlock(context));			
+			switchStmt.addCaseOp(createCaseBlock(context, null));			
 		}
 		
 		//TODO: do we need to start a new context for switch? for case?
@@ -310,7 +310,7 @@ public class Generator
 		return switchStmt;
 	}
 
-	public CaseBlock createCaseBlock(Context context)
+	CaseBlock createCaseBlock(Context context, createParams params)
 	{
 		traceIn("CaseBlock");
 		CaseBlock caseBlock;
@@ -326,13 +326,13 @@ public class Generator
 				
 		List<Caseable> cases = new LinkedList<Caseable>();
 		for(int i = 0; i < casesNum; i++)
-			cases.add(createCase(context));
+			cases.add(createCase(context, null));
 
 		if(context.caseBlockIncludeDefault)
 			cases.add((Default)_factoryJST.getConstantNode("default"));
 		
 		// generate operation - statement block
-		StatementsBlock stmtBlock = createStatementsBlock(context);
+		StatementsBlock stmtBlock = createStatementsBlock(context, null);
 		
 		caseBlock = new CaseBlock(cases, stmtBlock);
 		
@@ -340,16 +340,16 @@ public class Generator
 		return caseBlock;
 	}
 	
-	public Case createCase(Context context)
+	Case createCase(Context context, createParams params)
 	{
 		traceIn("Case");
-		Case caseObj = new Case(_logic.generateExpression(context));
+		Case caseObj = new Case(_logic.generateExpression(context, null));
 		
 		traceOut();
 		return caseObj;
 	}
 
-	public FunctionDef createFunctionDefinition(Context context) 
+	FunctionDef createFunctionDefinition(Context context, createParams params) 
 	{
 		// Randomize function name
 		String funcName = _counterFunc.getNext();
@@ -369,18 +369,18 @@ public class Generator
 		newContext.identifierUseExistingVarProb =  _configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P);
 
 		// TODO: check that no 2 identifiers the same
-		List<Identifier> params = new LinkedList<Identifier>();
+		List<Identifier> funcParams = new LinkedList<Identifier>();
 		for(int i = 0; i < paramsNum; i++)
-			params.add(createIdentifier(newContext));
+			funcParams.add(createIdentifier(newContext, null));
 		
 		newContext.identifierUseExistingVarProb = prevVal;
 				
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext);
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
 		
-		return new FunctionDef(functionId, params, stmtsBlock, paramsNum);
+		return new FunctionDef(functionId, funcParams, stmtsBlock);
 	}
 
-	public VarDecleration createVarDecleration(Context context)
+	VarDecleration createVarDecleration(Context context, createParams params)
 	{
 		traceIn("VarDecleration");
 		VarDecleration varDecleration;
@@ -390,15 +390,13 @@ public class Generator
 		varDecleration = new VarDecleration();
 		
 		for (int i=0; i<decleratorsNum ; i++)
-		{
-			varDecleration.addDeclerator(createVarDeclerator(context));
-		}
+			varDecleration.addDeclerator(createVarDeclerator(context, null));
 		
 		traceOut();
 		return varDecleration;
 	}
 
-	public VarDeclerator createVarDeclerator(Context context)
+	VarDeclerator createVarDeclerator(Context context, createParams params)
 	{
 		traceIn("VarDeclerator");
 		VarDeclerator varDeclerator;
@@ -414,7 +412,7 @@ public class Generator
 		// check if the identifier is defined in the current scope
 		do
 		{
-			id = createIdentifier(context);	
+			id = createIdentifier(context, null);	
 		} while (context.getSymTable().contains(id));
 		
 		// add identifier to current scope
@@ -422,7 +420,7 @@ public class Generator
 		
 		// generate expression to be assigned to the var
 		context.identifierUseExistingVarProb = 1; // all vars must be exist
-		AbsExpression exp = _logic.generateExpression(context);
+		AbsExpression exp = _logic.generateExpression(context, null);
 		
 		varDeclerator = new VarDeclerator(id, exp);
 		
@@ -430,7 +428,7 @@ public class Generator
 		return varDeclerator;
 	}
 
-	public Continue createContinue(Context context)
+	Continue createContinue(Context context, createParams params)
 	{
 		traceIn("Continue");
 		Continue continueStmt = (Continue) _factoryJST.getConstantNode("continue");
@@ -439,7 +437,7 @@ public class Generator
 		return continueStmt;
 	}
 	
-	public Break createBreak(Context context)
+	Break createBreak(Context context, createParams params)
 	{
 		traceIn("Break");
 		Break breakStmt = ((Break) _factoryJST.getConstantNode("break"));
@@ -448,7 +446,7 @@ public class Generator
 		return breakStmt;
 	}
 
-	public Return createReturn(Context context)
+	Return createReturn(Context context, createParams params)
 	{
 		traceIn("Return");
 		Return returnStmt;
@@ -457,7 +455,7 @@ public class Generator
 		
 		//decide whether to return a value
 		if(StdRandom.bernoulli(returnValueProb))
-			returnStmt = new Return(_logic.generateExpression(context));
+			returnStmt = new Return(_logic.generateExpression(context, null));
 		else
 			returnStmt = new Return();
 		
@@ -466,7 +464,7 @@ public class Generator
 	}
 
 	// TODO: add new arg: list of SymEntry to add to the new context right after created 
-	public StatementsBlock createStatementsBlock(Context context)
+	StatementsBlock createStatementsBlock(Context context, createParams params)
 	{
 		traceIn("StatementsBlock");
 		StatementsBlock stmtBlock = new StatementsBlock();
@@ -486,7 +484,7 @@ public class Generator
 		Context newContext = new Context(context, null, null); // TODO: set flags (loop/function)
 		
 		// generate statements
-		stmtBlock.addStatement(_logic.generateStatement(newContext, size));
+		stmtBlock.addStatement(_logic.generateStatement(newContext, null, size));
 		
 		traceOut();
 		return stmtBlock;
@@ -499,7 +497,7 @@ public class Generator
 	 * 
 	 * TODO: think if this behavior is sound for future analysis. 
 	 */
-	public Assignment createAssignment(Context context) 
+	Assignment createAssignment(Context context, createParams params) 
 	{
 		traceIn("Assignment");
 		Assignment assignment;
@@ -508,8 +506,8 @@ public class Generator
 		
 		double prevVal = context.identifierUseExistingVarProb;
 		context.identifierUseExistingVarProb = useExistingVarProb;
-		Identifier id = createIdentifier(context);
-		AbsExpression expr = _logic.generateExpression(context);
+		Identifier id = createIdentifier(context, null);
+		AbsExpression expr = _logic.generateExpression(context, null);
 		
 		context.identifierUseExistingVarProb = prevVal;
 		
@@ -526,15 +524,15 @@ public class Generator
 		return assignment;
 	}
 
-	public CompoundAssignment createCompoundAssignment(Context context)
+	CompoundAssignment createCompoundAssignment(Context context, createParams params)
 	{
 		traceIn("CompoundAssignment");
 		CompoundAssignment compAsssignment;
 		
 		//use only existing variables
 		context.identifierUseExistingVarProb = 1;
-		Identifier var = createIdentifier(context);
-		AbsExpression expr = _logic.generateExpression(context);
+		Identifier var = createIdentifier(context, null);
+		AbsExpression expr = _logic.generateExpression(context, null);
 		CompoundOps op = CompoundOps.getRandomly();
 		
 		compAsssignment = new CompoundAssignment(var, op, expr);
@@ -543,39 +541,46 @@ public class Generator
 		return compAsssignment;
 	}
 
-	public Call createCall(Context context) 
+	Call createCall(Context context, createParams params) 
 	{
+		traceIn("Call");
+		Call call;
+		
 		SymTable symbols = context.getSymTable();
 		
-		List<Identifier> functions = symbols.getAvaiableIdentifiers(SymEntryType.FUNC);
+		List<SymEntry> functions = symbols.getAvaiableEntries(SymEntryType.FUNC);
 		int funcIndex = StdRandom.uniform(functions.size());
-		Identifier funcId = functions.get(funcIndex);
+		SymEntryFunc funcEntry = (SymEntryFunc) functions.get(funcIndex);
 		
 		// create list of parameter
-		int paramNum = symbols.getParameterNum(funcId);
+		int paramNum = funcEntry.getParamsNumber();
 		// TODO mabye make identifier more likely (like in switch)
-		List<AbsExpression> params = new ArrayList<AbsExpression>(_logic.generateExpression(context, paramNum));
+		List<AbsExpression> callParams = new ArrayList<AbsExpression>(_logic.generateExpression(context, null, paramNum));
 		
-		return (new Call(funcId, params));
+		// create the call node
+		call = new Call(funcEntry.getIdentifier(), callParams);
+		
+		traceOut();
+		return call;
 	}
 
-	public FunctionExp createFunctionExpression(Context context) {
+	FunctionExp createFunctionExpression(Context context, createParams params) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public MemberExp createMemberExpression(Context context) {
+	MemberExp createMemberExpression(Context context, createParams params) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	// TODO: implement
-	public ObjectExp createObjectExpression(Context context) {
+	ObjectExp createObjectExpression(Context context, createParams params) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	
-	public ArrayExp createArrayExpression(Context context) 
+	ArrayExp createArrayExpression(Context context, createParams params) 
 	{
 		traceIn("ArrayExpression");
 		ArrayExp arrayExp;
@@ -583,13 +588,13 @@ public class Generator
 		double p = _configs.valDouble(ConfigProperties.ARRAY_LENGTH_LAMBDA_EXP);
 		int length = (int)Math.ceil(StdRandom.exp(p));
 		
-		arrayExp = new ArrayExp(_logic.generateExpression(context, length));
+		arrayExp = new ArrayExp(_logic.generateExpression(context, null, length));
 		
 		traceOut();
 		return arrayExp;
 	}
 	
-	public Identifier createIdentifier(Context context) 
+	Identifier createIdentifier(Context context, createParams params) 
 	{
 		traceIn("Identifier");
 		Identifier id;
@@ -597,22 +602,22 @@ public class Generator
 		//decide whether to use an existing variable
 		if(StdRandom.bernoulli(context.identifierUseExistingVarProb))
 		{
-			List<Identifier> existingVars = context.getSymTable().getAvaiableIdentifiers(SymEntryType.VAR);
+			List<SymEntry> existingVars = context.getSymTable().getAvaiableEntries(SymEntryType.VAR);
 			int totalVars = existingVars.size();
 			
 			// if no var is defined then - create new var decleration at root scope!
 			if (totalVars == 0)
 			{
 				_rootContext.varDecleratorForceNewIdentifier = true;
-				_program.addStatement(createVarDecleration(_rootContext));
+				_program.addStatement(createVarDecleration(_rootContext, null));
 				_rootContext.varDecleratorForceNewIdentifier = false;
 				
 				// re-get available vars
-				existingVars = context.getSymTable().getAvaiableIdentifiers(SymEntryType.VAR);
+				existingVars = context.getSymTable().getAvaiableEntries(SymEntryType.VAR);
 				totalVars = existingVars.size();
 			}
 			
-			id = existingVars.get(StdRandom.uniform(totalVars));
+			id = (existingVars.get(StdRandom.uniform(totalVars))).getIdentifier();
 		}
 		else
 		{
@@ -624,7 +629,7 @@ public class Generator
 		return id;
 	}
 	
-	public This createThis(Context context)
+	This createThis(Context context, createParams params)
 	{
 		traceIn("This");
 		This thisExp = ((This) _factoryJST.getConstantNode("this"));
@@ -633,7 +638,7 @@ public class Generator
 		return thisExp;
 	}
 
-	public OperationExp createExpressionOp(Context context) 
+	OperationExp createExpressionOp(Context context, createParams params) 
 	{
 		traceIn("ExpressionOp");
 		OperationExp expressionOp;
@@ -641,7 +646,7 @@ public class Generator
 		Operator operator = Operator.getRandomly(null); // TODO: use it more smart - send desired return type
 		
 		// generate operands array
-		List<AbsExpression> operandsArray = _logic.generateExpression(context, operator.getNumOperands()); 
+		List<AbsExpression> operandsArray = _logic.generateExpression(context, null, operator.getNumOperands()); 
 	
 		expressionOp = new OperationExp(operator, operandsArray);
 		
@@ -649,7 +654,7 @@ public class Generator
 		return expressionOp;
 	}
 
-	public Literal createLiteral(Context context) 
+	Literal createLiteral(Context context, createParams params) 
 	{
 		traceIn("Literal");
 		Literal lit = null;
@@ -659,15 +664,15 @@ public class Generator
 		if (litType.isSingleValue())
 			lit = (new Literal(litType));
 		else if(litType.equals(LiteralTypes.NUMBER))
-			lit = (createLiteralNumber(context));
+			lit = (createLiteralNumber(context, null));
 		else if(litType.equals(LiteralTypes.STRING))
-			lit = (createLiteralString(context));
+			lit = (createLiteralString(context, null));
 		
 		traceOut();
 		return lit;
 	}
 
-	public LiteralString createLiteralString(Context context) 
+	LiteralString createLiteralString(Context context, createParams params) 
 	{
 		traceIn("LiteralString");
 		LiteralString litStr;
@@ -692,7 +697,7 @@ public class Generator
 		return litStr;
 	}
 
-	public LiteralNumber createLiteralNumber(Context  context) 
+	LiteralNumber createLiteralNumber(Context  context, createParams params) 
 	{
 		traceIn("LiteralNumber");
 		LiteralNumber litNum;

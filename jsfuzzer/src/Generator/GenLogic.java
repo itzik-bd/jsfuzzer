@@ -1,14 +1,13 @@
-package Generator.Logic;
+package Generator;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
 import Utils.StdRandom;
-import Generator.Context;
-import Generator.Generator;
 import Generator.Config.ConfigProperties;
 import Generator.Config.Configs;
+import Generator.Params.createParams;
 import JST.AbsExpression;
 import JST.AbsStatement;
 import JST.JSTNode;
@@ -23,45 +22,45 @@ public class GenLogic
 		_configs = configs;
 	}
 	
-	private JSTNode applyMethod(String methodName, Context context)
+	private JSTNode applyMethod(String methodName, Context context, createParams params)
 	{
 		JSTNode node;
 
 		switch (methodName)
 		{
-		case "ForEach": node = _gen.createForEach(context); break;
-		case "Switch": node = _gen.createSwitch(context); break;
-		case "For": node = _gen.createFor(context); break;
-		case "If": node = _gen.createIf(context); break;
-		case "DoWhile": node = _gen.createDoWhile(context); break;
-		case "Case": node = _gen.createCase(context); break;
-		case "While": node = _gen.createWhile(context); break;
-		case "Break": node = _gen.createBreak(context); break;
-		case "Return": node = _gen.createReturn(context); break;
-		case "Call": node = _gen.createCall(context); break;
-		case "This": node = _gen.createThis(context); break;
-		case "Literal": node = _gen.createLiteral(context); break;
-		case "CaseBlock": node = _gen.createCaseBlock(context); break;
-		case "FunctionDefinition": node = _gen.createFunctionDefinition(context); break;
-		case "Continue": node = _gen.createContinue(context); break;
-		case "ArrayExpression": node = _gen.createArrayExpression(context); break;
-		case "Identifier": node = _gen.createIdentifier(context); break;
-		case "VarDeclerator": node = _gen.createVarDeclerator(context); break;
-		case "Assignment": node = _gen.createAssignment(context); break;
+		case "ForEach": node = _gen.createForEach(context, params); break;
+		case "Switch": node = _gen.createSwitch(context, params); break;
+		case "For": node = _gen.createFor(context, params); break;
+		case "If": node = _gen.createIf(context, params); break;
+		case "DoWhile": node = _gen.createDoWhile(context, params); break;
+		case "Case": node = _gen.createCase(context, params); break;
+		case "While": node = _gen.createWhile(context, params); break;
+		case "Break": node = _gen.createBreak(context, params); break;
+		case "Return": node = _gen.createReturn(context, params); break;
+		case "Call": node = _gen.createCall(context, params); break;
+		case "This": node = _gen.createThis(context, params); break;
+		case "Literal": node = _gen.createLiteral(context, params); break;
+		case "CaseBlock": node = _gen.createCaseBlock(context, params); break;
+		case "FunctionDefinition": node = _gen.createFunctionDefinition(context, params); break;
+		case "Continue": node = _gen.createContinue(context, params); break;
+		case "ArrayExpression": node = _gen.createArrayExpression(context, params); break;
+		case "Identifier": node = _gen.createIdentifier(context, params); break;
+		case "VarDeclerator": node = _gen.createVarDeclerator(context, params); break;
+		case "Assignment": node = _gen.createAssignment(context, params); break;
 		case "StatementsBlock": 
 			// TODO: create new conetxt and pass to create method
-			node = _gen.createStatementsBlock(context); break;
-		case "FunctionExpression": node = _gen.createFunctionExpression(context); break;
-		case "MemberExpression": node = _gen.createMemberExpression(context); break;
-		case "CompoundAssignment": node = _gen.createCompoundAssignment(context); break;
-		case "ObjectExpression": node = _gen.createObjectExpression(context); break;
-		case "VarDecleration":node = _gen.createVarDecleration(context); break;
-		case "LiteralNumber": node = _gen.createLiteralNumber(context); break;
-		case "ExpressionOp": node = _gen.createExpressionOp(context); break;
-		case "LiteralString": node = _gen.createLiteralString(context); break;
+			node = _gen.createStatementsBlock(context, params); break;
+		case "FunctionExpression": node = _gen.createFunctionExpression(context, params); break;
+		case "MemberExpression": node = _gen.createMemberExpression(context, params); break;
+		case "CompoundAssignment": node = _gen.createCompoundAssignment(context, params); break;
+		case "ObjectExpression": node = _gen.createObjectExpression(context, params); break;
+		case "VarDecleration":node = _gen.createVarDecleration(context, params); break;
+		case "LiteralNumber": node = _gen.createLiteralNumber(context, params); break;
+		case "ExpressionOp": node = _gen.createExpressionOp(context, params); break;
+		case "LiteralString": node = _gen.createLiteralString(context, params); break;
 
 		// generate expression
-		case "Expression": node = generateExpression(context); break;
+		case "Expression": node = generateExpression(context, params); break;
 		
 		default: throw new IllegalArgumentException("JSTnode '"+methodName+"' creation method was not defined");
 		}
@@ -74,7 +73,7 @@ public class GenLogic
 	 * Get all probabilities from the config and chose randomly with respect to their relations
 	 * @return
 	 */
-	public AbsStatement generateStatement(Context context)
+	AbsStatement generateStatement(Context context, createParams params)
 	{
 		HashMap<String, Integer> hs = new HashMap<String, Integer>();
 		
@@ -111,7 +110,7 @@ public class GenLogic
 		// randomly choose statement
 		String createMethod = StdRandom.choseFromProbList(hs);
 		
-		return (AbsStatement) applyMethod(createMethod, context);
+		return (AbsStatement) applyMethod(createMethod, context, params);
 	}
 
 	/**
@@ -119,7 +118,7 @@ public class GenLogic
 	 * Get all pr  obabilities from the config and chose randomly with respect to their relations
 	 * @return
 	 */
-	public AbsExpression generateExpression(Context context)
+	AbsExpression generateExpression(Context context, createParams params)
 	{
 		HashMap<String, Double> hs = new HashMap<String, Double>();
 		
@@ -152,26 +151,26 @@ public class GenLogic
 		// randomly choose expression
 		String createMethod = StdRandom.choseFromProbList(hs);
 		
-		return (AbsExpression) applyMethod(createMethod, context);
+		return (AbsExpression) applyMethod(createMethod, context, params);
 	}
 
-	public List<AbsExpression> generateExpression(Context context, int size)
+	public List<AbsExpression> generateExpression(Context context, createParams params, int size)
 	{
 		List<AbsExpression> stmtList = new LinkedList<AbsExpression>();
 		
 		for (int i=0 ; i<size ; i++) {
-			stmtList.add(generateExpression(context));
+			stmtList.add(generateExpression(context, params));
 		}
 		
 		return stmtList;
 	}
 	
-	public List<AbsStatement> generateStatement(Context context, int size)
+	public List<AbsStatement> generateStatement(Context context, createParams params, int size)
 	{
 		List<AbsStatement> expList = new LinkedList<AbsStatement>();
 		
 		for (int i=0 ; i<size ; i++) {
-			expList.add(generateStatement(context));
+			expList.add(generateStatement(context, params));
 		}
 		
 		return expList;
