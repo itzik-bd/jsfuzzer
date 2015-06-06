@@ -16,6 +16,8 @@ public abstract class AbstractEngine
 	
 	public void runFile(String filePath)
 	{
+		System.out.println(String.format("Running file '%s' over engine '%s'", filePath, _platformName));
+		
 		ProcessBuilder proc = new ProcessBuilder(_platformExe, filePath);
 		File outputFile = new File(generateFileName(filePath));
 		File errFile = new File(generateErrFileName(filePath));

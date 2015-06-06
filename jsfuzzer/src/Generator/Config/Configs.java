@@ -1,11 +1,10 @@
 package Generator.Config;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+
+import Utils.FilesIO;
 
 public class Configs
 {
@@ -13,17 +12,16 @@ public class Configs
 	
 	private Map<ConfigProperties, Object> _configsMap = new HashMap<ConfigProperties, Object>();
 	
-	public static Configs loadConfigFile(String configFile) throws IOException
+	public static Configs loadConfigFile(String configFile) throws Exception
 	{
+		// load properties
 		String actualFile = (configFile != null) ? configFile : DEFAULT_CONFIG_FILE;
+		Properties p = FilesIO.loadPropertiesFile(actualFile);
+		
+		StringBuffer errorsList = new StringBuffer();
+		boolean errorFound = false;
 		
 		Configs res = new Configs();
-		boolean errorFound = false;
-		Properties p = new Properties();
-		
-		InputStream input = new FileInputStream(actualFile);
-		p.load(input);
-		input.close();
 		
 		for(ConfigProperties prop : ConfigProperties.values())
 		{
@@ -34,8 +32,8 @@ public class Configs
 			 valStr = p.getProperty(prop.toString());
 			 if(valStr == null)
 			 {
-				System.err.println(String.format("config property %s doesn't exists", prop));
-				errorFound = true;
+				 errorsList.append(String.format("config property %s doesn't exists\n", prop));
+				 errorFound = true;
 			 }
 			 else
 			 {
@@ -43,7 +41,7 @@ public class Configs
 				try {
 					valParsed = parseValue(valStr, prop);
 				} catch (Exception e) {
-					System.err.println(String.format("config property %s is not from type %s", prop, prop.getClassType().getName()));
+					errorsList.append(String.format("config property %s is not from type %s\n", prop, prop.getClassType().getName()));
 					errorFound = true;
 				}
 				
@@ -52,8 +50,13 @@ public class Configs
 			 }
 		}
 		
-		// return null if error occurred
-		return errorFound ? null : res;
+		// check if errors occurred
+		if (errorFound)
+		{
+			throw new Exception(errorsList.toString());
+		}
+		
+		return res;
 	}
 	
 	private static Object parseValue(String valStr, ConfigProperties prop) throws Exception

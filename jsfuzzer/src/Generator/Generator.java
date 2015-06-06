@@ -37,11 +37,13 @@ public class Generator
 	
 	private final boolean _verbose;
 	
-	public static Program generate(Configs configs, boolean verbose)
+	public static Program generate(Configs configs, String seed, boolean verbose)
 	{
 		Generator gen = new Generator(configs, verbose);
 		
-		StdRandom.setSeed(1436423645); // TODO: remove set seed after development
+		if (seed != null) {
+			StdRandom.setSeed(Long.parseLong(seed)); // development: use seed: 1436423645
+		}
 		
 		// generate program
 		Program prog = gen.createProgram();
