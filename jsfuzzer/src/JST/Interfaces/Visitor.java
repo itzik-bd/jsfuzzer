@@ -63,4 +63,6 @@ public interface Visitor
 	public Object visit(Literal literal, Object context);
 	public Object visit(LiteralString literal, Object context);
 	public Object visit(LiteralNumber literal, Object context);
+
+	public Object visit(OutputStatement outputStmt, Object context);
 }

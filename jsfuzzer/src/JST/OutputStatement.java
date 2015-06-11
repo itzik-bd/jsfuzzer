@@ -26,8 +26,8 @@ public class OutputStatement extends AbsStatement
 	}
 
 	@Override
-	public Object accept(Visitor visitor, Object context) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object accept(Visitor visitor, Object context)
+	{
+		return visitor.visit(this, context);
 	}
 }

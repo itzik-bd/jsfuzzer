@@ -23,7 +23,7 @@ public class GenLogic
 		_configs = configs;
 	}
 	
-	private JSTNode applyMethod(String methodName, Context context, createParams params)
+	protected JSTNode applyMethod(String methodName, Context context, createParams params)
 	{
 		JSTNode node;
 

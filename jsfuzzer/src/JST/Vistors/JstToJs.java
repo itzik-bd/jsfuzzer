@@ -510,4 +510,10 @@ public class JstToJs implements Visitor
 	{
 		return ((boolean)booleanValue == true);
 	}
+
+	@Override
+	public Object visit(OutputStatement outputStmt, Object context) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

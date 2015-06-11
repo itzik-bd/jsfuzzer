@@ -88,7 +88,7 @@ public enum Operator
 		if (type != null) {
 			for (Iterator<Operator> iter = values.iterator(); iter.hasNext() ; ) {
 				Operator op = iter.next();
-			    if (!(op == null || op._outputType == type)) {
+			    if (op != null && op._outputType != type) {
 			        iter.remove();
 			    }
 			}

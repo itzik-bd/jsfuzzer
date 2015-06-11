@@ -1,6 +1,6 @@
 package Generator.Params;
 
-public class CaseBlockParams implements createParams
+public class CaseBlockParams extends createParams
 {
 	private boolean _includeDefault = false;
 	
@@ -8,10 +8,16 @@ public class CaseBlockParams implements createParams
 		_includeDefault = includeDefault;
 	}
 	
-	public static boolean getIncludeDefault(createParams params) {
-		if (params == null)
-			return false;
-		
-		return ((CaseBlockParams) params)._includeDefault;
+	public static boolean getIncludeDefault(createParams params)
+	{
+		boolean defaultValue = false;
+		return (boolean) decide(params, defaultValue, new getParamField() {
+			@Override
+			public Object fetch(createParams params) {
+				return ((CaseBlockParams) params)._includeDefault;
+			}
+		});
 	}
+	
+	
 }

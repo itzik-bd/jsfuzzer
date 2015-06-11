@@ -48,6 +48,7 @@ package Utils;
  *************************************************************************/
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -351,6 +352,11 @@ public final class StdRandom {
         }
     }
 
+	public static <T> T choseFromListUniform(List<T> list)
+	{
+		return list.get(uniform(list.size()));
+	}
+    
 	//Get probs and chose rendomly with respect to their relations
 	public static <T> T choseFromProbList(HashMap<T, Double> hs)
 	{

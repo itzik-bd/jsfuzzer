@@ -16,6 +16,7 @@ import JST.*;
 import JST.Enums.CompoundOps;
 import JST.Enums.LiteralTypes;
 import JST.Enums.Operator;
+import JST.Helper.JSTProperties;
 import JST.Interfaces.Caseable;
 import JST.Interfaces.ObjectKeys;
 import Utils.StdRandom;
@@ -25,6 +26,8 @@ public class Generator
 {	
 	private final JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
 	private final Configs _configs;
+	
+	private final JSTProperties _jstProp = new JSTProperties();
 	
 	private final GenLogic _logic;
 	
@@ -219,10 +222,7 @@ public class Generator
 		Identifier loopCounter = _factoryJST.getLoopIdentifier(newName);
 		VarDecleration loopCounterDecl = new VarDecleration();
 		loopCounterDecl.addDeclerator(new VarDeclerator(loopCounter, new LiteralNumber("0")));
-		
-		//the var will be declared in outside scope
-		context.getParent().getSymTable().newEntry(new SymEntryVar(loopCounter));
-		
+				
 		//explicitly create binaryOp: new_var++ < max_iterations 
 		int loopIterationsLimit = getRandomLoopIterationsLimit();
 		LiteralNumber loopIterationsLiteral = new LiteralNumber(new Integer(loopIterationsLimit).toString());
@@ -251,16 +251,19 @@ public class Generator
 	{
 		traceIn("ForEach");
 		ForEach forEachStmt;
-		
-		Identifier id = createIdentifier(context, new IdentifierParams(1)); // TODO: Temporary solution (could also be a var decleration)
-		
+
 		// Temporary solution (could also be any existing iteratable var)
 		ArrayExp arr = createArrayExpression(context, null);
 		
+		Context newContext = new Context(context, true, null);
+
+		// create one varDecl (with new identifier) wihtout init value
+		VarDecleration varDecl = createVarDecleration(newContext, new VarDeclerationParams(true, 1, false));
+				
 		// Generate StatementsBlock
-		StatementsBlock stmtsBlock = createStatementsBlock(context, null);
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
 		
-		forEachStmt = new ForEach(id, arr, stmtsBlock);
+		forEachStmt = new ForEach(varDecl, arr, stmtsBlock);
 		
 		traceOut();
 		return forEachStmt;
@@ -397,12 +400,18 @@ public class Generator
 		traceIn("VarDecleration");
 		VarDecleration varDecleration;
 		
-		double lambda = _configs.valDouble(ConfigProperties.VAR_DECL_NUM_LAMBDA_EXP);
-		int decleratorsNum = StdRandom.expCeiled(lambda);
+		int decleratorsNum = VarDeclerationParams.getNumDeclerators(params);
+		
+		if(decleratorsNum == 0)
+		{
+			double lambda = _configs.valDouble(ConfigProperties.VAR_DECL_NUM_LAMBDA_EXP);
+			decleratorsNum = StdRandom.expCeiled(lambda);
+		}
+		
 		varDecleration = new VarDecleration();
 		
 		for (int i=0; i<decleratorsNum ; i++)
-			varDecleration.addDeclerator(createVarDeclerator(context, null));
+			varDecleration.addDeclerator(createVarDeclerator(context, params));
 		
 		traceOut();
 		return varDecleration;
@@ -432,9 +441,18 @@ public class Generator
 		// add identifier to current scope
 		context.getSymTable().newEntry(new SymEntryVar(id));
 		
-		// generate expression to be assigned to the var
-		AbsExpression exp = _logic.generateExpression(context, null);
 		
+		
+		// generate expression to be assigned to the var
+		boolean createInitExp;
+		switch (VarDeclerationParams.getHasInitValue(params))
+		{
+			case TRUE: createInitExp = true; break;
+			case UNDEF: createInitExp = StdRandom.bernoulli(_configs.valDouble(ConfigProperties.VAR_DECL_INIT_VAL_BERNOULLY_P)); break;
+			default: createInitExp = false;
+		}
+		
+		AbsExpression exp = createInitExp ? _logic.generateExpression(context, null) : null;
 		varDeclerator = new VarDeclerator(id, exp);
 		
 		traceOut();
@@ -502,26 +520,19 @@ public class Generator
 
 	/*
 	 * This function draws an identifier to be assigned.
-	 * Currently we are allowing the identifier not to be defined in higher scopes,
-	 * which in such case it will be defined in the root scope.
+	 * Currently we force the identifier to be defined in higher scopes (or current scope),
 	 * 
-	 * TODO: think if this behavior is sound for future analysis. 
+	 * TODO: think if this is not too restrictive 
 	 */
 	Assignment createAssignment(Context context, createParams params) 
 	{
 		traceIn("Assignment");
 		Assignment assignment;
-		
-		double useExistingVarProb = _configs.valDouble(ConfigProperties.ASSIGNMENT_USE_EXISTING_VAR_BERNOULLY_P);
-		
-		Identifier id = createIdentifier(context, new IdentifierParams(useExistingVarProb));
+				
+		//force an existing variable (1.0) to be assigned to
+		Identifier id = createIdentifier(context, new IdentifierParams(1.0));
 		AbsExpression expr = _logic.generateExpression(context, null);
-		
-		// make sure identifier is defined (if not add it to top level scope)
-		SymEntry entry = context.getSymTable().lookup(id);
-		if (entry == null)
-			_rootContext.getSymTable().newEntry(new SymEntryVar(id));
-		
+			
 		assignment = new Assignment(id, expr);
 		
 		traceOut();
@@ -533,7 +544,7 @@ public class Generator
 		traceIn("CompoundAssignment");
 		CompoundAssignment compAsssignment;
 		
-		Identifier var = createIdentifier(context, new IdentifierParams(1)); // use only existing variables
+		Identifier var = createIdentifier(context, new IdentifierParams(1.0)); // use only existing variables
 		AbsExpression expr = _logic.generateExpression(context, null);
 		CompoundOps op = CompoundOps.getRandomly();
 		
@@ -584,8 +595,9 @@ public class Generator
 		double lambda = _configs.valDouble(ConfigProperties.OBJECT_KEYS_LENGTH_LAMBDA_EXP);
 		int size = StdRandom.expCeiled(lambda);
 		
-		for (int i=0 ; i<size ; i++) {
-			ObjectKeys key = createIdentifier(context, null); // TODO: generate all object keys (strings also)
+		for (int i=0 ; i<size ; i++) 
+		{
+			ObjectKeys key = (ObjectKeys) _logic.applyMethod(StdRandom.choseFromListUniform(_jstProp.getObjectKeys()), context, null);
 			AbsExpression val = _logic.generateExpression(context, null);
 			
 			objExp.addToMap(key, val);
@@ -623,7 +635,7 @@ public class Generator
 			// if no var is defined then - create new var decleration at root scope!
 			if (totalVars == 0)
 			{
-				_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true)));
+				_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true, null, null)));
 				
 				// re-get available vars
 				existingVars = context.getSymTable().getAvaiableEntries(SymEntryType.VAR);

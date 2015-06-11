@@ -1,17 +1,21 @@
 package Generator.Params;
 
-public class IdentifierParams implements createParams
+public class IdentifierParams extends createParams
 {
 	private double _useExistingVarProb = 0;
 	
 	public IdentifierParams(double useExistingVarProb) {
 		_useExistingVarProb = useExistingVarProb;
 	}
-	
-	public static double getUseExistingVarProb(createParams params) {
-		if (params == null)
-			return 1; // by default all generated vars must be defined
-		
-		return ((IdentifierParams) params)._useExistingVarProb;
+
+	public static double getUseExistingVarProb(createParams params)
+	{
+		double defaultValue = 1.0;
+		return (double) decide(params, defaultValue, new getParamField() {
+			@Override
+			public Object fetch(createParams params) {
+				return ((IdentifierParams) params)._useExistingVarProb;
+			}
+		});
 	}
 }
