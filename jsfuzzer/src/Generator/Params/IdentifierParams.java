@@ -2,7 +2,7 @@ package Generator.Params;
 
 public class IdentifierParams extends createParams
 {
-	private double _useExistingVarProb = 0;
+	private double _useExistingVarProb;
 	
 	public IdentifierParams(double useExistingVarProb) {
 		_useExistingVarProb = useExistingVarProb;

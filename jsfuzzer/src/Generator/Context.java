@@ -21,36 +21,51 @@ public class Context
 		_inFunction = false;
 		_contextDepth = 0;
 	}
-
+	
 	/**
 	 * Constructor for inner node in the tree
 	 * 
 	 * @param parent - the parent of the node
-<<<<<<< HEAD
-	 * @param inLoop - flag if it's a loop context
-=======
 	 * @param inLoop - flag if its a loop context - null means use the parent's inLoop
 	 * @param inFunction - flag if its a function context - null means use the parent's inFunction  
->>>>>>> StmtBlock gets it's context by param
+	 * @param createNewSymTable - whether to create new symbol table or to use parent's 
 	 */
-	public Context(Context parent, Boolean inLoop, Boolean inFunction) {
+	public Context(Context parent, Boolean inLoop, Boolean inFunction, boolean createNewSymTable) {
 		_parentContext = parent;
-		_symTable = new SymTable(parent._symTable);
-		_loopDepth = parent._loopDepth
-				+ ((inLoop != null && inLoop == true) ? 1 : 0);
-		_inFunction = (inFunction == null || parent._inFunction == true) ? parent._inFunction
-				: inFunction;
+		_symTable = createNewSymTable ? new SymTable(parent._symTable) : parent._symTable;
+		_loopDepth = calculateLoopDepth(parent, inLoop);
+		_inFunction = calculateInFunction(parent, inFunction);
 		_contextDepth = parent._contextDepth + 1;
 	}
 
+	private boolean calculateInFunction(Context parent, Boolean inFunction)
+	{
+		if (inFunction == null || parent._inFunction == true) {
+			return parent._inFunction;
+		} else {
+			return inFunction;
+		}
+	}
+
+	private int calculateLoopDepth(Context parent, Boolean inLoop)
+	{
+		if (inLoop == null) {
+			return parent._loopDepth;
+		} else if (inLoop == true) {
+			return parent._loopDepth + 1;
+		} else {
+			return 0; // inLoop==false, so reset count
+		}
+	}
+
 	/**
 	 * Constructor for inner node in the tree
 	 * 
 	 * @param parent - the parent of the node
 	 */
-	public Context(Context parent) {
-		this(parent, null, null);
-	}
+//	public Context(Context parent) {
+//		this(parent, null, null, false);
+//	}
 
 	public SymTable getSymTable() {
 		return _symTable;

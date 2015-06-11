@@ -8,10 +8,12 @@ import java.util.List;
 public class JSTProperties
 {
 	private List<String> objectKeys;
+	private List<String> assignable;
 	
 	public JSTProperties()
 	{
 		objectKeys = Arrays.asList("Identifier", "LiteralString");
+		assignable = Arrays.asList("Identifier"); // TODO: add "MemberExp" to list when this jst will be supported!!!!!!!
 	}
 
 	public List<String> getObjectKeys()
@@ -19,5 +21,7 @@ public class JSTProperties
 		return objectKeys;
 	}
 
-
+	public List<String> getAssignable() {
+		return assignable;
+	}
 }

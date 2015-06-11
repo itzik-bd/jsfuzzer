@@ -42,20 +42,20 @@ public class GenLogic
 		case "This": node = _gen.createThis(context, params); break;
 		case "Literal": node = _gen.createLiteral(context, params); break;
 		case "CaseBlock": node = _gen.createCaseBlock(context, params); break;
-		case "FunctionDefinition": node = _gen.createFunctionDefinition(context, params); break;
+		case "FunctionDef": node = _gen.createFunctionDef(context, params); break;
 		case "Continue": node = _gen.createContinue(context, params); break;
-		case "ArrayExpression": node = _gen.createArrayExpression(context, params); break;
+		case "ArrayExp": node = _gen.createArrayExp(context, params); break;
 		case "Identifier": node = _gen.createIdentifier(context, params); break;
 		case "VarDeclerator": node = _gen.createVarDeclerator(context, params); break;
 		case "Assignment": node = _gen.createAssignment(context, params); break;
-		case "StatementsBlock": node = _gen.createStatementsBlock(new Context(context), params); break;
-		case "FunctionExpression": node = _gen.createFunctionExpression(context, params); break;
-		case "MemberExpression": node = _gen.createMemberExpression(context, params); break;
+		case "StatementsBlock": node = _gen.createStatementsBlock(context, params); break;
+		case "FunctionExp": node = _gen.createFunctionExp(context, params); break;
+		case "MemberExp": node = _gen.createMemberExp(context, params); break;
 		case "CompoundAssignment": node = _gen.createCompoundAssignment(context, params); break;
-		case "ObjectExpression": node = _gen.createObjectExpression(context, params); break;
+		case "ObjectExp": node = _gen.createObjectExp(context, params); break;
 		case "VarDecleration":node = _gen.createVarDecleration(context, params); break;
 		case "LiteralNumber": node = _gen.createLiteralNumber(context, params); break;
-		case "ExpressionOp": node = _gen.createExpressionOp(context, params); break;
+		case "OperationExp": node = _gen.createOperationExp(context, params); break;
 		case "LiteralString": node = _gen.createLiteralString(context, params); break;
 
 		// generate expression
@@ -78,7 +78,7 @@ public class GenLogic
 		
 		// All properties are relative to the total of all properties
 		hs.put("CompoundAssignment", (double) _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT));
-		hs.put("FunctionDefinition", (double) _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
+		hs.put("FunctionDef", (double) _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
 		hs.put("If", (double) _configs.valInt(ConfigProperties.STMT_IF));
 		//hs.put("OutputStatement", _configs.valInt(ConfigProperties.STMT_OUTPUTSTATEMENT));
 		hs.put("Switch", (double) _configs.valInt(ConfigProperties.STMT_SWITCH));
@@ -129,13 +129,13 @@ public class GenLogic
 		hs.put("This", _configs.valInt(ConfigProperties.EXPR_THIS)/factorDepth);
 		
 		// non-leafs - probability decrease as depth grows
-		hs.put("ExpressionOp", _configs.valInt(ConfigProperties.EXPR_EXPRESSIONOP)*factorDepth);
+		hs.put("OperationExp", _configs.valInt(ConfigProperties.EXPR_EXPRESSIONOP)*factorDepth);
 		
-		//hs.put("ArrayExpression", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
+		//hs.put("ArrayExp", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
 		//hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
-		//hs.put("MemberExpression", _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
-		hs.put("ObjectExpression", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
-		//hs.put("FunctionExpression", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);
+		//hs.put("MemberExp", _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
+		hs.put("ObjectExp", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
+		//hs.put("FunctionExp", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);
 
 		
 		// Change special values acording to the input map

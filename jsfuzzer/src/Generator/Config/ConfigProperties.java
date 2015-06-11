@@ -2,10 +2,8 @@ package Generator.Config;
 
 public enum ConfigProperties
 {
-	CASE_NUM_NORMAL_EXP("cases_num_normal_exp", Integer.class),
-	CASES_NUM_NORMAL_STDDEV("cases_num_normal_stddev",Integer.class),
-	CASES_BLOCKS_NUM_NORMAL_EXP("cases_blocks_num_normal_exp",Integer.class),
-	CASES_BLOCKS_NUM_NORMAL_STDDEV("cases_blocks_num_normal_stddev", Integer.class),
+	SWITCH_BLOCK_NUM_LAMBDA_EXP("switch_block_num_lambda_exp", Double.class),
+	CASE_NUM_LAMBDA_EXP("case_num_lambda_exp", Double.class),
 	CASE_BLOCK_INCLUDE_DEFAULT_BERNOULLY_P("case_block_include_default_bernoully_p", Double.class),
 	RETURN_VALUE_BERNOULLY_P("return_value_bernoully_p", Double.class),
 	STMTS_BLOCK_SIZE_LAMBDA("stmts_block_size_lambda", Double.class),

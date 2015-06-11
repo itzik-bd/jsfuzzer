@@ -2,12 +2,10 @@ package JST;
 
 import java.util.List;
 
-import JST.Interfaces.Assignable;
 import JST.Interfaces.Visitor;
 
-public class Call extends AbsExpression implements Assignable
+public class Call extends AbsExpression
 {
-	
 	private AbsExpression _base;
 	
 	private List<AbsExpression> _params;
