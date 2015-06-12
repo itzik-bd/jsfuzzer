@@ -1,6 +1,6 @@
 package JST;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import JST.Interfaces.ObjectKeys;
@@ -12,7 +12,7 @@ public class ObjectExp extends AbsExpression
 	
 	public ObjectExp()
 	{
-		_map = new HashMap<ObjectKeys, AbsExpression>();
+		_map = new LinkedHashMap<ObjectKeys, AbsExpression>();
 	}
 	
 	public Map<ObjectKeys, AbsExpression> getMap()

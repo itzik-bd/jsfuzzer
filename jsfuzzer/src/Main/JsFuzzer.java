@@ -3,7 +3,9 @@ package Main;
 import Engines.EnginesUtil;
 import Generator.Generator;
 import Generator.Config.Configs;
+import JST.Program;
 import JST.Vistors.JstToJs;
+import JST.Vistors.JstToTree;
 
 public class JsFuzzer
 {
@@ -87,17 +89,34 @@ public class JsFuzzer
 		// try to generate program, and in case of exception - print the error
 		try
 		{
+			// load configuration file
 			Configs configs = Configs.loadConfigFile(_configsFile);
-			JST.Program program = Generator.generate(configs, _seed, false);
-			String programStr = JstToJs.executeCostum(program, "  ", "\n");
-					
-			Utils.FilesIO.WriteToFile(_outputFile, programStr);
-			System.out.println(String.format("new random program was saved to '%s'", _outputFile));
+			System.out.println("Configuration file was successfully loaded");
 			
+			// generate program
+			Generator gen = new Generator(configs, _seed);
+			Program program = gen.createProgram();
+			System.out.println("New random program was successfully generated");
+			
+			// save program as Javascript file					
+			Utils.FilesIO.WriteToFile(_outputFile, JstToJs.executeCostum(program, "  ", "\n"));
+			System.out.println(String.format("The generated program was successfully saved to '%s'", _outputFile));
+			
+			// save verbose to file
+			Utils.FilesIO.WriteToFile(_outputFile+".verbose", gen.getVerboseOutput());
+			System.out.println(String.format("The verbose was successfully saved to '%s'", _outputFile+".verbose"));
+			
+			// save tree to file
+			Utils.FilesIO.WriteToFile(_outputFile+".tree", JstToTree.execute(program));
+			System.out.println(String.format("The program tree was successfully saved to '%s'", _outputFile+".tree"));
+			
+			// run the new program over engines if client asked for it
 			if (_runEngines) {
 				EnginesUtil engines = new EnginesUtil();
 				engines.runFile(_outputFile);	
-			}			
+			}
+			
+			System.out.println("All done.");
 		}
 		catch (Exception e)
 		{

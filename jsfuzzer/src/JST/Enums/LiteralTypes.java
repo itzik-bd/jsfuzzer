@@ -42,4 +42,9 @@ public enum LiteralTypes
 
 		return values[StdRandom.uniform(values.length)];
 	}
+	
+	@Override
+	public String toString() {
+		return _token;
+	}
 }

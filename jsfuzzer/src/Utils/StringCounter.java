@@ -27,4 +27,11 @@ public class StringCounter
 	public long getCurrentId() {
 		return _id;
 	}
+	
+	/**
+	 * restart the counter
+	 */
+	public void restart() {
+		_id = 0;
+	}
 }

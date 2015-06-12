@@ -24,4 +24,10 @@ public class LiteralNumber extends Literal
 	public Object accept(Visitor visitor, Object context) {
 		return visitor.visit(this, context);
 	}
+	
+	@Override
+	public String toString()
+	{
+		return _value;
+	}
 }

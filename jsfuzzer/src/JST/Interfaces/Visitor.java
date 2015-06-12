@@ -6,7 +6,7 @@ public interface Visitor
 {
 	public Object visit(Program program, Object context);
 	
-	public Object visit(Comment program, Object context);
+	public Object visit(Comment comment, Object context);
 	
 	/* Statement Nodes */
 	

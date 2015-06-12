@@ -38,6 +38,12 @@ public class Identifier extends AbsExpression implements ObjectKeys, Assignable
 	}
 	
 	@Override
+	public String toString()
+	{
+		return _name;
+	}
+	
+	@Override
 	public Object accept(Visitor visitor, Object context) {
 		return visitor.visit(this, context);
 	}

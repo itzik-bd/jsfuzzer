@@ -14,10 +14,6 @@ public class If extends AbsStatement
 		_elseStmtsBlock = elseStmtsBlock;
 	}
 	
-	public If(AbsExpression condition, StatementsBlock stmtsBlock) {
-		this(condition, stmtsBlock, null);
-	}
-	
 	public AbsExpression getCondition() {
 		return _condition;
 	}

@@ -26,6 +26,6 @@ public abstract class SymEntry
 	@Override
 	public String toString()
 	{
-		return String.format("%10s %s", _type, _id.getName());
+		return String.format("%4s %s", _type, _id.getName());
 	}
 }
