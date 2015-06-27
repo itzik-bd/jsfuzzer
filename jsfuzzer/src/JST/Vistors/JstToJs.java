@@ -514,6 +514,7 @@ public class JstToJs implements Visitor
 	@Override
 	public Object visit(OutputStatement outputStmt, Object context)
 	{
-		return identString(String.format("console.log(%s)", outputStmt.getExp().accept(this, false)));
+		String param = (String) outputStmt.getExp().accept(this, false);
+		return identString(String.format("typeof console !== 'undefined' ? console.log(%s) : print(%s);", param, param));
 	}
 }
