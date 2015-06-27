@@ -6,30 +6,33 @@ import java.io.IOException;
 public abstract class AbstractEngine
 {
 	private String _platformName;
-	private String _platformExe;
 	
-	public AbstractEngine(String name, String exe)
+	public AbstractEngine(String name)
 	{
 		_platformName = name;
-		_platformExe = exe;
 	}
 	
 	public void runFile(String filePath)
 	{
 		System.out.println(String.format("Running file '%s' over engine '%s'", filePath, _platformName));
 		
-		ProcessBuilder proc = new ProcessBuilder(_platformExe, filePath);
-		File outputFile = new File(generateFileName(filePath));
-		File errFile = new File(generateErrFileName(filePath));
-		proc.redirectOutput(outputFile);
-		proc.redirectError(errFile);
-		try {
-			proc.start();
-		} catch (IOException e) {
+		// create new js process
+		ProcessBuilder proc = new ProcessBuilder(getCommandLineList(filePath));
+		
+		// redirect stdout and stderr
+		proc.redirectOutput(new File(generateFileName(filePath)));
+		proc.redirectError(new File(generateErrFileName(filePath)));
+		
+		// execute program
+		try { proc.start(); }
+		catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
+	/** this method should return a array of cli command to be executed */
+	protected abstract String[] getCommandLineList(String filePath);
 	
 	protected String generateFileName(String file)
 	{

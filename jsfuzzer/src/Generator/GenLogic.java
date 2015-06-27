@@ -132,7 +132,7 @@ public class GenLogic
 		hs.put("OperationExp", _configs.valInt(ConfigProperties.EXPR_EXPRESSIONOP)*factorDepth);
 		
 		//hs.put("ArrayExp", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
-		//hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
+		hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
 		//hs.put("MemberExp", _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
 		hs.put("ObjectExp", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
 		//hs.put("FunctionExp", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);

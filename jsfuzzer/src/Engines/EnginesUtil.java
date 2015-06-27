@@ -11,6 +11,9 @@ public class EnginesUtil
 	{
 		_engineList.add(new SpiderMonkeyEngine());
 		_engineList.add(new NodejsEngine());
+		_engineList.add(new RhinoEngine());
+		_engineList.add(new DynjsEngine());
+		_engineList.add(new NashornEngine());
 	}
 	
 	public List<AbstractEngine> getEngineList()

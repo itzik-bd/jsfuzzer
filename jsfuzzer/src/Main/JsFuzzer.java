@@ -9,9 +9,14 @@ import JST.Vistors.JstToTree;
 
 public class JsFuzzer
 {
-	private String _outputFile = null;
+	// var to hold js file path
+	private String _jsFile = null;
+	
+	// vars for generating program
+	private boolean _isGenerate = true;
 	private String _configsFile = null;
 	private String _seed = null;
+	
 	private boolean _showHelpAndExit = false;
 	private boolean _runEngines = false;
 	
@@ -28,11 +33,16 @@ public class JsFuzzer
 	
 	public static String getUsageString()
 	{
-		return "usage: JsFuzzer -o <FILE> [OPTIONS]\n"
-				+ "-o <FILE> - save output to file\n"
-				+ "-c <FILE> - load costum configuration file\n"
-				+ "-s <SEED> - set the seed of the random generator\n"
-				+ "-r        - runs generated program over engines";
+		return "usage: JsFuzzer [OPTIONS]\n"
+				+ "--help           - show this help\n\n"
+				+ "To generate new program:\n"
+				+ "--out <FILE>     - save output to file\n"
+				+ "--config <FILE>  - load costum configuration file\n"
+				+ "--seed <SEED>    - set the seed of the random generator\n\n"
+				+ "To use a javascript file:\n"
+				+ "--load <FILE>    - load javascript file\n\n"
+				+ "To compare over supported engines:\n"
+				+ "--run            - runs generated program over engines\n";
 	}
 	
 	public void parseArguments(String[] args)
@@ -42,19 +52,25 @@ public class JsFuzzer
 		
 		while (i<len)
 		{
-			if (args[i].equals("-o") && i+1 < len) {
-				_outputFile = args[i+1];
+			if (args[i].equals("--out") && i+1 < len) {
+				_jsFile = args[i+1];
+				_isGenerate = true;
 				i++;
 			}
-			else if (args[i].equals("-c") && i+1 < len) {
+			else if (args[i].equals("--config") && i+1 < len) {
 				_configsFile = args[i+1];
 				i++;
 			}
-			else if (args[i].equals("-s") && i+1 < len) {
+			else if (args[i].equals("--seed") && i+1 < len) {
 				_seed  = args[i+1];
 				i++;
 			}
-			else if (args[i].equals("-r")) {
+			else if (args[i].equals("--load") && i+1 < len) {
+				_jsFile  = args[i+1];
+				_isGenerate = false; // no need to generate new program
+				i++;
+			}
+			else if (args[i].equals("--run")) {
 				_runEngines = true;
 			}
 			else if (args[i].equals("--help")) {
@@ -63,6 +79,11 @@ public class JsFuzzer
 			
 			// advance to next argument
 			i++;
+		}
+		
+		// show help if no path were chosen
+		if (_jsFile==null) {
+			_showHelpAndExit = true;
 		}
 	}
 	
@@ -75,13 +96,31 @@ public class JsFuzzer
 		}
 		
 		// check that the client supplied output file
-		if (_outputFile == null) {
+		if (_jsFile == null) {
 			System.out.println("Please specify an output file with -o <FILE>");
 			return;
 		}
 		
-		// generate new file
-		generate();
+		// check whether to generate a new program
+		if (_isGenerate) {
+			generate();
+		}
+		
+		// run js program over engines if user asked for it
+		if (_runEngines) {
+			runEngines();
+		}
+		
+		System.out.println("All done.");
+	}
+
+	private void runEngines()
+	{
+		if (_runEngines)
+		{
+			EnginesUtil engines = new EnginesUtil();
+			engines.runFile(_jsFile);	
+		}
 	}
 
 	private void generate()
@@ -99,24 +138,16 @@ public class JsFuzzer
 			System.out.println("New random program was successfully generated");
 			
 			// save program as Javascript file					
-			Utils.FilesIO.WriteToFile(_outputFile, JstToJs.executeCostum(program, "  ", "\n"));
-			System.out.println(String.format("The generated program was successfully saved to '%s'", _outputFile));
+			Utils.FilesIO.WriteToFile(_jsFile, JstToJs.executeCostum(program, "  ", "\n"));
+			System.out.println(String.format("The generated program was successfully saved to '%s'", _jsFile));
 			
 			// save verbose to file
-			Utils.FilesIO.WriteToFile(_outputFile+".verbose", gen.getVerboseOutput());
-			System.out.println(String.format("The verbose was successfully saved to '%s'", _outputFile+".verbose"));
+			Utils.FilesIO.WriteToFile(_jsFile+".verbose", gen.getVerboseOutput());
+			System.out.println(String.format("The verbose was successfully saved to '%s'", _jsFile+".verbose"));
 			
 			// save tree to file
-			Utils.FilesIO.WriteToFile(_outputFile+".tree", JstToTree.execute(program));
-			System.out.println(String.format("The program tree was successfully saved to '%s'", _outputFile+".tree"));
-			
-			// run the new program over engines if client asked for it
-			if (_runEngines) {
-				EnginesUtil engines = new EnginesUtil();
-				engines.runFile(_outputFile);	
-			}
-			
-			System.out.println("All done.");
+			Utils.FilesIO.WriteToFile(_jsFile+".tree", JstToTree.execute(program));
+			System.out.println(String.format("The program tree was successfully saved to '%s'", _jsFile+".tree"));
 		}
 		catch (Exception e)
 		{

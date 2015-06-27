@@ -70,6 +70,8 @@ public class Generator
 		
 		// generate statements
 		_program.addStatement(_logic.generateStatement(_rootContext, null, size));
+		
+		_program.addStatement(new OutputStatement(new LiteralString("yess!")));
 
 		// attach configuration used to generate program
 		_program.addStatement(generateFooter());

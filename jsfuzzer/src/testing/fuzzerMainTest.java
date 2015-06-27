@@ -16,7 +16,7 @@ public class fuzzerMainTest
 		int num = (new Random()).nextInt(Integer.MAX_VALUE);
 		String outputFile = "tests/" + num + ".js";
 		
-		JsFuzzer.main("-o",outputFile);
+		JsFuzzer.main("--out",outputFile);
 	}
 	
 	@Test

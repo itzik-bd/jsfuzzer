@@ -62,7 +62,7 @@ public class JstToJs implements Visitor
 	@Override
 	public Object visit(Comment comment, Object isStatement)
 	{
-		String[] commentLines = comment.getComment().split("\\r?\\n");;
+		String[] commentLines = comment.getComment().split("\\r?\\n");
 		StringBuffer s = new StringBuffer();
 		
 		if (commentLines.length == 1)
@@ -512,8 +512,8 @@ public class JstToJs implements Visitor
 	}
 
 	@Override
-	public Object visit(OutputStatement outputStmt, Object context) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object visit(OutputStatement outputStmt, Object context)
+	{
+		return identString(String.format("console.log(%s)", outputStmt.getExp().accept(this, false)));
 	}
 }
