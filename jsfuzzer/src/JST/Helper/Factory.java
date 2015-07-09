@@ -5,12 +5,13 @@ import java.util.Map;
 
 import JST.Identifier;
 import JST.JSTNode;
+import JST.Literal;
 import JST.Enums.LiteralTypes;
 
 public class Factory
 {
 	private Map<String, JSTNode> _constantNodes = new HashMap<String, JSTNode>();
-	private Map<String, JSTNode> _literalNodes = new HashMap<String, JSTNode>();
+	private Map<LiteralTypes, Literal> _literalNodes = new HashMap<LiteralTypes, Literal>();
 	private Map<String, Identifier> _funcIdentifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _identifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _loopIdentifierNodes = new HashMap<String, Identifier>();
@@ -22,13 +23,15 @@ public class Factory
 		_constantNodes.put("continue", new JST.Continue());
 		_constantNodes.put("this", new JST.This());
 		_constantNodes.put("default", new JST.Default());
+		_constantNodes.put("lit-function", new JST.LiteralString("function"));
+		_constantNodes.put("lit-null", new JST.LiteralString("null"));
 		
 		// constant literal nodes
 		for(LiteralTypes type : LiteralTypes.values())
 		{
 			if (type.isSingleValue())
 			{
-				_literalNodes.put(type.getToken(), new JST.Literal(type));
+				_literalNodes.put(type, new JST.Literal(type));
 			}
 		}
 	}
@@ -77,8 +80,8 @@ public class Factory
 		return _constantNodes.get(name);
 	}
 	
-	public JSTNode getSingleLiteralNode(String name)
+	public Literal getSingleLiteralNode(LiteralTypes type)
 	{
-		return _literalNodes.get(name);
+		return _literalNodes.get(type);
 	}
 }

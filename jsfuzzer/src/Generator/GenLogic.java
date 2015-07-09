@@ -8,6 +8,7 @@ import Utils.StdRandom;
 import Generator.Config.ConfigProperties;
 import Generator.Config.Configs;
 import Generator.Params.createParams;
+import Generator.Params.GenerateExprParams;
 import JST.AbsExpression;
 import JST.AbsStatement;
 import JST.JSTNode;
@@ -122,6 +123,7 @@ public class GenLogic
 		HashMap<String, Double> hs = new HashMap<String, Double>();
 		
 		double factorDepth = Math.pow(_configs.valDouble(ConfigProperties.FACTOR_DEPTH), _depth);
+		boolean isStatementExpression = GenerateExprParams.getStatementExpression(params);
 		
 		// leafs - probability increase as depth grows
 		hs.put("Identifier", _configs.valInt(ConfigProperties.EXPR_IDENTIFIER)/factorDepth);
@@ -134,7 +136,11 @@ public class GenLogic
 		//hs.put("ArrayExp", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
 		hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
 		//hs.put("MemberExp", _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
-		hs.put("ObjectExp", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
+		
+		//ObjectExp is illegal statement
+		if (isStatementExpression)
+			hs.put("ObjectExp", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
+		
 		//hs.put("FunctionExp", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);
 
 		

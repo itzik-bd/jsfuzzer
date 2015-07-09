@@ -15,6 +15,7 @@ import Generator.Params.*;
 import Generator.SymTable.*;
 import JST.*;
 import JST.Enums.CompoundOps;
+import JST.Enums.DataTypes;
 import JST.Enums.LiteralTypes;
 import JST.Enums.Operator;
 import JST.Interfaces.Caseable;
@@ -27,6 +28,8 @@ public class Generator
 	// static fields
 	private final static JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
 	private final static JST.Helper.JSTProperties _jstProp = new JST.Helper.JSTProperties();
+	
+	private final static String _largestJSNumber = "9007199254740992";
 	
 	// instance fields - one time initialize
 	private final Configs _configs;
@@ -533,7 +536,7 @@ public class Generator
 		return compAsssignment;
 	}
 
-	Call createCall(Context context, createParams params)
+	OperationExp createCall(Context context, createParams params)
 	{
 		traceIn("Call");
 		Call call;
@@ -577,8 +580,10 @@ public class Generator
 					
 		call = new Call(func, callParams);
 		
+		OperationExp trinaryOp = getWrappedCall(call);
+			
 		traceOut();
-		return call;
+		return trinaryOp;
 	}
 
 	MemberExp createMemberExp(Context context, createParams params) {
@@ -726,7 +731,7 @@ public class Generator
 	LiteralNumber createLiteralNumber(Context context, createParams params)
 	{
 		LiteralNumber litNum;
-
+		
 		// return infinity?
 		double infinity = _configs.valDouble(ConfigProperties.LITERAL_NUMBER_MAX_PROBABILITY);
 		if (StdRandom.bernoulli(infinity)) {
@@ -735,13 +740,32 @@ public class Generator
 		else
 		{
 			StringBuilder strBld = new StringBuilder();
-
-			// Randomize number's length
-			int length = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.LITERAL_NUMBER_LAMBDA));
+			int length;
 			
-			for (int i = 0; i < length; i++)
-				strBld.append(StdRandom.uniform(10));
-
+			//keep randomize number's length until legal length
+			while(true)
+			{
+				// Randomize number's length
+				length = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.LITERAL_NUMBER_LAMBDA));
+				if (length <= _largestJSNumber.length())
+					break;
+			}
+			
+			//keep randomize number to get a legal one
+			while (true)
+			{
+				strBld.setLength(0);
+				for (int i = 0; i < length; i++)
+				{
+					if (i == 0) //first digit must be > 0
+						strBld.append(StdRandom.uniform(1,10));
+					else
+						strBld.append(StdRandom.uniform(10));				
+				}
+				
+				if(isLegalNum(strBld))
+					break;
+			}
 			litNum = new LiteralNumber(strBld.toString());
 		}
 
@@ -750,7 +774,7 @@ public class Generator
 	}
 
 	// ===============================================================================
-	
+
 	/**
 	 * handles the createWhile/createDoWhile, and returns the instance by the
 	 * class param
@@ -812,7 +836,7 @@ public class Generator
 		StatementsBlock stmtsBlock = new StatementsBlock();
 		stmtsBlock.addStatement((AbsStatement) _factoryJST.getConstantNode("break"));
 		If ifStoppingCondition = new If(new OperationExp(Operator.LNEG, loopStopCond), stmtsBlock, null);
-		ifStoppingCondition.setNonRandomBranch();
+		ifStoppingCondition.setNoneRandomBranch(); //this is a non randomized node
 
 		List<AbsStatement> stmts = new LinkedList<AbsStatement>();
 		stmts.add(loopCounterDecl);
@@ -839,5 +863,38 @@ public class Generator
 		}
 		
 		return id;
+	}
+	
+	/** returns true iff the number represented by strNum is a legal JS number */
+	private boolean isLegalNum(StringBuilder strNum) 
+	{
+		if(strNum.charAt(0) == '0')
+			return false;
+		
+		if (strNum.length() > _largestJSNumber.length())
+			return true;
+		
+		if (strNum.length() > _largestJSNumber.length())
+			return false;
+		
+		//strNum.length == _largestJSNumber.length
+		for(int i = 0; i < strNum.length(); i++)
+		{
+			if (strNum.charAt(i) < _largestJSNumber.charAt(i))
+				return true;
+			if (strNum.charAt(i) > _largestJSNumber.charAt(i))
+				return false;
+		}
+		
+		//we get here only if strNum == _largestJSNumber
+		return true;
+	}
+	
+	private OperationExp getWrappedCall(Call call) 
+	{
+		OperationExp typeOfCall = new OperationExp(Operator.TYPEOF, call.getBase());
+		OperationExp equals = new OperationExp(Operator.EQUALTYPE, typeOfCall, (LiteralString) _factoryJST.getConstantNode("lit-function"));
+		OperationExp trinaryOp = new OperationExp(Operator.CONDOP, equals, call, _factoryJST.getSingleLiteralNode(LiteralTypes.NULL));
+		return trinaryOp;
 	}
 }
