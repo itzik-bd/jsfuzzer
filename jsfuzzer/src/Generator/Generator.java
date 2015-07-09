@@ -321,6 +321,28 @@ public class Generator
 		return caseObj;
 	}
 
+	FunctionExp createFunctionExp(Context context, createParams params) 
+	{
+		// Randomize number of parameters
+		int ParamNum = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP));
+	
+		// Send number of parameters back to caller
+		if (params != null)
+			((funcDefParams)params).setParamNumber(ParamNum);
+				
+		// create the context defined by the function (force no loop)
+		Context newContext = new Context(context, false, true, true);
+		
+		// Generate parameters
+		List<Identifier> formals = getFunctionParametersList(newContext, ParamNum);
+		
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
+
+		FunctionExp funcExp = new FunctionExp(formals, stmtsBlock);
+		
+		return funcExp;
+	}
+	
 	FunctionDef createFunctionDef(Context context, createParams params)
 	{
 		traceIn("FunctionDef");
@@ -337,21 +359,8 @@ public class Generator
 
 		// create the context defined by the function (force no loop)
 		Context newContext = new Context(context, false, true, true);
-
-		// param for create identifier
-		IdentifierParams idParams = new IdentifierParams(_configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P));
-
-		List<Identifier> funcParams = new LinkedList<Identifier>();
-		for (int i = 0; i < paramsNum; i++)
-		{
-			Identifier id = createVarIdentifierNotInCurrentScope(newContext, idParams);
-			
-			// add param id to function symbol table
-			newContext.getSymTable().newEntry(new SymEntryVar(id));
-
-			// add param id to params list
-			funcParams.add(id);
-		}
+				
+		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
 
 		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
 
@@ -361,6 +370,26 @@ public class Generator
 		return funcDef;
 	}
 
+	private List<Identifier> getFunctionParametersList(Context context, Integer paramsNum)
+	{
+		// param for create identifier
+		IdentifierParams idParams = new IdentifierParams(_configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P));
+
+		List<Identifier> funcParams = new LinkedList<Identifier>();
+		for (int i = 0; i < paramsNum; i++)
+		{
+			Identifier id = createVarIdentifierNotInCurrentScope(context, idParams);
+			
+			// add param id to function symbol table
+			context.getSymTable().newEntry(new SymEntryVar(id));
+
+			// add param id to params list
+			funcParams.add(id);
+		}
+		
+		return funcParams;
+	}
+	
 	VarDecleration createVarDecleration(Context context, createParams params)
 	{
 		traceIn("VarDecleration");
@@ -510,25 +539,46 @@ public class Generator
 		Call call;
 
 		SymTable symbols = context.getSymTable();
-
+		
+		// Get existing functions list
 		List<SymEntry> functions = symbols.getAvaiableEntries(SymEntryType.FUNC);
-		int funcIndex = StdRandom.uniform(functions.size());
-		SymEntryFunc funcEntry = (SymEntryFunc) functions.get(funcIndex);
-
+		
+		//get parameters ready
+		AbsExpression func;
+		int paramNum;
+		
+		// choose randomly between existing or anonymous function
+		double p = _configs.valDouble(ConfigProperties.CALL_EXISTING_FUNCTION_BERNOULLY_P);
+		boolean chooseExisting = StdRandom.bernoulli(p);
+		if (chooseExisting && functions.size() > 0)
+		{
+			// choose a function between existing
+			int funcIndex = StdRandom.uniform(functions.size());
+			SymEntryFunc funcEntry = (SymEntryFunc) functions.get(funcIndex);
+			
+			// Get number of parameters
+			paramNum = funcEntry.getParamsNumber();
+			
+			// create the call node
+			func = funcEntry.getIdentifier();
+		}
+		else
+		{
+			// Create the anonymous function
+			funcDefParams newParams = new funcDefParams();
+			func = createFunctionExp(context, newParams);		
+			
+			// Get number of parameters
+			paramNum = newParams.getParamNumber();
+		}
+		
 		// create list of parameter
-		int paramNum = funcEntry.getParamsNumber();
 		List<AbsExpression> callParams = new ArrayList<AbsExpression>(_logic.generateExpression(context, null, paramNum));
-
-		// create the call node
-		call = new Call(funcEntry.getIdentifier(), callParams);
-
+					
+		call = new Call(func, callParams);
+		
 		traceOut();
 		return call;
-	}
-
-	FunctionExp createFunctionExp(Context context, createParams params) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	MemberExp createMemberExp(Context context, createParams params) {

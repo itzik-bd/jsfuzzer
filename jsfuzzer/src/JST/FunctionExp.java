@@ -10,6 +10,12 @@ public class FunctionExp extends AbsExpression
 	private List<Identifier> _formals;
 	private StatementsBlock _stmtsBlock;
 	
+	public FunctionExp(List<Identifier> formals, StatementsBlock stmts)
+	{
+		_formals = formals;
+		_stmtsBlock = stmts;
+	}
+	
 	public FunctionExp(List<Identifier> formals)
 	{
 		_formals = formals;
