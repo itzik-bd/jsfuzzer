@@ -40,7 +40,11 @@ public class SymTable
 		}
 	}
 	
-	/** Check if the identifier is defined in the current symbol table only! */
+	/**
+	 * Check if the identifier is defined in the current symbol table only!
+	 * @param id - identifier
+	 * @return boolean - whether contains
+	 */
 	public boolean contains(Identifier id)
 	{
 		return (_entriesVar.containsKey(id) || _entriesFunc.containsKey(id));

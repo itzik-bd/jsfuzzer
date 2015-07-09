@@ -16,6 +16,10 @@ public class StatementsBlock extends AbsStatement {
 	public void addStatement(ProgramUnit s) {
 		_statements.add(s);
 	}
+	
+	public void addStatementFirst(ProgramUnit s) {
+		_statements.add(0, s);
+	}
 
 	public void addStatement(List<? extends ProgramUnit> s) {
 		_statements.addAll(s);

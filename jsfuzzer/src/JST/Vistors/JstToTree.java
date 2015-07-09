@@ -75,16 +75,17 @@ public class JstToTree implements Visitor
 	private boolean traceIn(String str, JSTNode node)
 	{
 		trace(str, node);
-		
-		if(node.isRandomBranch()) 
+
+		if(node.isRandomBranch() && node.isRandomNode()) 
 			_depth++;
 		
 		return node.isRandomBranch();
 	}
 	
-	private Object traceOut() {
-		_depth--;
-		return null;
+	private void traceOut(JSTNode node) {
+		if (node.isRandomNode() && node.isRandomBranch()) {
+			_depth--;
+		}
 	}
 	
 	private void visitChildrenList(List<? extends JSTObject> list) {
@@ -100,7 +101,7 @@ public class JstToTree implements Visitor
 		if (traceIn("Program", program))
 		{
 			visitChildrenList(program.getStatements());
-			traceOut();
+			traceOut(program);
 		}
 		
 		return null;
@@ -121,7 +122,7 @@ public class JstToTree implements Visitor
 			ifStatement.getStatementsBlock().accept(this, null);
 			if (ifStatement.hasElse())
 				ifStatement.getElseStatementsBlock().accept(this, null);
-			traceOut();
+			traceOut(ifStatement);
 		}
 		
 		return null;
@@ -134,7 +135,7 @@ public class JstToTree implements Visitor
 		{
 			whileStatement.getCondition().accept(this, null);
 			whileStatement.getStatementsBlock().accept(this, null);
-			traceOut();			
+			traceOut(whileStatement);			
 		}
 		
 		return null;
@@ -147,7 +148,7 @@ public class JstToTree implements Visitor
 		{
 			doWhile.getCondition().accept(this, null);
 			doWhile.getStatementsBlock().accept(this, null);
-			return traceOut();			
+			traceOut(doWhile);			
 		}
 		
 		return null;
@@ -162,7 +163,7 @@ public class JstToTree implements Visitor
 			forStatement.getConditionExpression().accept(this, null);
 			forStatement.getStepExpression().accept(this, null);
 			forStatement.getStatementsBlock().accept(this, null);
-			traceOut();			
+			traceOut(forStatement);			
 		}
 		
 		return null;
@@ -176,7 +177,7 @@ public class JstToTree implements Visitor
 			forEach.getCollection().accept(this, null);
 			forEach.getItem().accept(this, null);
 			forEach.getStatementsBlock().accept(this, null);
-			traceOut();
+			traceOut(forEach);
 		}
 		
 		return null;
@@ -189,7 +190,7 @@ public class JstToTree implements Visitor
 		{
 			switchStatement.getExpression().accept(this, null);
 			visitChildrenList(switchStatement.getCasesOps());
-			traceOut();
+			traceOut(switchStatement);
 		}
 		
 		return null;
@@ -202,7 +203,7 @@ public class JstToTree implements Visitor
 		{
 			visitChildrenList(caseBlock.getCases());
 			caseBlock.getStatementBlock().accept(this, null);
-			traceOut();
+			traceOut(caseBlock);
 		}
 		
 		return null;
@@ -214,7 +215,7 @@ public class JstToTree implements Visitor
 		if (traceIn("Case", myCase))
 		{
 			myCase.getCaseExpr().accept(this, null);
-			traceOut();
+			traceOut(myCase);
 		}
 		
 		return null;
@@ -234,7 +235,7 @@ public class JstToTree implements Visitor
 			functionDefinition.getId().accept(this, null);
 			visitChildrenList(functionDefinition.getFormals());
 			functionDefinition.getStatementsBlock().accept(this, null);
-			traceOut();
+			traceOut(functionDefinition);
 		}
 
 		return null;
@@ -246,7 +247,7 @@ public class JstToTree implements Visitor
 		if(traceIn("VarDecleration", varDecleration))
 		{
 			visitChildrenList(varDecleration.getDecleratorList());
-			traceOut();
+			traceOut(varDecleration);
 		}
 		
 		return null;
@@ -260,7 +261,7 @@ public class JstToTree implements Visitor
 			varDeclerator.getId().accept(this, null);
 			if (varDeclerator.hasInit())
 				varDeclerator.getInit().accept(this, null);
-			traceOut();			
+			traceOut(varDeclerator);			
 		}
 		
 		return null;
@@ -285,7 +286,7 @@ public class JstToTree implements Visitor
 		{
 			if (returnStatement.hasValue())
 				returnStatement.getValue().accept(this, null);
-			traceOut();			
+			traceOut(returnStatement);			
 		}
 		
 		return null;
@@ -297,7 +298,7 @@ public class JstToTree implements Visitor
 		if (traceIn("StatementsBlock", stmtBlock))
 		{
 			visitChildrenList(stmtBlock.getStatements());
-			traceOut();
+			traceOut(stmtBlock);
 		}
 		
 		return null;
@@ -310,7 +311,7 @@ public class JstToTree implements Visitor
 		{
 			assignment.getLeftHandSide().accept(this, null);
 			assignment.getExpr().accept(this, null);
-			return traceOut();
+			traceOut(assignment);
 		}
 		
 		return null;
@@ -323,7 +324,7 @@ public class JstToTree implements Visitor
 		{
 			assignment.getLeftHandSide().accept(this, null);
 			assignment.getExpr().accept(this, null);
-			return traceOut();
+			traceOut(assignment);
 		}
 		
 		return null;
@@ -336,7 +337,7 @@ public class JstToTree implements Visitor
 		{
 			call.getBase().accept(this, null);
 			visitChildrenList(call.getParams());
-			traceOut();
+			traceOut(call);
 		}
 		
 		return null;
@@ -349,7 +350,7 @@ public class JstToTree implements Visitor
 		{
 			visitChildrenList(functionExpression.getFormals());
 			functionExpression.getStatementsBlock().accept(this, null);
-			traceOut();
+			traceOut(functionExpression);
 		}
 		
 		return null;
@@ -362,7 +363,7 @@ public class JstToTree implements Visitor
 		{
 			memberExpr.getBase().accept(this, null);
 			memberExpr.getLocation().accept(this, null);
-			traceOut();
+			traceOut(memberExpr);
 		}
 		
 		return null;
@@ -378,7 +379,7 @@ public class JstToTree implements Visitor
 				item.getKey().accept(this, null);
 				item.getValue().accept(this, null);
 			}
-			traceOut();
+			traceOut(objExpr);
 		}
 		
 		return null;
@@ -390,7 +391,7 @@ public class JstToTree implements Visitor
 		if (traceIn("ArrayExp", arrayExpr))
 		{
 			visitChildrenList(arrayExpr.getItemsList());
-			traceOut();
+			traceOut(arrayExpr);
 		}
 		
 		return null;
@@ -414,7 +415,7 @@ public class JstToTree implements Visitor
 		if (traceIn(String.format("OperationExp (%s)", opExp.getOperator()), opExp))
 		{
 			visitChildrenList(opExp.getOperandList());
-			return traceOut();
+			traceOut(opExp);
 		}
 		
 		return null;

@@ -58,15 +58,6 @@ public class Context
 		}
 	}
 
-	/**
-	 * Constructor for inner node in the tree
-	 * 
-	 * @param parent - the parent of the node
-	 */
-//	public Context(Context parent) {
-//		this(parent, null, null, false);
-//	}
-
 	public SymTable getSymTable() {
 		return _symTable;
 	}

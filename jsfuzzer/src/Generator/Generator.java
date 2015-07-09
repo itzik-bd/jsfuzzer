@@ -15,7 +15,6 @@ import Generator.Params.*;
 import Generator.SymTable.*;
 import JST.*;
 import JST.Enums.CompoundOps;
-import JST.Enums.DataTypes;
 import JST.Enums.LiteralTypes;
 import JST.Enums.Operator;
 import JST.Interfaces.Caseable;
@@ -73,8 +72,7 @@ public class Generator
 		
 		// generate statements
 		_program.addStatement(_logic.generateStatement(_rootContext, null, size));
-		
-		_program.addStatement(new OutputStatement(new LiteralString("yess!")));
+		_program.addStatement(newOutputStatement("Execution is over."));
 
 		// attach configuration used to generate program
 		_program.addStatement(generateFooter());
@@ -231,9 +229,6 @@ public class Generator
 		// WTF - how do we gonna solve it??????
 		// this is relevant for the FOR loop also.
 		
-		// TODO: there is actually another problem - some JST node are generated
-		// but are not being added to the tree. very weird!
-		
 		// create new loop context that has the same symbol table as his parent
 		Context newContext = new Context(context, true, null, false);
 
@@ -326,6 +321,8 @@ public class Generator
 
 	FunctionExp createFunctionExp(Context context, createParams params) 
 	{
+		traceIn("FunctionExp");
+		
 		// Randomize number of parameters
 		int ParamNum = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP));
 	
@@ -343,6 +340,7 @@ public class Generator
 
 		FunctionExp funcExp = new FunctionExp(formals, stmtsBlock);
 		
+		traceOut();
 		return funcExp;
 	}
 	
@@ -365,7 +363,7 @@ public class Generator
 				
 		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
 
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams("Inside function: " + functionId));
 
 		FunctionDef funcDef = new FunctionDef(functionId, funcParams, stmtsBlock);
 
@@ -480,6 +478,13 @@ public class Generator
 	{
 		traceIn("StatementsBlock");
 		StatementsBlock stmtBlock = new StatementsBlock();
+		
+		// add output string
+		String outString = StatementBlockParams.getOutString(params);
+		if (outString != null)
+		{
+			stmtBlock.addStatement(newOutputStatement(outString));
+		}
 
 		// decide how many statements will be generate
 		int size = 0;
@@ -559,6 +564,9 @@ public class Generator
 			int funcIndex = StdRandom.uniform(functions.size());
 			SymEntryFunc funcEntry = (SymEntryFunc) functions.get(funcIndex);
 			
+			// trace function name
+			trace(String.format("Identifier (%s)", funcEntry.getIdentifier()));
+			
 			// Get number of parameters
 			paramNum = funcEntry.getParamsNumber();
 			
@@ -574,7 +582,7 @@ public class Generator
 			// Get number of parameters
 			paramNum = newParams.getParamNumber();
 		}
-		
+
 		// create list of parameter
 		List<AbsExpression> callParams = new ArrayList<AbsExpression>(_logic.generateExpression(context, null, paramNum));
 					
@@ -773,6 +781,12 @@ public class Generator
 		return litNum;
 	}
 
+	OutputStatement newOutputStatement(String str)
+	{
+		trace("OutputStatement");
+		return new OutputStatement(new LiteralString(str));
+	}
+	
 	// ===============================================================================
 
 	/**
@@ -894,7 +908,11 @@ public class Generator
 	{
 		OperationExp typeOfCall = new OperationExp(Operator.TYPEOF, call.getBase());
 		OperationExp equals = new OperationExp(Operator.EQUALTYPE, typeOfCall, (LiteralString) _factoryJST.getConstantNode("lit-function"));
-		OperationExp trinaryOp = new OperationExp(Operator.CONDOP, equals, call, _factoryJST.getSingleLiteralNode(LiteralTypes.NULL));
+		equals.setNoneRandomBranch();
+		Literal nullLit = new Literal(LiteralTypes.UNDEFINED);
+		nullLit.setNoneRandomNode();
+		OperationExp trinaryOp = new OperationExp(Operator.CONDOP, equals, call, nullLit);
+		trinaryOp.setNoneRandomNode();
 		return trinaryOp;
 	}
 }

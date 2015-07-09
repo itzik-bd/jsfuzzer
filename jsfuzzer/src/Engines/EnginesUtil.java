@@ -2,6 +2,9 @@ package Engines;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map.Entry;
+
+import Utils.OutLog;
 
 public class EnginesUtil
 { 
@@ -16,16 +19,34 @@ public class EnginesUtil
 		_engineList.add(new NashornEngine());
 	}
 	
-	public List<AbstractEngine> getEngineList()
+	public void compare(String file)
 	{
-		return _engineList;
+		EnginesCompareModel compareModel = runFileAndGetCompareModel(file);
+		
+		OutLog.printInfo("Failed: " + String.join(", ", compareModel.getFailedEngines()));
+		OutLog.printInfo("Passed: " + String.join(", ", compareModel.getPassedEngines()));
+		
+		for (List<String> eqvClass : compareModel.getEquivalencePassedEngines())
+		{
+			OutLog.printInfo("equivalent class: " + String.join(", ", eqvClass));
+		}
+		
+		for (Entry<String,String> entry : compareModel.getFailedErrors().entrySet())
+		{
+			OutLog.printDebug(entry.getKey()+" stderr:", entry.getValue());
+		}
 	}
 	
-	public void runFile(String file)
+	private EnginesCompareModel runFileAndGetCompareModel(String file)
 	{
+		EnginesCompareModel compareModel = new EnginesCompareModel();
+		
 		for (AbstractEngine engine : _engineList)
 		{
-			engine.runFile(file);
+			OutLog.printInfo(String.format("Running file '%s' over engine '%s'", file, engine.getPlatformName()));
+			compareModel.addEngineResult(engine.getPlatformName(), engine.runFile(file));
 		}
+		
+		return compareModel;
 	}
 }

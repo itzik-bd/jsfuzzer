@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 public class FilesIO
@@ -24,6 +26,11 @@ public class FilesIO
 				catch (IOException e) { /* ignore */ }
 			}
 		}
+	}
+	
+	public static String ReadFile(String path) throws IOException
+	{
+		return new String(Files.readAllBytes(Paths.get(path)));
 	}
 	
 	public static Properties loadPropertiesFile(String propertiesFile) throws IOException

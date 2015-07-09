@@ -15,6 +15,7 @@ public class StringCounter
 	
 	/**
 	 * function to get the next string
+	 * @return string - next token
 	 */
 	public String getNext() {
 		_id++;
@@ -23,6 +24,7 @@ public class StringCounter
 	
 	/**
 	 * get the current id of the counter
+	 * @return int - current id
 	 */
 	public long getCurrentId() {
 		return _id;

@@ -55,7 +55,7 @@ public enum Operator
 	IN(2, DataTypes.BOOLEAN, "%s in %s", "in"),
 	
 	// Ternary Operations
-	CONDOP(3, null,"%s ? %s : %s ", "conditional operation");
+	CONDOP(3, null,"%s ? %s : %s", "conditional operation");
 	
 	private final int _numOperands;
 	private final DataTypes _outputType;

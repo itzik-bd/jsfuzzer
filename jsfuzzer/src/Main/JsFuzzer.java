@@ -6,6 +6,7 @@ import Generator.Config.Configs;
 import JST.Program;
 import JST.Vistors.JstToJs;
 import JST.Vistors.JstToTree;
+import Utils.OutLog;
 
 public class JsFuzzer
 {
@@ -119,7 +120,7 @@ public class JsFuzzer
 		if (_runEngines)
 		{
 			EnginesUtil engines = new EnginesUtil();
-			engines.runFile(_jsFile);	
+			engines.compare(_jsFile);	
 		}
 	}
 
@@ -130,24 +131,34 @@ public class JsFuzzer
 		{
 			// load configuration file
 			Configs configs = Configs.loadConfigFile(_configsFile);
-			System.out.println("Configuration file was successfully loaded");
+			OutLog.printInfo("Configuration file was successfully loaded");
 			
 			// generate program
 			Generator gen = new Generator(configs, _seed);
 			Program program = gen.createProgram();
-			System.out.println("New random program was successfully generated");
+			OutLog.printInfo("New random program was successfully generated");
 			
-			// save program as Javascript file					
-			Utils.FilesIO.WriteToFile(_jsFile, JstToJs.executeCostum(program, "  ", "\n"));
-			System.out.println(String.format("The generated program was successfully saved to '%s'", _jsFile));
+			// get program representation
+			String jsProgram = JstToJs.executeCostum(program, "  ", "\n");
+			String jsVerbose = gen.getVerboseOutput();
+			String jsTree = JstToTree.execute(program);
+			
+			// save program as Javascript file
+			Utils.FilesIO.WriteToFile(_jsFile, jsProgram);
+			OutLog.printInfo(String.format("The generated program was successfully saved to '%s'", _jsFile));
 			
 			// save verbose to file
-			Utils.FilesIO.WriteToFile(_jsFile+".verbose", gen.getVerboseOutput());
-			System.out.println(String.format("The verbose was successfully saved to '%s'", _jsFile+".verbose"));
+			Utils.FilesIO.WriteToFile(_jsFile+".verbose", jsVerbose);
+			OutLog.printInfo(String.format("The verbose was successfully saved to '%s'", _jsFile+".verbose"));
 			
 			// save tree to file
-			Utils.FilesIO.WriteToFile(_jsFile+".tree", JstToTree.execute(program));
-			System.out.println(String.format("The program tree was successfully saved to '%s'", _jsFile+".tree"));
+			Utils.FilesIO.WriteToFile(_jsFile+".tree", jsTree);
+			OutLog.printInfo(String.format("The program tree was successfully saved to '%s'", _jsFile+".tree"));
+			
+			// make sure that verbose and tree are identical
+			if (!jsTree.equals(jsVerbose)) {
+				OutLog.printWarn("verbose tree and actual tree are not identical!");
+			}
 		}
 		catch (Exception e)
 		{
