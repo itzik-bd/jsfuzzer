@@ -939,16 +939,12 @@ public class Generator
 	 */
 	private void addPrintVarsStmts(Program program) 
 	{
-		List<Identifier> vars = _factoryJST.getAllVars();
-		List<Identifier> loopVars = _factoryJST.getAllLoopVar();
+		List<SymEntry> symEntries = _rootContext.getSymTable().getAvaiableEntries(SymEntryType.VAR);
 		
 		program.addStatement(new Comment("------------- Printing All The Program Variables -------------\n", true));
 		
-		for(Identifier id : vars)
-			addPrintVarStmt(program, id);
-		
-		for(Identifier loopId: loopVars)
-			addPrintVarStmt(program, loopId);
+		for(SymEntry entry : symEntries)
+			addPrintVarStmt(program, entry.getIdentifier());			
 	}
 
 	/***
