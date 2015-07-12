@@ -76,36 +76,44 @@ public class GenLogic
 	AbsStatement generateStatement(Context context, createParams params)
 	{
 		HashMap<String, Double> hs = new HashMap<String, Double>();
+	
+		// Factor for making leafs commoner in deep depth parts
+		double factorDepth = Math.pow(_configs.valDouble(ConfigProperties.FACTOR_DEPTH), _depth);
 		
 		// All properties are relative to the total of all properties
-		hs.put("CompoundAssignment", (double) _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT));
-		hs.put("FunctionDef", (double) _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION));
-		hs.put("If", (double) _configs.valInt(ConfigProperties.STMT_IF));
-		//hs.put("OutputStatement", _configs.valInt(ConfigProperties.STMT_OUTPUTSTATEMENT));
-		hs.put("Switch", (double) _configs.valInt(ConfigProperties.STMT_SWITCH));
-		hs.put("VarDecleration", (double) _configs.valInt(ConfigProperties.STMT_VARDECLERATION));
-		hs.put("Assignment", (double) _configs.valInt(ConfigProperties.STMT_ASSIGNMENT));
-		hs.put("Expression", (double) _configs.valInt(ConfigProperties.STMT_EXPRESSION));
-				
+		
+	// Leafs
+		hs.put("VarDecleration", (double) _configs.valInt(ConfigProperties.STMT_VARDECLERATION) / factorDepth);
+		hs.put("CompoundAssignment", (double) _configs.valInt(ConfigProperties.STMT_COMPOUNDASSIGNMENT) / factorDepth);
+		hs.put("Assignment", (double) _configs.valInt(ConfigProperties.STMT_ASSIGNMENT) / factorDepth);
+		hs.put("Expression", (double) _configs.valInt(ConfigProperties.STMT_EXPRESSION) / factorDepth);
+		hs.put("Call", (double) _configs.valInt(ConfigProperties.STMT_CALL) / factorDepth);
+		
+		// Is in function
 		if (context.isInFunction())
-		{
-			hs.put("Return", (double) _configs.valInt(ConfigProperties.STMT_RETURN));
-		}
+			hs.put("Return", (double) _configs.valInt(ConfigProperties.STMT_RETURN) / factorDepth);
 		
 		// Is in loop
 		if (context.isInLoop())
 		{
-			hs.put("Break", (double) _configs.valInt(ConfigProperties.STMT_BREAK));
-			hs.put("Continue", (double) _configs.valInt(ConfigProperties.STMT_CONTINUE));
+			hs.put("Break", (double) _configs.valInt(ConfigProperties.STMT_BREAK) / factorDepth);
+			hs.put("Continue", (double) _configs.valInt(ConfigProperties.STMT_CONTINUE) / factorDepth);
 		}
 		
-		// Lower the probability of nested loop
-		int p = _configs.valInt(ConfigProperties.NESTED_LOOPS_FACTOR) * (context.getLoopDepth()+1); // depth must starts from 1 (not 0)
+	// Non-Leafs
+		hs.put("If", (double) _configs.valInt(ConfigProperties.STMT_IF) * factorDepth);
+		hs.put("Switch", (double) _configs.valInt(ConfigProperties.STMT_SWITCH) * factorDepth);
 		
-		hs.put("ForEach", (double) (_configs.valInt(ConfigProperties.STMT_FOREACH)/p));
-		hs.put("While", (double) (_configs.valInt(ConfigProperties.STMT_WHILE)/p));
-		hs.put("DoWhile", (double) (_configs.valInt(ConfigProperties.STMT_DOWHILE)/p));
-		hs.put("For", (double) (_configs.valInt(ConfigProperties.STMT_FOR)/p));
+		// make function def in high depth very not common
+		hs.put("FunctionDef", (double) _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION) * factorDepth * factorDepth);
+		
+		// Lower the probability of nested loop
+		factorDepth *= _configs.valDouble(ConfigProperties.NESTED_LOOPS_FACTOR) * (context.getLoopDepth() + 1); // depth must starts from 1 (not 0)
+		
+		hs.put("ForEach", (double) (_configs.valInt(ConfigProperties.STMT_FOREACH) * factorDepth));
+		hs.put("While", (double) (_configs.valInt(ConfigProperties.STMT_WHILE) * factorDepth));
+		hs.put("DoWhile", (double) (_configs.valInt(ConfigProperties.STMT_DOWHILE) * factorDepth));
+		hs.put("For", (double) (_configs.valInt(ConfigProperties.STMT_FOR) * factorDepth));
 		
 		// randomly choose statement
 		String createMethod = StdRandom.choseFromProbList(hs);
@@ -132,7 +140,6 @@ public class GenLogic
 		
 		// non-leafs - probability decrease as depth grows
 		hs.put("OperationExp", _configs.valInt(ConfigProperties.EXPR_EXPRESSIONOP)*factorDepth);
-		
 		//hs.put("ArrayExp", _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
 		hs.put("Call", _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
 		//hs.put("MemberExp", _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
@@ -142,8 +149,7 @@ public class GenLogic
 			hs.put("ObjectExp", _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
 		
 		//hs.put("FunctionExp", _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);
-
-		
+	
 		// Change special values acording to the input map
 //		for (String probName : specialProbs.keySet())
 //		{
@@ -161,24 +167,24 @@ public class GenLogic
 
 	public List<AbsExpression> generateExpression(Context context, createParams params, int size)
 	{
-		List<AbsExpression> stmtList = new LinkedList<AbsExpression>();
+		List<AbsExpression> expList = new LinkedList<AbsExpression>();
 		
 		for (int i=0 ; i<size ; i++) {
-			stmtList.add(generateExpression(context, params));
+			expList.add(generateExpression(context, params));
 		}
 		
-		return stmtList;
+		return expList;
 	}
 	
 	public List<AbsStatement> generateStatement(Context context, createParams params, int size)
 	{
-		List<AbsStatement> expList = new LinkedList<AbsStatement>();
+		List<AbsStatement> stmtList = new LinkedList<AbsStatement>();
 		
 		for (int i=0 ; i<size ; i++) {
-			expList.add(generateStatement(context, params));
+			stmtList.add(generateStatement(context, params));
 		}
 		
-		return expList;
+		return stmtList;
 	}
 
 	public void increaseDepth() {

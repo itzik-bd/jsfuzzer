@@ -122,7 +122,7 @@ public class Generator
 	{
 		return _verboseString.toString();
 	}
-
+	
 	// ===============================================================================
 
 	private void trace(String str)
@@ -374,11 +374,8 @@ public class Generator
 
 		// Randomize number of parameters
 		int paramsNum = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP));
-
-		// add function to current scope
-		context.getSymTable().newEntry(new SymEntryFunc(functionId, paramsNum));
-
-		// create the context defined by the function (force no loop)
+		
+		// Create the context defined by the function (force no loop)
 		Context newContext = new Context(context, false, true, true);
 				
 		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
@@ -387,6 +384,10 @@ public class Generator
 
 		FunctionDef funcDef = new FunctionDef(functionId, funcParams, stmtsBlock);
 
+		// Add function to current scope
+		// (!) This is performed after FunctionDef() to avoid recursion (and inner defined function calling father function)
+		context.getSymTable().newEntry(new SymEntryFunc(functionId, paramsNum));
+		
 		traceOut();
 		return funcDef;
 	}
@@ -442,7 +443,7 @@ public class Generator
 		if (VarDeclerationParams.getForceNewIdentifier(params))
 			idParams = new IdentifierParams(0);
 		else
-			idParams = new IdentifierParams(_configs.valDouble(ConfigProperties.VAR_DECL_NUM_LAMBDA_EXP)); // TODO: this is not the right property!!!!!!!
+			idParams = new IdentifierParams(_configs.valDouble(ConfigProperties.VAR_RE_DECL_EXISTING_VAR));
 
 		// create identifier that does not exists in current scope
 		Identifier id = createVarIdentifierNotInCurrentScope(context, idParams);
@@ -695,13 +696,13 @@ public class Generator
 		traceIn(String.format("OperationExp (%s)", operator));
 		OperationExp expressionOp;
 
-		Operator[] unaryOpAssignable = { Operator.PLUSPLUSLEFT,
-				Operator.PLUSPLUSRIGHT, Operator.MINUSMINUSLEFT,
-				Operator.MINUSMINUSRIGHT };
+		Operator[] unaryOpAssignable = { Operator.PLUSPLUSLEFT, Operator.PLUSPLUSRIGHT, 
+				Operator.MINUSMINUSLEFT, Operator.MINUSMINUSRIGHT };
 
-		// generate operands array
+		// Generate operands array
 		List<AbsExpression> operandsList;
 
+		// Does operand forces identifier as operand
 		if (Arrays.asList(unaryOpAssignable).contains(operator))
 		{
 			operandsList = new ArrayList<AbsExpression>();
@@ -718,7 +719,6 @@ public class Generator
 		return expressionOp;
 	}
 	
-
 	Literal createLiteral(Context context, createParams params)
 	{
 		LiteralTypes litType = LiteralTypes.getRandomly();

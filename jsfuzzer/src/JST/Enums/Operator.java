@@ -51,8 +51,9 @@ public enum Operator
 	BITAND(2, DataTypes.NUMBER, "%s & %s", "bitwise and"),
 	BITOR(2, DataTypes.NUMBER, "%s | %s", "bitwise or"),
 	
-	INSTANCEOF(2, DataTypes.BOOLEAN, "%s instanceof %s", "instance of"),
-	IN(2, DataTypes.BOOLEAN, "%s in %s", "in"),
+	// TODO: decide what to do with these two, and do it...
+	// INSTANCEOF(2, DataTypes.BOOLEAN, "%s instanceof %s", "instance of"),
+	// IN(2, DataTypes.BOOLEAN, "%s in %s", "in"),
 	
 	// Ternary Operations
 	CONDOP(3, null,"%s ? %s : %s", "conditional operation");
