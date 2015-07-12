@@ -1,0 +1,9 @@
+function JSCall() {
+	var f = arguments['0'];
+	if (typeof f === 'function') {
+		var params = [];
+		for (key in arguments) if (key != '0') params.push(arguments[key]);
+		JSPrint("JSCall");
+		return f.apply(f, params);
+	}
+}

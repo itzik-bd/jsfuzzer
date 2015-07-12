@@ -8,6 +8,8 @@ public interface Visitor
 	
 	public Object visit(Comment comment, Object context);
 	
+	public Object visit(RawCode rawcode, Object context);
+	
 	/* Statement Nodes */
 	
 	public Object visit(If ifStatement, Object context);

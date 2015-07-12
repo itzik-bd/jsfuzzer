@@ -102,6 +102,8 @@ public class JsFuzzer
 			return;
 		}
 		
+		long startTime = System.currentTimeMillis();
+		
 		// check whether to generate a new program
 		if (_isGenerate) {
 			generate();
@@ -112,7 +114,10 @@ public class JsFuzzer
 			runEngines();
 		}
 		
-		System.out.println("All done.");
+		long endTime = System.currentTimeMillis();
+		double totalTimeSeconds = (endTime - startTime) / 1000.0;
+		
+		OutLog.printInfo(String.format("All done. Execution time: %.2f sec", totalTimeSeconds));
 	}
 
 	private void runEngines()
@@ -136,12 +141,11 @@ public class JsFuzzer
 			// generate program
 			Generator gen = new Generator(configs, _seed);
 			Program program = gen.createProgram();
-			OutLog.printInfo("New random program was successfully generated");
-			
-			// get program representation
 			String jsProgram = JstToJs.executeCostum(program, "  ", "\n");
 			String jsVerbose = gen.getVerboseOutput();
 			String jsTree = JstToTree.execute(program);
+			double sizeKb = jsProgram.length() / 1024.0;
+			OutLog.printInfo(String.format("New random program was successfully generated (%.2fKb)", sizeKb));
 			
 			// save program as Javascript file
 			Utils.FilesIO.WriteToFile(_jsFile, jsProgram);

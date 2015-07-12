@@ -5,7 +5,7 @@ public class RunEngineResult
 	private String _stdout;
 	private String _stderr;
 	
-	public void setResult(String stdout, String stderr) {
+	public RunEngineResult(String stdout, String stderr) {
 		_stdout = normalizeLineFeed(stdout);
 		_stderr = normalizeLineFeed(stderr);
 	}

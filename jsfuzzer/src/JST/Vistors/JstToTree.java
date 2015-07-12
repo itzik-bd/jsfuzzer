@@ -30,6 +30,7 @@ import JST.ObjectExp;
 import JST.OperationExp;
 import JST.OutputStatement;
 import JST.Program;
+import JST.RawCode;
 import JST.Return;
 import JST.StatementsBlock;
 import JST.Switch;
@@ -445,4 +446,10 @@ public class JstToTree implements Visitor
 		return trace("OutputStatement", outputStmt);
 	}
 
+	@Override
+	public Object visit(RawCode rawcode, Object context)
+	{
+		/* do nothing - should not be called */
+		return null;
+	}
 }

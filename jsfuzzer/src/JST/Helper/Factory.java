@@ -1,5 +1,6 @@
 package JST.Helper;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,7 +9,9 @@ import java.util.Map;
 import JST.Identifier;
 import JST.JSTNode;
 import JST.Literal;
+import JST.RawCode;
 import JST.Enums.LiteralTypes;
+import Utils.FilesIO;
 
 public class Factory
 {
@@ -17,7 +20,7 @@ public class Factory
 	private Map<String, Identifier> _funcIdentifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _identifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _loopIdentifierNodes = new HashMap<String, Identifier>();
-	private Identifier _JSPrintFunction;
+	private Map<String, RawCode> _snippets = new HashMap<String, RawCode>();
 
 	public Factory()
 	{		
@@ -28,6 +31,10 @@ public class Factory
 		_constantNodes.put("default", new JST.Default());
 		_constantNodes.put("lit-function", new JST.LiteralString("function"));
 		_constantNodes.put("lit-null", new JST.LiteralString("null"));
+		
+		// create helper functions name
+		_funcIdentifierNodes.put("JSPrint", new Identifier("JSPrint"));
+		_funcIdentifierNodes.put("JSCall", new Identifier("JSCall"));
 		
 		// constant literal nodes
 		for(LiteralTypes type : LiteralTypes.values())
@@ -98,13 +105,19 @@ public class Factory
 		return new LinkedList<Identifier>(_loopIdentifierNodes.values());
 	}
 	
-	public Identifier getJSPrintID()
+	public RawCode getSnippet(String snippetName)
 	{
-		return _JSPrintFunction; 
-	}
-	
-	public void setJSPrintID(Identifier id)
-	{
-		_JSPrintFunction = id;
+		if (!_snippets.containsKey(snippetName)) {
+			String path = "resources/snippets/" + snippetName + ".txt";
+			String code = null;
+			try {
+				 code = FilesIO.ReadFile(path);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			_snippets.put(snippetName, new RawCode(code));
+		}
+		
+		return _snippets.get(snippetName);
 	}
 }

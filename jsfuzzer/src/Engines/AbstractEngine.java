@@ -1,8 +1,8 @@
 package Engines;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 public abstract class AbstractEngine
@@ -22,30 +22,22 @@ public abstract class AbstractEngine
 	public RunEngineResult runFile(String filePath)
 	{		
 		// create new js process
-		ProcessBuilder procBuild = new ProcessBuilder(getCommandLineList(filePath));
-		
-		// redirect stdout to file
-		String outFile = generateOutFileName(filePath);
-		procBuild.redirectOutput(new File(outFile));
-		
-		RunEngineResult runResult = new RunEngineResult();
+		ProcessBuilder procBuild = new ProcessBuilder(getCommandLineList(filePath));		
+		RunEngineResult runResult = null;
 		
 		// execute program
 		try
 		{
+			// run process
 			Process proc = procBuild.start();
-			proc.waitFor();
-
-			// read output
-			String stdout = Utils.FilesIO.ReadFile(outFile);
-			String stderr = readProcessError(proc);
 			
-			runResult.setResult(stdout, stderr);
+			// read proccess stdout and stdin
+			String stdout = communicateProcess(proc.getInputStream()); // getInputStream actually returns the stdout!
+			String stderr = communicateProcess(proc.getErrorStream());
+			
+			runResult = new RunEngineResult(stdout, stderr);
 		}
 		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -56,9 +48,9 @@ public abstract class AbstractEngine
 	/** this method should return a array of cli command to be executed */
 	protected abstract String[] getCommandLineList(String filePath);
 	
-	private String readProcessError(Process p)
+	private String communicateProcess(InputStream is)
 	{
-		BufferedReader in = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		BufferedReader in = new BufferedReader(new InputStreamReader(is));
 		String lineFeed = System.getProperty("line.separator");
 		StringBuffer sb = new StringBuffer();
 		String line;
@@ -73,10 +65,5 @@ public abstract class AbstractEngine
 		}
 
 		return sb.toString();
-	}
-	
-	private String generateOutFileName(String file)
-	{
-		return String.format("%s.%s.out", file, _platformName);
 	}
 }

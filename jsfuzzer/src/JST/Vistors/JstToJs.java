@@ -65,11 +65,15 @@ public class JstToJs implements Visitor
 		String[] commentLines = comment.getComment().split("\\r?\\n");
 		StringBuffer s = new StringBuffer();
 		
-		if (commentLines.length == 1)
+		if (commentLines.length == 0)
+		{
+			
+		}
+		else if (commentLines.length == 1 && !comment.getForcedExpand())
 		{
 			s.append("/* " + commentLines[0] + " */");
 		}
-		else if (commentLines.length > 1)
+		else
 		{
 			ident(s);
 			s.append("/*"); // begin comment
@@ -459,6 +463,19 @@ public class JstToJs implements Visitor
 		return res;
 	}
 	
+	@Override
+	public Object visit(OutputStatement outputStmt, Object context)
+	{
+		String param = (String) outputStmt.getExp().accept(this, false);
+		return identString(String.format("typeof console !== 'undefined' ? console.log(%s) : print(%s);", param, param));
+	}
+
+	@Override
+	public Object visit(RawCode rawcode, Object context)
+	{
+		return identString(rawcode.getCode());
+	}
+	
 	// -------------------------------------------------
 	
 	private String listJoinFormat(List<? extends JSTObject> list, boolean isStatement, String format, String delimiter)
@@ -509,12 +526,5 @@ public class JstToJs implements Visitor
 	private boolean isTrue(Object booleanValue)
 	{
 		return ((boolean)booleanValue == true);
-	}
-
-	@Override
-	public Object visit(OutputStatement outputStmt, Object context)
-	{
-		String param = (String) outputStmt.getExp().accept(this, false);
-		return identString(String.format("typeof console !== 'undefined' ? console.log(%s) : print(%s);", param, param));
 	}
 }

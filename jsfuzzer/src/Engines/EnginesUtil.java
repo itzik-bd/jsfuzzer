@@ -23,14 +23,18 @@ public class EnginesUtil
 	{
 		EnginesCompareModel compareModel = runFileAndGetCompareModel(file);
 		
+		// print passed and failed engines
 		OutLog.printInfo("Failed: " + String.join(", ", compareModel.getFailedEngines()));
 		OutLog.printInfo("Passed: " + String.join(", ", compareModel.getPassedEngines()));
 		
-		for (List<String> eqvClass : compareModel.getEquivalencePassedEngines())
+		// print Equivalence classed based on output
+		for (Entry<String, List<String>> eqvClass : compareModel.getEquivalenceEngines().entrySet())
 		{
-			OutLog.printInfo("equivalent class: " + String.join(", ", eqvClass));
+			double sizeKb = eqvClass.getKey().length() / 1024.0;
+			OutLog.printInfo(String.format("equivalent class (%.2fKb): %s", sizeKb, String.join(", ", eqvClass.getValue())));
 		}
 		
+		// print all stdout of engines that failed 
 		for (Entry<String,String> entry : compareModel.getFailedErrors().entrySet())
 		{
 			OutLog.printDebug(entry.getKey()+" stderr:", entry.getValue());
@@ -46,6 +50,8 @@ public class EnginesUtil
 			OutLog.printInfo(String.format("Running file '%s' over engine '%s'", file, engine.getPlatformName()));
 			compareModel.addEngineResult(engine.getPlatformName(), engine.runFile(file));
 		}
+		
+		compareModel.saveOutputByEquivalenceClass(file);
 		
 		return compareModel;
 	}
