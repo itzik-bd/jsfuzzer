@@ -1,5 +1,6 @@
 package JST;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,6 +17,11 @@ public class FunctionDef extends AbsStatement
 		_id = id;
 		_formals = formals;
 		_stmtsBlock = stmtsBlock;
+	}
+	
+	public FunctionDef(Identifier id, Identifier ... formals)
+	{
+		this(id, Arrays.asList(formals), new StatementsBlock());
 	}
 	
 	public FunctionDef(Identifier id)

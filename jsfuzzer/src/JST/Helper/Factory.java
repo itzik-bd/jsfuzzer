@@ -1,6 +1,8 @@
 package JST.Helper;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import JST.Identifier;
@@ -15,6 +17,7 @@ public class Factory
 	private Map<String, Identifier> _funcIdentifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _identifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _loopIdentifierNodes = new HashMap<String, Identifier>();
+	private Identifier _JSPrintFunction;
 
 	public Factory()
 	{		
@@ -83,5 +86,25 @@ public class Factory
 	public Literal getSingleLiteralNode(LiteralTypes type)
 	{
 		return _literalNodes.get(type);
+	}
+	
+	public List<Identifier> getAllVars()
+	{
+		return new LinkedList<Identifier>(_identifierNodes.values());
+	}
+	
+	public List<Identifier> getAllLoopVar()
+	{
+		return new LinkedList<Identifier>(_loopIdentifierNodes.values());
+	}
+	
+	public Identifier getJSPrintID()
+	{
+		return _JSPrintFunction; 
+	}
+	
+	public void setJSPrintID(Identifier id)
+	{
+		_JSPrintFunction = id;
 	}
 }

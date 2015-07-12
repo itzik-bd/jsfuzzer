@@ -67,20 +67,29 @@ public class Generator
 		// first of all generate variables to be used
 		_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true, null, null)));
 
+		// generate ID of JSPrint function, the function definition will be added at the end to the prog
+		CreateJSPrintID();
+		
 		// choose how many statements the program will have
 		int size = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.PROGRAM_SIZE_LAMBDA));
 		
 		// generate statements
 		_program.addStatement(_logic.generateStatement(_rootContext, null, size));
-		_program.addStatement(newOutputStatement("Execution is over."));
-
+		_program.addStatement(newOutputStatement("Execution is over.\n"));
+		
+		// add print stmts for each program identifier
+		addPrintVarsStmts(_program);
+		
+		// add definition of JSPrint function
+		addJSPrintDef(_program);
+		
 		// attach configuration used to generate program
 		_program.addStatement(generateFooter());
 
 		traceOut();
 		return _program;
 	}
-	
+
 	private void initNewProgram()
 	{
 		_program = new Program();
@@ -781,10 +790,16 @@ public class Generator
 		return litNum;
 	}
 
-	OutputStatement newOutputStatement(String str)
+	private Call newOutputStatement(String str)
 	{
-		trace("OutputStatement");
-		return new OutputStatement(new LiteralString(str));
+		return newOutputStatement(new LiteralString(str));
+	}
+
+	private Call newOutputStatement(AbsExpression expr)
+	{
+		Call call = new Call(_factoryJST.getJSPrintID(), expr);
+		call.setNoneRandomBranch();
+		return call;
 	}
 	
 	// ===============================================================================
@@ -904,6 +919,11 @@ public class Generator
 		return true;
 	}
 	
+	/**
+	 * Wrap call to function with the check that the function exists
+	 * @param call
+	 * @return Wrapped Expression
+	 */
 	private OperationExp getWrappedCall(Call call) 
 	{
 		OperationExp typeOfCall = new OperationExp(Operator.TYPEOF, call.getBase());
@@ -914,5 +934,76 @@ public class Generator
 		OperationExp trinaryOp = new OperationExp(Operator.CONDOP, equals, call, nullLit);
 		trinaryOp.setNoneRandomNode();
 		return trinaryOp;
+	}
+	
+	/***
+	 * For each var x (including loopVars), add stmt: print("x = " + x); 
+	 * @param program
+	 */
+	private void addPrintVarsStmts(Program program) 
+	{
+		List<Identifier> vars = _factoryJST.getAllVars();
+		List<Identifier> loopVars = _factoryJST.getAllLoopVar();
+				
+		trace("Comment");
+		StringBuffer s = new StringBuffer();
+		s.append("------------- Printing All The Program Variables -------------\n");
+		s.append("Including loop Variables\n\n");
+		program.addStatement(new Comment(s.toString()));
+		
+		for(Identifier id : vars)
+			addPrintVarStmt(program, id);
+		
+		for(Identifier loopId: loopVars)
+			addPrintVarStmt(program, loopId);
+	}
+
+	/***
+	 * Adds the stmt - "print("id =  " + id);
+	 * @param program
+	 * @param id - to be printed
+	 */
+	private void addPrintVarStmt(Program program, Identifier id)
+	{
+		OperationExp plusExpr = new OperationExp(Operator.PLUS, new LiteralString(id.getName() + " = "), id);
+		Call callToJSPrint = CreateCallToJSPrint(plusExpr);
+		callToJSPrint.setNoneRandomBranch();
+		
+		program.addStatement(callToJSPrint);
+	}
+
+	private void CreateJSPrintID()
+	{
+		Identifier printID = new Identifier("JSPrint");
+		_factoryJST.setJSPrintID(printID);
+	}
+	
+	private void addJSPrintDef(Program program)
+	{
+		trace("Comment");
+		StringBuffer s = new StringBuffer();
+		s.append("------------- JSPrint Function -------------\n");
+		s.append("Added Manually\n\n");
+		program.addStatement(new Comment(s.toString()));
+
+		Identifier funcID = _factoryJST.getJSPrintID();
+		Identifier strID = new Identifier("str");
+		FunctionDef printDef = new FunctionDef(funcID, strID);
+		printDef.setNoneRandomBranch();
+		
+		// define the print statement
+		printDef.addStatement(new OutputStatement(strID));
+		
+		program.addStatement(printDef);
+		
+		_factoryJST.setJSPrintID(funcID);
+	}
+	
+	
+	private Call CreateCallToJSPrint(OperationExp expr)
+	{
+		Call call = new Call(_factoryJST.getJSPrintID(), expr);
+		call.setNoneRandomBranch();
+		return call;
 	}
 }
