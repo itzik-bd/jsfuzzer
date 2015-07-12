@@ -595,6 +595,9 @@ public class Generator
 			
 			// create the call node
 			func = funcEntry.getIdentifier();
+			
+			OperationExp compare = new OperationExp(Operator.EQUALTYPE, new OperationExp(Operator.TYPEOF, func), (LiteralString)_factoryJST.getConstantNode("lit-function"));
+			func = new OperationExp(Operator.CONDOP, compare, func, _factoryJST.getSingleLiteralNode(LiteralTypes.UNDEFINED));
 		}
 		else
 		{
