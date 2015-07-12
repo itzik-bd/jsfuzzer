@@ -1,20 +1,22 @@
 package Generator.Params;
 
+import JST.AbsStatement;
+
 public class StatementBlockParams extends createParams
 {
-	private String _outputString = null;
+	private AbsStatement _firstSatement = null;
 	
-	public StatementBlockParams(String outputString) {
-		_outputString = outputString;
+	public StatementBlockParams(AbsStatement firstSatement) {
+		_firstSatement = firstSatement;
 	}
 
-	public static String getOutString(createParams params)
+	public static AbsStatement getFirstStatement(createParams params)
 	{
-		String defaultValue = null;
-		return (String) decide(params, defaultValue, new getParamField() {
+		AbsStatement defaultValue = null;
+		return (AbsStatement) decide(params, defaultValue, new getParamField() {
 			@Override
 			public Object fetch(createParams params) {
-				return ((StatementBlockParams) params)._outputString;
+				return ((StatementBlockParams) params)._firstSatement;
 			}
 		});
 	}

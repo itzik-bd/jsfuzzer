@@ -37,8 +37,8 @@ public class Generator
 	private final GenLogic _logic;
 	
 	// instance fields - one time initialize, but may be restarted
-	private final StringCounter _counterVar = new StringCounter("var%d");
-	private final StringCounter _counterFunc = new StringCounter("func%d");
+	private final StringCounter _counterVar = new StringCounter("v%d");
+	private final StringCounter _counterFunc = new StringCounter("f%d");
 	private final StringCounter _counterLoopVar = new StringCounter("loop_var%d");
 	
 	private final StringBuilder _verboseString = new StringBuilder();
@@ -66,6 +66,7 @@ public class Generator
 		traceIn("Program");
 
 		_program.addStatement(generateHeader());
+		_program.addStatement(generateRawFunctions());
 		
 		// first of all generate variables to be used
 		_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true, null, null)));
@@ -79,8 +80,6 @@ public class Generator
 		
 		// add print stmts for each program identifier
 		addPrintVarsStmts(_program);
-		
-		_program.addStatement(generateRawFunctions());
 
 		// attach configuration used to generate program
 		_program.addStatement(generateFooter());
@@ -379,8 +378,11 @@ public class Generator
 		Context newContext = new Context(context, false, true, true);
 				
 		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
+		
+		Call debugCall = new Call(_factoryJST.getFuncIdentifier("JSCallDebug"), new LiteralString(functionId.getName()));
+		debugCall.setNoneRandomBranch();
 
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams("Inside function: " + functionId));
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(debugCall));
 
 		FunctionDef funcDef = new FunctionDef(functionId, funcParams, stmtsBlock);
 
@@ -501,10 +503,10 @@ public class Generator
 		StatementsBlock stmtBlock = new StatementsBlock();
 		
 		// add output string
-		String outString = StatementBlockParams.getOutString(params);
-		if (outString != null)
+		AbsStatement firstStatement = StatementBlockParams.getFirstStatement(params);
+		if (firstStatement != null)
 		{
-			stmtBlock.addStatement(newOutputStatement(outString));
+			stmtBlock.addStatement(firstStatement);
 		}
 
 		// decide how many statements will be generate
