@@ -1,3 +1,0 @@
-function JSPrint(str) {
-  typeof console !== 'undefined' ? console.log(str) : print(str);
-}

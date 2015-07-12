@@ -1,0 +1,42 @@
+/*----------------------------------------------------------------------------
+ *	print function - platform independent
+ */
+function JSPrint(str) {
+	typeof console !== 'undefined' ? console.log(str) : print(str);
+}
+/*---------------------
+ *	Function that print all vars and their value (JSON)
+ *	Recives a single array whose elements are pairs (as array) that contains string and value.
+ *	For example: [["v2",v2],["v7",v7]]
+ */
+function JSDebugVars(varsArray) {
+	for (var i=0; i<varsArray.length; i++) {
+		var vaule;
+		try { value = JSON.stringify(varsArray[i][1]); }
+		catch(e) { value = "[circular Object]"; }
+		JSPrint(varsArray[i][0] + " = " + value);
+	}
+}
+/*---------------------
+ *	call proxy function - every call to any generated function is pass through this proxy.
+ *	Moreover, it trace the program function calls depth
+ */
+var JSCallDepth = -1;
+function JSCall() {
+	var f = arguments['0'];
+	if (typeof f === 'function') {
+		var params = [];
+		for (key in arguments) if (key != '0') params.push(arguments[key]);
+		JSCallDepth++;
+		var result = f.apply(f, params);
+		JSCallDepth--;
+		return result;
+	}
+}
+/*---------------------
+ *	dubug function to print some string and its depth in the program
+ */
+function JSCallDebug(str) {
+	JSPrint(Array(JSCallDepth+1).join(" ") + str);
+}
+/*----------------------------------------------------------------------------*/

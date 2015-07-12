@@ -145,7 +145,7 @@ public class JsFuzzer
 			String jsVerbose = gen.getVerboseOutput();
 			String jsTree = JstToTree.execute(program);
 			double sizeKb = jsProgram.length() / 1024.0;
-			OutLog.printInfo(String.format("New random program was successfully generated (%.2fKb)", sizeKb));
+			OutLog.printInfo(String.format("New random program was successfully generated (%.2f Kb)", sizeKb));
 			
 			// save program as Javascript file
 			Utils.FilesIO.WriteToFile(_jsFile, jsProgram);

@@ -31,7 +31,7 @@ public class EnginesUtil
 		for (Entry<String, List<String>> eqvClass : compareModel.getEquivalenceEngines().entrySet())
 		{
 			double sizeKb = eqvClass.getKey().length() / 1024.0;
-			OutLog.printInfo(String.format("equivalent class (%.2fKb): %s", sizeKb, String.join(", ", eqvClass.getValue())));
+			OutLog.printInfo(String.format("equivalent class (%.2f Kb): %s", sizeKb, String.join(", ", eqvClass.getValue())));
 		}
 		
 		// print all stdout of engines that failed 

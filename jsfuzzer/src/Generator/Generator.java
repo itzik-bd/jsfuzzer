@@ -66,7 +66,7 @@ public class Generator
 		traceIn("Program");
 
 		_program.addStatement(generateHeader());
-		_program.addStatement(generateRawFunctions());
+		_program.addStatement(_factoryJST.getSnippet("rawUtilsFunctions"));
 		
 		// first of all generate variables to be used
 		_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true, null, null)));
@@ -79,28 +79,13 @@ public class Generator
 		_program.addStatement(newOutputStatement("Execution is over.\n"));
 		
 		// add print stmts for each program identifier
-		addPrintVarsStmts(_program);
+		_program.addStatement(generatePrintVarsSection());
 
 		// attach configuration used to generate program
 		_program.addStatement(generateFooter());
 
 		traceOut();
 		return _program;
-	}
-
-	private List<ProgramUnit> generateRawFunctions()
-	{
-		List<ProgramUnit> rawList = new LinkedList<ProgramUnit>();
-		
-		// JSPrint
-		rawList.add(new Comment("Calling proxy", true));
-		rawList.add(_factoryJST.getSnippet("JSCall"));
-		
-		// JSCall
-		rawList.add(new Comment("print proxy", true));
-		rawList.add(_factoryJST.getSnippet("JSPrint"));
-		
-		return rawList;
 	}
 
 	private void initNewProgram()
@@ -809,18 +794,6 @@ public class Generator
 		return litNum;
 	}
 
-	private Call newOutputStatement(String str)
-	{
-		return newOutputStatement(new LiteralString(str));
-	}
-
-	private Call newOutputStatement(AbsExpression expr)
-	{
-		Call call = new Call(_factoryJST.getFuncIdentifier("JSPrint"), expr);
-		call.setNoneRandomBranch();
-		return call;
-	}
-	
 	// ===============================================================================
 
 	/**
@@ -938,31 +911,41 @@ public class Generator
 		return true;
 	}
 	
-	/***
-	 * For each var x (including loopVars), add stmt: print("x = " + x); 
-	 * @param program
+	/**
+	 * generate a call to debug function that prints all variables with their data:
+	 * it constructs an array of pairs: (id name, id val) and pass it to the function
 	 */
-	private void addPrintVarsStmts(Program program) 
+	private List<ProgramUnit> generatePrintVarsSection() 
 	{
-		List<SymEntry> symEntries = _rootContext.getSymTable().getAvaiableEntries(SymEntryType.VAR);
+		List<ProgramUnit> units = new LinkedList<ProgramUnit>();
 		
-		program.addStatement(new Comment("------------- Printing All The Program Variables -------------\n", true));
+		units.add(new Comment("------------- Printing All The Program Variables -------------", true));
 		
-		for(SymEntry entry : symEntries)
-			addPrintVarStmt(program, entry.getIdentifier());			
+		// create array of pairs: (id name, id val)
+		List<AbsExpression> list = new LinkedList<AbsExpression>();
+		for(SymEntry entry : _rootContext.getSymTable().getAvaiableEntries(SymEntryType.VAR))
+		{
+			Identifier id = entry.getIdentifier();
+			list.add(new ArrayExp(new LiteralString(id.getName()), id));
+		}
+		
+		// create call to predefined function to print vars
+		Call call = new Call(_factoryJST.getFuncIdentifier("JSDebugVars"), new ArrayExp(list));
+		call.setNoneRandomBranch();
+		units.add(call);
+		
+		return units;
 	}
 
-	/***
-	 * Adds the stmt - "print("id =  " + id);
-	 * @param program
-	 * @param id - to be printed
-	 */
-	private void addPrintVarStmt(Program program, Identifier id)
+	private Call newOutputStatement(String str)
 	{
-		OperationExp plusExpr = new OperationExp(Operator.PLUS, new LiteralString(id.getName() + " = "), id);
-		Call callToJSPrint = newOutputStatement(plusExpr);
-		callToJSPrint.setNoneRandomBranch();
-		
-		program.addStatement(callToJSPrint);
+		return newOutputStatement(new LiteralString(str));
+	}
+
+	private Call newOutputStatement(AbsExpression expr)
+	{
+		Call call = new Call(_factoryJST.getFuncIdentifier("JSPrint"), expr);
+		call.setNoneRandomBranch();
+		return call;
 	}
 }
