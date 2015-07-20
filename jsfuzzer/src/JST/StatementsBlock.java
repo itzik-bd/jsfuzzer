@@ -25,10 +25,6 @@ public class StatementsBlock extends AbsStatement {
 		_statements.addAll(s);
 	}
 
-	public void addStatementAtIndex(int index, ProgramUnit s) {
-		_statements.add(index, s);
-	}
-
 	@Override
 	public Object accept(Visitor visitor, Object context) {
 		return visitor.visit(this, context);

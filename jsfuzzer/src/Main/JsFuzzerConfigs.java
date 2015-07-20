@@ -5,7 +5,7 @@ import java.util.List;
 
 public class JsFuzzerConfigs
 {
-	public final static int[] version = {0,02};
+	public final static int[] version = {0,3};
 	
 	public static String getVersion()
 	{

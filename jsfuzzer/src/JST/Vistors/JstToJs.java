@@ -104,10 +104,8 @@ public class JstToJs implements Visitor
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("function %s(%s) ", functionDefinition.getId().accept(this, false), listJoin(functionDefinition.getFormals(), false, ", ")));
-		_depth++;
+		s.append(String.format("function %s(%s)", functionDefinition.getId().accept(this, false), listJoin(functionDefinition.getFormals(), false, ", ")));
 		s.append(functionDefinition.getStatementsBlock().accept(this, true));
-		_depth--;
 
 		return s.toString();
 	}
@@ -143,10 +141,8 @@ public class JstToJs implements Visitor
 		
 		s.append(whileStatement.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
 		ident(s);
-		s.append(String.format("while (%s) ", whileStatement.getCondition().accept(this, false)));
-		_depth++;
+		s.append(String.format("while (%s)", whileStatement.getCondition().accept(this, false)));
 		s.append(whileStatement.getStatementsBlock().accept(this, true));
-		_depth--;
 		
 		return s.toString();
 	}
@@ -158,10 +154,8 @@ public class JstToJs implements Visitor
 		
 		s.append(doWhile.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
 		ident(s);
-		s.append("do ");
-		_depth++;
+		s.append("do");
 		s.append(doWhile.getStatementsBlock().accept(this, true));
-		_depth--;
 		ident(s);
 		s.append(String.format("while (%s);",doWhile.getCondition().accept(this, false)));
 		
@@ -175,10 +169,8 @@ public class JstToJs implements Visitor
 		
 		s.append(forStatement.getLoopCounterInit().accept(this, true)); //init the loop counter outside the loop
 		ident(s);
-		s.append(String.format("for (%s ; %s ; %s) ", forStatement.getInitStatement().accept(this, false), forStatement.getConditionExpression().accept(this, false), forStatement.getStepExpression().accept(this, false)));
-		_depth++;
+		s.append(String.format("for (%s ; %s ; %s)", forStatement.getInitStatement().accept(this, false), forStatement.getConditionExpression().accept(this, false), forStatement.getStepExpression().accept(this, false)));
 		s.append(forStatement.getStatementsBlock().accept(this, true));
-		_depth--;
 
 		return s.toString();
 	}
@@ -189,10 +181,8 @@ public class JstToJs implements Visitor
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("for (%s in %s) ", forEach.getItem().accept(this, false), forEach.getCollection().accept(this, false)));
-		_depth++;
+		s.append(String.format("for (%s in %s)", forEach.getItem().accept(this, false), forEach.getCollection().accept(this, false)));
 		s.append(forEach.getStatementsBlock().accept(this, true));
-		_depth--;
 
 		return s.toString();
 	}
@@ -215,7 +205,9 @@ public class JstToJs implements Visitor
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("switch (%s) {", switchStatement.getExpression().accept(this, false)));
+		s.append(String.format("switch (%s)", switchStatement.getExpression().accept(this, false)));
+		ident(s);
+		s.append("{");
 		_depth++;
 		s.append(listJoin(switchStatement.getCasesOps(), false));
 		_depth--;
@@ -230,10 +222,8 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 
-		s.append(listJoin(caseBlock.getCases(), false) + " ");
-		_depth++;
+		s.append(listJoin(caseBlock.getCases(), false));
 		s.append(caseBlock.getStatementBlock().accept(this, true));
-		_depth--;
 		
 		return s.toString();
 	}
@@ -269,17 +259,13 @@ public class JstToJs implements Visitor
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
-		s.append(String.format("if (%s) ", ifStatement.getCondition().accept(this, false)));
-		_depth++;
+		s.append(String.format("if (%s)", ifStatement.getCondition().accept(this, false)));
 		s.append(ifStatement.getStatementsBlock().accept(this, true));
-		_depth--;
 		
 		if (ifStatement.hasElse()) {
 			ident(s);
-			s.append("else ");
-			_depth++;
+			s.append("else");
 			s.append(ifStatement.getElseStatementsBlock().accept(this, true)); // todo
-			_depth--;
 		}
 		
 		return s.toString();
@@ -290,11 +276,12 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 		
+		ident(s);
 		s.append("{");
+		_depth++;
 		s.append(listJoin(stmtBlock.getStatements(), true));
 		_depth--;
 		ident(s);
-		_depth++;
 		s.append("}");
 		
 		return s.toString();
@@ -349,8 +336,7 @@ public class JstToJs implements Visitor
 	{
 		StringBuffer s = new StringBuffer();
 		
-		ident(s);
-		s.append(String.format("function (%s) ", listJoin(functionExpression.getFormals(), false, ", ")));
+		s.append(String.format("function (%s)", listJoin(functionExpression.getFormals(), false, ", ")));
 		_depth++;
 		s.append(functionExpression.getStatementsBlock().accept(this, true));
 		_depth--;

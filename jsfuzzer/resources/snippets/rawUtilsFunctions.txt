@@ -1,51 +1,55 @@
-/* ------------------------- Print Function - Platform Independent ------------------------- */
-
-function JSPrint(str) {
-	typeof console !== 'undefined' ? console.log(str) : print(str);
-}
-
-
-/* --------------------------------- JSDebugVars Function ---------------------------------- */
-/*	Function that print all vars and their value (JSON)
- *	Recives a single array whose elements are pairs (as array) that contains string and value.
- *	For example: [["v2",v2],["v7",v7]]
- */
- 
-function JSDebugVars(varsArray) {
-	for (var i=0; i<varsArray.length; i++) {
-		var vaule;
-		try { value = JSON.stringify(varsArray[i][1]); }
-		catch(e) { value = "[circular Object]"; }
-		JSPrint(varsArray[i][0] + " = " + value);
-	}
-}
-
-
-/*------------------------------------ JSCall Function ------------------------------------- */
-/*	call proxy function - every call to any generated function is pass through this proxy.
- *	Moreover, it trace the program function calls depth
- */
- 
-var JSCallDepth = -1;
-function JSCall() {
-	var f = arguments['0'];
-	if (typeof f === 'function') {
-		var params = [];
-		for (key in arguments) if (key != '0') params.push(arguments[key]);
-		JSCallDepth++;
-		var result = f.apply(f, params);
-		JSCallDepth--;
+var JSFuzzer = (function()
+{
+	// private
+	var callDepth = -1;
+	
+	// public
+	var api = {};
+	
+	/*	print function - platform independent */
+	api.print = function(str)
+	{
+		typeof console !== 'undefined' ? console.log(str) : print(str);
+	};
+	
+	/*	Function that print all vars and their value (JSON)
+	 *	Recives a single array whose elements are pairs (as array) that contains string and value.
+	 *	For example: [["v2",v2],["v7",v7]]
+	 */
+	api.debugVars = function (varsArray)
+	{
+		for (var i=0; i<varsArray.length; i++) {
+			var vaule;
+			try { value = JSON.stringify(varsArray[i][1]); }
+			catch(e) { value = "[circular Object]"; }
+			api.print(varsArray[i][0] + " = " + value);
+		}
+	};
+	
+	/*	call proxy function - every call to any generated function is pass through this proxy.
+	 *	Moreover, it trace the program function calls depth
+	 */
+	api.call = function ()
+	{
+		callDepth++;
+		var result;
+		var f = arguments['0'];
+		var f_name = arguments['1'];
+		if (typeof f === 'function') {
+			api.traceDebug(f_name);
+			var params = [];
+			for (key in arguments) if (key != '0' && key != '1') params.push(arguments[key]);
+			result = f.apply(f, params);		
+		}
+		else api.traceDebug('call to non-func ' + f_name);
+		callDepth--;
 		return result;
-	}
-}
-
-
-/*--------------------------------- JSCallDebug Function ----------------------------------- */
-/*	dubug function to print some string and its depth in the program
- */
-function JSCallDebug(str) {
-	JSPrint(Array(JSCallDepth+1).join(" ") + str);
-}
-
-
-/*------------------------------------Generated Program -------------------------------------*/
+	};
+	
+	api.traceDebug = function(str)
+	{
+		api.print(Array(callDepth+1).join("\t") + str);
+	};
+	
+	return api;
+})();

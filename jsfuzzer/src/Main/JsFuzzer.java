@@ -3,6 +3,7 @@ package Main;
 import java.io.File;
 
 import Engines.EnginesUtil;
+import Generator.ExecFlow;
 import Generator.Generator;
 import Generator.Config.Configs;
 import JST.Program;
@@ -19,6 +20,7 @@ public class JsFuzzer
 	private boolean _isGenerate = true;
 	private String _configsFile = null;
 	private String _seed = null;
+	private ExecFlow _execFlow = ExecFlow.NORMAL;
 	
 	private boolean _showHelpAndExit = false;
 	private boolean _runEngines = false;
@@ -42,7 +44,8 @@ public class JsFuzzer
 				+ "To generate new program:\n"
 				+ "--out <FILE>     - save output to file\n"
 				+ "--config <FILE>  - load costum configuration file\n"
-				+ "--seed <SEED>    - set the seed of the random generator\n\n"
+				+ "--seed <SEED>    - set the seed of the random generator\n"
+				+ "--execFlow <normal | function | blocks> - set the javascript execution print level\n\n"
 				+ "To use a javascript file:\n"
 				+ "--load <FILE>    - load javascript file\n\n"
 				+ "To compare over supported engines:\n"
@@ -68,6 +71,11 @@ public class JsFuzzer
 			else if (args[i].equals("--seed") && i+1 < len) {
 				_seed  = args[i+1];
 				i++;
+			}
+			else if (args[i].equals("--execFlow") && i+1 < len) {
+				String execFlowStr = args[i+1].toUpperCase();
+				try { _execFlow = ExecFlow.valueOf(execFlowStr); }
+				catch (IllegalArgumentException e) { OutLog.printWarn("No such execFlow value: " + execFlowStr + ". Using execFlow: " + _execFlow); }
 			}
 			else if (args[i].equals("--load") && i+1 < len) {
 				_jsFile  = args[i+1];
@@ -142,9 +150,9 @@ public class JsFuzzer
 			OutLog.printInfo("Configuration file was successfully loaded");
 			
 			// generate program
-			Generator gen = new Generator(configs, _seed);
+			Generator gen = new Generator(configs, _seed, _execFlow);
 			Program program = gen.createProgram();
-			String jsProgram = JstToJs.executeCostum(program, "  ", "\n");
+			String jsProgram = JstToJs.executeCostum(program, "\t", "\n");
 			String jsVerbose = gen.getVerboseOutput();
 			String jsTree = JstToTree.execute(program);
 			double sizeKb = jsProgram.length() / 1024.0;

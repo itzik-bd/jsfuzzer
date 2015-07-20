@@ -43,6 +43,7 @@ public class Generator
 	// instance fields - one time initialize
 	private final Configs _configs;
 	private final GenLogic _logic;
+	private final ExecFlow _flowLevel;
 	
 	// instance fields - one time initialize, but may be restarted
 	private final StringCounter _counterVar = new StringCounter("v%d");
@@ -55,10 +56,11 @@ public class Generator
 	private Program _program; // generated program instance
 	private Context _rootContext; // global scope
 	
-	public Generator(Configs configs, String seed)
+	public Generator(Configs configs, String seed, ExecFlow flowLevel)
 	{
 		// set internal properties
 		_configs = configs;
+		_flowLevel = flowLevel;
 		_logic = new GenLogic(this, configs);
 		
 		// set seed random seed, to be able to generate the same program again
@@ -75,6 +77,7 @@ public class Generator
 
 		_program.addStatement(generateHeader());
 		_program.addStatement(_factoryJST.getSnippet("rawUtilsFunctions"));
+		_program.addStatement(new Comment("--------------------------------- [ Generated Program ] ---------------------------------", 2, 1));
 		
 		// first of all generate variables to be used
 		_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true, null, null)));
@@ -222,8 +225,7 @@ public class Generator
 		VarDecleration loopCounterDecl = (VarDecleration) stmts.get(0);
 		If stopAndStepCond = (If) stmts.get(1);
 
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
-		stmtsBlock.addStatementAtIndex(0, stopAndStepCond); // inject stopping condition + counter step
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(stopAndStepCond));
 
 		// create for loop: for(random var decl; random expr; random expr)
 		For forLoop = new For(initStmt, conditionExpr, stepExpr, stmtsBlock, loopCounterDecl);
@@ -370,11 +372,8 @@ public class Generator
 		Context newContext = new Context(context, false, true, true);
 				
 		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
-		
-		Call debugCall = new Call(_factoryJST.getFuncIdentifier("JSCallDebug"), new LiteralString(functionId.getName()));
-		debugCall.setNoneRandomBranch();
 
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(debugCall));
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
 
 		FunctionDef funcDef = new FunctionDef(functionId, funcParams, stmtsBlock);
 
@@ -494,6 +493,15 @@ public class Generator
 		traceIn("StatementsBlock");
 		StatementsBlock stmtBlock = new StatementsBlock();
 		
+		stmtBlock.addStatement(new Comment("block id: " + stmtBlock.getUniqueId()));
+		
+		if (_flowLevel.isA(ExecFlow.EXTENSIVE))
+		{
+			Call debugCall = new Call(getApiMethod(ApiOptions.PRINT), new LiteralString("block " + stmtBlock.getUniqueId()));
+			debugCall.setNoneRandomBranch();
+			stmtBlock.addStatement(debugCall);
+		}
+		
 		// add output string
 		AbsStatement firstStatement = StatementBlockParams.getFirstStatement(params);
 		if (firstStatement != null)
@@ -558,7 +566,6 @@ public class Generator
 	Call createCall(Context context, createParams params)
 	{
 		traceIn("Call");
-		trace("Identifier (JSCall)");
 
 		SymTable symbols = context.getSymTable();
 		
@@ -567,6 +574,7 @@ public class Generator
 		
 		//get parameters ready
 		AbsExpression func;
+		LiteralString funcName;
 		int paramNum;
 		
 		// choose randomly between existing or anonymous function
@@ -585,16 +593,19 @@ public class Generator
 			paramNum = funcEntry.getParamsNumber();
 			
 			// create the call node
-			func = funcEntry.getIdentifier();
+			Identifier funcId = funcEntry.getIdentifier();
+			funcName = new LiteralString(funcId.getName());
 			
-			OperationExp compare = new OperationExp(Operator.EQUALTYPE, new OperationExp(Operator.TYPEOF, func), (LiteralString)_factoryJST.getConstantNode("lit-function"));
-			func = new OperationExp(Operator.CONDOP, compare, func, _factoryJST.getSingleLiteralNode(LiteralTypes.UNDEFINED));
+			OperationExp compare = new OperationExp(Operator.EQUALTYPE, new OperationExp(Operator.TYPEOF, funcId), (LiteralString)_factoryJST.getConstantNode("lit-function"));
+			func = new OperationExp(Operator.CONDOP, compare, funcId, _factoryJST.getSingleLiteralNode(LiteralTypes.UNDEFINED));
 		}
 		else
 		{
 			// Create the anonymous function
 			funcDefParams newParams = new funcDefParams();
-			func = createFunctionExp(context, newParams);		
+			FunctionExp funcExp = createFunctionExp(context, newParams);
+			funcName = new LiteralString("anonymous f" + funcExp.getUniqueId());
+			func = funcExp;
 			
 			// Get number of parameters
 			paramNum = newParams.getParamNumber();
@@ -609,10 +620,11 @@ public class Generator
 		
 		// add the function name (or its implementation in case of anonymous function) 
 		// as the first parameter to the proxy call function
+		callParams.add(0, funcName);
 		callParams.add(0, func);
 		
 		// create a proxy call to function
-		Call wrappedCall = new Call(_factoryJST.getFuncIdentifier("JSCall"), callParams);
+		Call wrappedCall = new Call(getApiMethod(ApiOptions.PROXY_CALL), callParams);
 			
 		traceOut();
 		return wrappedCall;
@@ -829,9 +841,7 @@ public class Generator
 		If stopAndStepCond = (If) stmts.get(1);
 
 		// create loop content
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
-
-		stmtsBlock.addStatementAtIndex(0, stopAndStepCond); // inject stopping condition + counter step
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(stopAndStepCond));
 
 		try {
 			// create new while/doWhile instance
@@ -941,7 +951,7 @@ public class Generator
 		}
 		
 		// create call to predefined function to print vars
-		Call call = new Call(_factoryJST.getFuncIdentifier("JSDebugVars"), new ArrayExp(list));
+		Call call = new Call(getApiMethod(ApiOptions.DEBUG_VARS), new ArrayExp(list));
 		call.setNoneRandomBranch();
 		units.add(call);
 		
@@ -955,8 +965,13 @@ public class Generator
 
 	private Call newOutputStatement(AbsExpression expr)
 	{
-		Call call = new Call(_factoryJST.getFuncIdentifier("JSPrint"), expr);
+		Call call = new Call(getApiMethod(ApiOptions.PRINT), expr);
 		call.setNoneRandomBranch();
 		return call;
+	}
+	
+	private MemberExp getApiMethod(ApiOptions apiMethod)
+	{
+		return new MemberExp(_factoryJST.getIdentifier("JSFuzzer"), _factoryJST.getFuncIdentifier(apiMethod.getApiName()));
 	}
 }

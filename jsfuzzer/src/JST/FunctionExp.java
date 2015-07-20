@@ -7,8 +7,8 @@ import JST.Interfaces.Visitor;
 
 public class FunctionExp extends AbsExpression
 {
-	private List<Identifier> _formals;
-	private StatementsBlock _stmtsBlock;
+	private final List<Identifier> _formals;
+	private final StatementsBlock _stmtsBlock;
 	
 	public FunctionExp(List<Identifier> formals, StatementsBlock stmts)
 	{

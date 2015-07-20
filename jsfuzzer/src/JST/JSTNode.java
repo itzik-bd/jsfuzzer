@@ -4,6 +4,9 @@ import JST.Interfaces.JSTObject;
 
 public abstract class JSTNode implements JSTObject
 {
+	private static int _instanceCounter = 0;
+	protected final int _uniqueId = _instanceCounter++;
+	
 	/** True if the branch under this node is randomized */
 	private boolean _isRandomBranch = true;
 	
@@ -28,5 +31,10 @@ public abstract class JSTNode implements JSTObject
 	public void setNoneRandomNode()
 	{
 		_isRandomNode = false;
-	}	
+	}
+	
+	public int getUniqueId()
+	{
+		return _uniqueId;
+	}
 }
