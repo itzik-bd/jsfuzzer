@@ -9,10 +9,12 @@ import Utils.StdRandom;
 import Generator.Config.ConfigProperties;
 import Generator.Config.Configs;
 import Generator.Params.GenerateExpressionParams;
+import Generator.Params.GenerateOpExprParams;
 import Generator.Params.createParams;
 import JST.AbsExpression;
 import JST.AbsStatement;
 import JST.JSTNode;
+import JST.Enums.DataTypes;
 import JST.Enums.JSTNodes;
 
 public class GenLogic
@@ -142,8 +144,8 @@ public class GenLogic
 		
 		// non-leafs - probability decrease as depth grows
 		testAndPut(params, hs, JSTNodes.OperationExp, _configs.valInt(ConfigProperties.EXPR_EXPRESSIONOP)*factorDepth);
-		//testAndPut(params, hs, JSTNodes.ArrayExp, _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
 		testAndPut(params, hs, JSTNodes.Call, _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
+		//testAndPut(params, hs, JSTNodes.ArrayExp, _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
 		//testAndPut(params, hs, JSTNodes.MemberExp, _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
 		
 		//ObjectExp is illegal statement
@@ -161,6 +163,26 @@ public class GenLogic
 		return (AbsExpression) applyMethod(createMethod, context, params);
 	}
 
+	/**
+	 * @param context - current Context
+	 * @param params - reserved parameter, null expected
+	 * @return an AbsExpression, suitable to be used as condition
+	 */
+	AbsExpression generateCondition(Context context, createParams params)
+	{
+		// create params for all options
+		GenerateExpressionParams GenExpParams = new GenerateExpressionParams(true);
+		
+		GenExpParams.addOption(JSTNodes.Identifier, null);
+		GenExpParams.addOption(JSTNodes.Call, null);
+		
+		// OperationExp that returns boolean value
+		GenerateOpExprParams opExpParams = new GenerateOpExprParams(DataTypes.BOOLEAN);
+		GenExpParams.addOption(JSTNodes.OperationExp, opExpParams);
+		
+		return generateExpression(context, GenExpParams);
+	}
+	
 	private void testAndPut(createParams params, HashMap<JSTNodes, Double> hs, JSTNodes node, double val) 
 	{
 		Map<JSTNodes, createParams> options = null;

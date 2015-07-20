@@ -20,6 +20,10 @@ public class GenerateExpressionParams extends createParams
 		_optionalExpresstions = new HashMap<JSTNodes, createParams>();
 	}
 	
+	/**
+	 * @param node - what node to include/disclude
+	 * @param params - parameters to transfer to creator, if this was choosen
+	 */
 	public void addOption(JSTNodes node, createParams params){
 		_optionalExpresstions.put(node, params);
 	}

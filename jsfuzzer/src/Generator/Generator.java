@@ -29,6 +29,11 @@ import Utils.StringCounter;
 
 public class Generator
 {
+	// TODO: major bug! when using the same symbol table as the parent
+	// the variable deceleration is known at the outer scope!!
+	// WTF - how do we gonna solve it??????
+	// this is relevant for the FOR loop also.
+	
 	// static fields
 	private final static JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
 	private final static JST.Helper.JSTProperties _jstProp = new JST.Helper.JSTProperties();
@@ -160,16 +165,9 @@ public class Generator
 	If createIf(Context context, createParams params)
 	{
 		traceIn("If");
-		
-		// create params for all options
-		GenerateExpressionParams GenExpParams = new GenerateExpressionParams(true);
-		GenExpParams.addOption(JSTNodes.Identifier, null);
-		GenExpParams.addOption(JSTNodes.Call, null);
-		GenerateOpExprParams opExpParams = new GenerateOpExprParams(DataTypes.BOOLEAN);
-		GenExpParams.addOption(JSTNodes.OperationExp, opExpParams);
-		
+				
 		// Genersate condition
-		AbsExpression conditionExp = _logic.generateExpression(context, GenExpParams);
+		AbsExpression conditionExp = _logic.generateCondition(context, params);
 		
 		// create Statements Block
 		StatementsBlock trueOp = createStatementsBlock(context, null);
@@ -212,8 +210,10 @@ public class Generator
 		Context newContext = new Context(context, true, null, false);
 
 		AbsStatement initStmt = createVarDecleration(newContext, new VarDeclerationParams(null, 1, null));
-		AbsExpression conditionExpr = _logic.generateExpression(newContext, null);
 		AbsExpression stepExpr = _logic.generateExpression(newContext, null);
+		
+		// Generate condition
+		AbsExpression conditionExpr = _logic.generateCondition(newContext, null);
 
 		// first: loopVarDecl (added to the previous scope), second: stopping cond and step
 		// loopVar will be added to the prev scope
@@ -239,11 +239,6 @@ public class Generator
 
 		// Temporary solution (could also be any existing iteratable var)
 		ArrayExp arr = createArrayExp(context, null);
-
-		// TODO: major bug! when using the same symbol table as the parent
-		// the variable deceleration is known at the outer scope!!
-		// WTF - how do we gonna solve it??????
-		// this is relevant for the FOR loop also.
 		
 		// create new loop context that has the same symbol table as his parent
 		Context newContext = new Context(context, true, null, false);
@@ -527,8 +522,6 @@ public class Generator
 	/**
 	 * This function draws an identifier to be assigned. Currently we force the
 	 * identifier to be defined in higher scopes (or current scope),
-	 * 
-	 * TODO: think if this is not too restrictive
 	 */
 	Assignment createAssignment(Context context, createParams params)
 	{
@@ -536,7 +529,8 @@ public class Generator
 		Assignment assignment;
 
 		// force an existing variable (1.0) to be assigned to
-		Identifier id = createIdentifier(context, new IdentifierParams(1.0)); // TODO: change to assignable instead of var
+		// TODO: change to assignable instead of var. To make it less restrictive
+		Identifier id = createIdentifier(context, new IdentifierParams(1.0)); 
 		AbsExpression expr = _logic.generateExpression(context, null);
 
 		assignment = new Assignment(id, expr);
@@ -606,8 +600,12 @@ public class Generator
 			paramNum = newParams.getParamNumber();
 		}
 
+		// Do not allow abstract function as parameter
+		GenerateExpressionParams genExpParams = new GenerateExpressionParams(false);
+		genExpParams.addOption(JSTNodes.FunctionExp, null);
+		
 		// create list of parameter
-		List<AbsExpression> callParams = _logic.generateExpression(context, null, paramNum);
+		List<AbsExpression> callParams = _logic.generateExpression(context, genExpParams, paramNum);
 		
 		// add the function name (or its implementation in case of anonymous function) 
 		// as the first parameter to the proxy call function
@@ -821,7 +819,7 @@ public class Generator
 		Context newContext = new Context(context, true, null, false);
 
 		// create loop condition
-		AbsExpression conditionExp = _logic.generateExpression(newContext, null); 
+		AbsExpression conditionExp = _logic.generateCondition(newContext, null);
 
 		// first: loopVarDecl (added to the previous scope), second: stopping cond and step
 		// loopVar will be added to the prev scope
