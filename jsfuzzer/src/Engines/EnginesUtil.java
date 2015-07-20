@@ -1,5 +1,6 @@
 package Engines;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -19,7 +20,7 @@ public class EnginesUtil
 		_engineList.add(new NashornEngine());
 	}
 	
-	public void compare(String file)
+	public void compare(File file)
 	{
 		EnginesCompareModel compareModel = runFileAndGetCompareModel(file);
 		
@@ -41,7 +42,7 @@ public class EnginesUtil
 		}
 	}
 	
-	private EnginesCompareModel runFileAndGetCompareModel(String file)
+	private EnginesCompareModel runFileAndGetCompareModel(File file)
 	{
 		EnginesCompareModel compareModel = new EnginesCompareModel();
 		
@@ -51,6 +52,7 @@ public class EnginesUtil
 			compareModel.addEngineResult(engine.getPlatformName(), engine.runFile(file));
 		}
 		
+		compareModel.removeLastExecutionEnginesOutput(file);
 		compareModel.saveOutputByEquivalenceClass(file);
 		
 		return compareModel;

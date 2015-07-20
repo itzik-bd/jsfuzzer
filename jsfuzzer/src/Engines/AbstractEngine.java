@@ -1,6 +1,7 @@
 package Engines;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -19,7 +20,7 @@ public abstract class AbstractEngine
 		return _platformName;
 	}
 	
-	public RunEngineResult runFile(String filePath)
+	public RunEngineResult runFile(File filePath)
 	{		
 		// create new js process
 		ProcessBuilder procBuild = new ProcessBuilder(getCommandLineList(filePath));		
@@ -46,7 +47,7 @@ public abstract class AbstractEngine
 	}
 	
 	/** this method should return a array of cli command to be executed */
-	protected abstract String[] getCommandLineList(String filePath);
+	protected abstract String[] getCommandLineList(File filePath);
 	
 	private String communicateProcess(InputStream is)
 	{
@@ -54,15 +55,12 @@ public abstract class AbstractEngine
 		String lineFeed = System.getProperty("line.separator");
 		StringBuffer sb = new StringBuffer();
 		String line;
+		
 		try {
-			while ((line = in.readLine()) != null) {
-			    sb.append(line+lineFeed);
-			}
+			while ((line = in.readLine()) != null) sb.append(line+lineFeed);
 			in.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+		catch (IOException e) { e.printStackTrace(); }
 
 		return sb.toString();
 	}

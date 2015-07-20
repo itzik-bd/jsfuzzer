@@ -1,5 +1,7 @@
 package Engines;
 
+import java.io.File;
+
 public class NodejsEngine extends AbstractEngine
 {
 	public NodejsEngine()
@@ -8,9 +10,9 @@ public class NodejsEngine extends AbstractEngine
 	}
 	
 	@Override
-	protected String[] getCommandLineList(String filePath)
+	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"../JSEngines/Nodejs/node.exe", filePath};
+		String[] list = {"../JSEngines/Nodejs/node.exe", filePath.toString()};
 		
 		return list;
 	}

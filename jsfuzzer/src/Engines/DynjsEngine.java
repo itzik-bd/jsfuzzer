@@ -1,5 +1,7 @@
 package Engines;
 
+import java.io.File;
+
 public class DynjsEngine extends AbstractEngine
 {
 	public DynjsEngine()
@@ -8,9 +10,9 @@ public class DynjsEngine extends AbstractEngine
 	}
 
 	@Override
-	protected String[] getCommandLineList(String filePath)
+	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"java", "-jar", "../JSEngines/Dynjs/dynjs.jar", filePath};
+		String[] list = {"java", "-jar", "../JSEngines/Dynjs/dynjs.jar", filePath.toString()};
 		
 		return list;
 	}

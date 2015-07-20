@@ -1,5 +1,7 @@
 package Engines;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -9,6 +11,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import Utils.FilesIO;
+import Utils.OutLog;
 
 public class EnginesCompareModel
 {
@@ -54,25 +57,39 @@ public class EnginesCompareModel
 		return eqvClasses;
 	}
 	
-	public void saveOutputByEquivalenceClass(String file)
+	public void saveOutputByEquivalenceClass(File file)
 	{
 		for (Entry<String,List<String>> engineClass : eqvClasses.entrySet())
 		{
 			String stdout = engineClass.getKey();
 			List<String> engineList = engineClass.getValue();
 			
-			try {
-				FilesIO.WriteToFile(generateOutFileName(file, engineList), stdout);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			try { FilesIO.WriteToFile(generateEngineOutFileName(file, engineList), stdout); }
+			catch (IOException e) { e.printStackTrace(); }
 		}
 	}
 	
-	private String generateOutFileName(String file, List<String> engines)
+	public void removeLastExecutionEnginesOutput(final File file)
 	{
-		return String.format("%s.%s.out", file, String.join(".", engines));
+		File[] myFiles = file.getParentFile().listFiles(new FilenameFilter() {
+		    public boolean accept(File currentDirectory, String currFile) {
+		        return (currFile.startsWith(file.getName()+".engines") && currFile.endsWith(".out"));
+		    }
+		});
+		
+		if (myFiles.length > 0)
+		{
+			OutLog.printInfo("remove old engines out files");
+			
+			for(File engineOutFile : myFiles)
+				engineOutFile.delete();
+		}
+			
+	}
+	
+	private String generateEngineOutFileName(File file, List<String> engines)
+	{
+		return String.format("%s.engines.%s.out", file, String.join(".", engines));
 	}
 	
 	public Map<String,String> getFailedErrors()

@@ -1,5 +1,7 @@
 package Engines;
 
+import java.io.File;
+
 public class SpiderMonkeyEngine extends AbstractEngine
 {	
 	public SpiderMonkeyEngine()
@@ -8,9 +10,9 @@ public class SpiderMonkeyEngine extends AbstractEngine
 	}
 	
 	@Override
-	protected String[] getCommandLineList(String filePath)
+	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"../JSEngines/SpiderMonkey/js.exe",filePath};
+		String[] list = {"../JSEngines/SpiderMonkey/js.exe",filePath.toString()};
 		
 		return list;
 	}

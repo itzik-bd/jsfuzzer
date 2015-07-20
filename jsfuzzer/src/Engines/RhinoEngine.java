@@ -1,5 +1,7 @@
 package Engines;
 
+import java.io.File;
+
 public class RhinoEngine extends AbstractEngine
 {
 	public RhinoEngine()
@@ -8,9 +10,9 @@ public class RhinoEngine extends AbstractEngine
 	}
 	
 	@Override
-	protected String[] getCommandLineList(String filePath)
+	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"java", "-jar", "../JSEngines/Rhino/js.jar", filePath};
+		String[] list = {"java", "-jar", "../JSEngines/Rhino/js.jar", filePath.toString()};
 		
 		return list;
 	}

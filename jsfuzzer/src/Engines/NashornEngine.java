@@ -1,5 +1,7 @@
 package Engines;
 
+import java.io.File;
+
 public class NashornEngine extends AbstractEngine
 {
 	public NashornEngine()
@@ -8,9 +10,9 @@ public class NashornEngine extends AbstractEngine
 	}
 	
 	@Override
-	protected String[] getCommandLineList(String filePath)
+	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"../JSEngines/Nashorn/jjs.exe", filePath};
+		String[] list = {"../JSEngines/Nashorn/jjs.exe", filePath.toString()};
 		
 		return list;
 	}

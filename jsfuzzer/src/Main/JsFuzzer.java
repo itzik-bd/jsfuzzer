@@ -1,5 +1,7 @@
 package Main;
 
+import java.io.File;
+
 import Engines.EnginesUtil;
 import Generator.Generator;
 import Generator.Config.Configs;
@@ -34,7 +36,8 @@ public class JsFuzzer
 	
 	public static String getUsageString()
 	{
-		return "usage: JsFuzzer [OPTIONS]\n"
+		return "JsFuzzer version " + JsFuzzerConfigs.getVersion() + "\n\n"
+				+ "usage: JsFuzzer [OPTIONS]\n"
 				+ "--help           - show this help\n\n"
 				+ "To generate new program:\n"
 				+ "--out <FILE>     - save output to file\n"
@@ -125,7 +128,7 @@ public class JsFuzzer
 		if (_runEngines)
 		{
 			EnginesUtil engines = new EnginesUtil();
-			engines.compare(_jsFile);	
+			engines.compare(new File(_jsFile));	
 		}
 	}
 
