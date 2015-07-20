@@ -15,6 +15,8 @@ import Generator.Params.*;
 import Generator.SymTable.*;
 import JST.*;
 import JST.Enums.CompoundOps;
+import JST.Enums.DataTypes;
+import JST.Enums.JSTNodes;
 import JST.Enums.LiteralTypes;
 import JST.Enums.Operator;
 import JST.Interfaces.Caseable;
@@ -159,8 +161,17 @@ public class Generator
 	{
 		traceIn("If");
 		
-		// create operation and boolean condition
-		AbsExpression conditionExp = _logic.generateExpression(context, null);
+		// create params for all options
+		GenerateExpressionParams GenExpParams = new GenerateExpressionParams(true);
+		GenExpParams.addOption(JSTNodes.Identifier, null);
+		GenExpParams.addOption(JSTNodes.Call, null);
+		GenerateOpExprParams opExpParams = new GenerateOpExprParams(DataTypes.BOOLEAN);
+		GenExpParams.addOption(JSTNodes.OperationExp, opExpParams);
+		
+		// Genersate condition
+		AbsExpression conditionExp = _logic.generateExpression(context, GenExpParams);
+		
+		// create Statements Block
 		StatementsBlock trueOp = createStatementsBlock(context, null);
 		StatementsBlock falseOp = null;
 		
@@ -682,7 +693,8 @@ public class Generator
 
 	OperationExp createOperationExp(Context context, createParams params)
 	{
-		Operator operator = Operator.getRandomly(null); // TODO: use it more smart - send desired return type
+		DataTypes desiredType = GenerateOpExprParams.getDataType(params);
+		Operator operator = Operator.getRandomly(desiredType);
 		
 		traceIn(String.format("OperationExp (%s)", operator));
 		OperationExp expressionOp;

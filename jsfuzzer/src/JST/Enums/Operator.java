@@ -1,5 +1,6 @@
 package JST.Enums;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -20,7 +21,6 @@ public enum Operator
 	PLUSPLUSRIGHT(1, DataTypes.NUMBER, "%s++", "plus plus"),
 	MINUSMINUSRIGHT(1, DataTypes.NUMBER, "%s--", "minus minus"),
 	
-	DELETE(1, DataTypes.BOOLEAN,"delete %s", "delete object"),
 	TYPEOF(1, DataTypes.STRING,"typeof %s", "type of"),
 	VOID(1, DataTypes.UNDEFINED,"void %s", "void"),
 	
@@ -51,9 +51,12 @@ public enum Operator
 	BITAND(2, DataTypes.NUMBER, "%s & %s", "bitwise and"),
 	BITOR(2, DataTypes.NUMBER, "%s | %s", "bitwise or"),
 	
-	// TODO: decide what to do with these two, and do it...
+	// TODO: implement smartly
 	// INSTANCEOF(2, DataTypes.BOOLEAN, "%s instanceof %s", "instance of"),
+	
+	// TODO: decide what to do with these two, and do it...
 	// IN(2, DataTypes.BOOLEAN, "%s in %s", "in"),
+	// DELETE(1, DataTypes.BOOLEAN,"delete %s", "delete object"),
 	
 	// Ternary Operations
 	CONDOP(3, null,"%s ? %s : %s", "conditional operation");
@@ -83,7 +86,7 @@ public enum Operator
 	}
 
 	public static Operator getRandomly(DataTypes type) {
-		List<Operator> values = Arrays.asList(values());
+		List<Operator> values = new ArrayList<Operator> (Arrays.asList(values()));
 		
 		// remove operator whose return value type is other then desired type
 		if (type != null) {
