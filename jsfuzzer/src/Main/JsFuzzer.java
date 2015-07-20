@@ -45,7 +45,7 @@ public class JsFuzzer
 				+ "--out <FILE>     - save output to file\n"
 				+ "--config <FILE>  - load costum configuration file\n"
 				+ "--seed <SEED>    - set the seed of the random generator\n"
-				+ "--execFlow <normal | function | blocks> - set the javascript execution print level\n\n"
+				+ "--execFlow <normal | extensive> - set the javascript execution print level\n\n"
 				+ "To use a javascript file:\n"
 				+ "--load <FILE>    - load javascript file\n\n"
 				+ "To compare over supported engines:\n"
@@ -74,8 +74,13 @@ public class JsFuzzer
 			}
 			else if (args[i].equals("--execFlow") && i+1 < len) {
 				String execFlowStr = args[i+1].toUpperCase();
-				try { _execFlow = ExecFlow.valueOf(execFlowStr); }
-				catch (IllegalArgumentException e) { OutLog.printWarn("No such execFlow value: " + execFlowStr + ". Using execFlow: " + _execFlow); }
+				switch (execFlowStr)
+				{
+				case "normal": _execFlow = ExecFlow.NORMAL; break;
+				case "extensive": _execFlow = ExecFlow.EXTENSIVE; break;
+				default:
+					OutLog.printWarn("No such execFlow value: " + execFlowStr + ". Using execFlow: " + _execFlow);
+				}
 			}
 			else if (args[i].equals("--load") && i+1 < len) {
 				_jsFile  = args[i+1];
