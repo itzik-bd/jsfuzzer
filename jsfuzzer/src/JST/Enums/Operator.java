@@ -51,7 +51,7 @@ public enum Operator
 	BITAND(2, DataTypes.NUMBER, "%s & %s", "bitwise and"),
 	BITOR(2, DataTypes.NUMBER, "%s | %s", "bitwise or"),
 	
-	// TODO: implement smartly
+	// INSTANCEOF is not relevant for now because we do not allow "var x = FuncName()"
 	// INSTANCEOF(2, DataTypes.BOOLEAN, "%s instanceof %s", "instance of"),
 	
 	// TODO: decide what to do with these two, and do it...
