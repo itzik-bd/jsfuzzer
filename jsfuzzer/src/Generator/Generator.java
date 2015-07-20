@@ -497,7 +497,7 @@ public class Generator
 		
 		if (_flowLevel.isA(ExecFlow.EXTENSIVE))
 		{
-			Call debugCall = new Call(getApiMethod(ApiOptions.PRINT), new LiteralString("block " + stmtBlock.getUniqueId()));
+			Call debugCall = new Call(getApiMethod(ApiOptions.TRACE_DEBUG), new LiteralString("block " + stmtBlock.getUniqueId()));
 			debugCall.setNoneRandomBranch();
 			stmtBlock.addStatement(debugCall);
 		}
