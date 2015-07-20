@@ -65,6 +65,10 @@ public class JstToJs implements Visitor
 		String[] commentLines = comment.getComment().split("\\r?\\n");
 		StringBuffer s = new StringBuffer();
 		
+		for(int i = 0; i < comment.getLinesBefore(); i++)
+			ident(s);
+			
+		
 		if (commentLines.length == 0)
 		{
 			
@@ -87,6 +91,9 @@ public class JstToJs implements Visitor
 			ident(s);
 			s.append(" */"); // end comment
 		}
+		
+		for(int i = 0; i < comment.getLinesAfter(); i++)
+			ident(s);
 		
 		return s.toString();
 	}

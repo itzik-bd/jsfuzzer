@@ -7,6 +7,8 @@ public class Comment extends JSTNode implements ProgramUnit
 {
 	private String _comment;
 	private boolean _forceExpand = false;
+	private int _linesBefore = 0;
+	private int _linesAfter = 0;
 	
 	public Comment(String comment)
 	{
@@ -20,6 +22,21 @@ public class Comment extends JSTNode implements ProgramUnit
 		_forceExpand = forceExpand;
 	}
 	
+	public Comment(String comment, boolean forceExpand, int linesBefore, int linesAfter)
+	{
+		this(comment, forceExpand);
+		this._linesBefore = linesBefore;
+		this._linesAfter = linesAfter;
+	}
+	
+	public Comment(String comment, int linesBefore, int linesAfter)
+	{
+		this(comment);
+		this._linesBefore = linesBefore;
+		this._linesAfter = linesAfter;
+	}
+	
+	
 	public String getComment()
 	{
 		return _comment;
@@ -28,6 +45,16 @@ public class Comment extends JSTNode implements ProgramUnit
 	public boolean getForcedExpand()
 	{
 		return _forceExpand;
+	}
+	
+	public int getLinesBefore()
+	{
+		return _linesBefore;
+	}
+	
+	public int getLinesAfter()
+	{
+		return _linesAfter;
 	}
 	
 	@Override

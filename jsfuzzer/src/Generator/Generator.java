@@ -77,7 +77,7 @@ public class Generator
 		
 		// generate statements
 		_program.addStatement(_logic.generateStatement(_rootContext, null, size));
-		_program.addStatement(newOutputStatement("Execution is over.\n"));
+		_program.addStatement(newOutputStatement("Execution is over."));
 		
 		// add print stmts for each program identifier
 		_program.addStatement(generatePrintVarsSection());
@@ -145,7 +145,7 @@ public class Generator
 		s.append("seed: " + StdRandom.getSeed() + EOL);
 		s.append("date: " + (new Date()) + EOL);
 
-		return new Comment(s.toString());
+		return new Comment(s.toString(), 0, 2);
 	}
 	
 	private Comment generateFooter()
@@ -920,7 +920,7 @@ public class Generator
 	{
 		List<ProgramUnit> units = new LinkedList<ProgramUnit>();
 		
-		units.add(new Comment("------------- Printing All The Program Variables -------------", true));
+		units.add(new Comment("-------------------------- Printing All The Program Variables --------------------------", false, 3, 1));
 		
 		// create array of pairs: (id name, id val)
 		List<AbsExpression> list = new LinkedList<AbsExpression>();
