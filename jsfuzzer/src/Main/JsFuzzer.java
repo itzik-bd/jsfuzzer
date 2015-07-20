@@ -73,7 +73,7 @@ public class JsFuzzer
 				i++;
 			}
 			else if (args[i].equals("--execFlow") && i+1 < len) {
-				String execFlowStr = args[i+1].toUpperCase();
+				String execFlowStr = args[i+1];
 				switch (execFlowStr)
 				{
 				case "normal": _execFlow = ExecFlow.NORMAL; break;

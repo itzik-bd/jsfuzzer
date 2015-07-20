@@ -19,9 +19,13 @@ var JSFuzzer = (function()
 	api.debugVars = function (varsArray)
 	{
 		for (var i=0; i<varsArray.length; i++) {
-			var vaule;
-			try { value = JSON.stringify(varsArray[i][1]); }
-			catch(e) { value = "[circular Object]"; }
+			var value = varsArray[i][1];
+			if (typeof value === 'object') {
+				try { value = JSON.stringify(varsArray[i][1]); }
+				catch(e) { value = "[circular Object]"; }
+			} else if (typeof value === 'function') {
+				value = 'function';
+			}
 			api.print(varsArray[i][0] + " = " + value);
 		}
 	};
