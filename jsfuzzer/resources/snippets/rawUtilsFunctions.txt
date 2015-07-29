@@ -108,7 +108,7 @@ var JSFuzzer = (function()
 			str = str + oldStringifyFunction(key) + ":";
 			
 			if(typeof value == 'object')
-				str += objStringify(value);
+				str += oldStringifyFunction(value);
 			else if(typeof value == 'number' && isNaN(value))
 				str += "null";
 			else

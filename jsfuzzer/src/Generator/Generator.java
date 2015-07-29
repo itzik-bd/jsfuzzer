@@ -752,7 +752,7 @@ public class Generator
 		int length = Math.min(maxLength, StdRandom.expCeiled(_configs.valDouble(ConfigProperties.LITERAL_STRING_LAMBDA)));
 
 		for (int i = 0; i < length; i++)
-			strBld.append((char) StdRandom.uniform(128));
+			strBld.append((char) (1+StdRandom.uniform(127)));
 
 		litStr = new LiteralString(strBld.toString());
 

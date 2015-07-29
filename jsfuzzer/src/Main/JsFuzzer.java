@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import Engines.EnginesUtil;
-import Generator.ExecFlow;
 import Generator.Generator;
 import Generator.Config.Configs;
 import JST.Program;
@@ -12,155 +11,76 @@ import JST.Vistors.JstToJs;
 import JST.Vistors.JstToTree;
 import Utils.FilesIO;
 import Utils.OutLog;
+import Utils.TimerRunner;
 
 public class JsFuzzer
 {
-	// var to hold js file path
-	private String _jsFile = null;
-	
-	// vars for generating program
-	private boolean _isGenerate = true;
-	private String _configsFile = null;
-	private String _seed = null;
-	private ExecFlow _execFlow = ExecFlow.NORMAL;
-	
-	private boolean _showHelpAndExit = false;
-	private boolean _runEngines = false;
-	private int _runTimeout = 8000; // 8 seconds default
+	private JsFuzzerArgs _args;
 	
 	public static void main(String... args)
 	{
-		// instantiate new fuzzer and run
-		JsFuzzer fuzzer = new JsFuzzer(args);
-		fuzzer.run();
-	}
-	
-	public JsFuzzer(String[] args) {
-		parseArguments(args);
-	}
-	
-	public static String getUsageString()
-	{
-		return "JsFuzzer version " + JsFuzzerConfigs.getVersion() + "\n\n"
-				+ "usage: JsFuzzer [OPTIONS]\n"
-				+ "--help           - show this help\n\n"
-				+ "To generate new program:\n"
-				+ "--out <FILE>     - save output to file\n"
-				+ "--config <FILE>  - load costum configuration file\n"
-				+ "--seed <SEED>    - set the seed of the random generator\n"
-				+ "--execFlow <normal | extensive> - set the javascript execution print level\n\n"
-				+ "To use a javascript file:\n"
-				+ "--load <FILE>    - load javascript file\n\n"
-				+ "To compare over supported engines:\n"
-				+ "--run            - runs generated program over engines\n"
-				+ "--timeout <MS>   - limit each javascript engine total runtime (milliseconds)\n";
-	}
-	
-	public void parseArguments(String[] args)
-	{
-		int len = args.length;
-		int i = 0;
+		// parse arguments
+		JsFuzzerArgs parsedArgs = JsFuzzerArgs.parse(args);
 		
-		while (i<len)
+		// check that no errors occured while parsing JsFuzzer arguments
+		if (parsedArgs != null)
 		{
-			if (args[i].equals("--out") && i+1 < len) {
-				_jsFile = args[i+1];
-				_isGenerate = true;
-				i++;
-			}
-			else if (args[i].equals("--config") && i+1 < len) {
-				_configsFile = args[i+1];
-				i++;
-			}
-			else if (args[i].equals("--seed") && i+1 < len) {
-				_seed  = args[i+1];
-				i++;
-			}
-			else if (args[i].equals("--execFlow") && i+1 < len) {
-				String execFlowStr = args[i+1];
-				switch (execFlowStr)
-				{
-				case "normal": _execFlow = ExecFlow.NORMAL; break;
-				case "extensive": _execFlow = ExecFlow.EXTENSIVE; break;
-				default:
-					OutLog.printWarn("No such execFlow value: " + execFlowStr + ". Using execFlow: " + _execFlow);
-				}
-			}
-			else if (args[i].equals("--load") && i+1 < len) {
-				_jsFile  = args[i+1];
-				_isGenerate = false; // no need to generate new program
-				i++;
-			}
-			else if (args[i].equals("--run")) {
-				_runEngines = true;
-			}
-			else if (args[i].equals("--timeout") && i+1 < len) {
-				_runTimeout = Integer.parseInt(args[i+1]);
-			}
-			else if (args[i].equals("--help")) {
-				_showHelpAndExit = true;
-			}
-			
-			// advance to next argument
-			i++;
+			// instantiate new fuzzer and run
+			JsFuzzer fuzzer = new JsFuzzer(parsedArgs);
+			fuzzer.run();
 		}
 		
-		// show help if no path were chosen
-		if (_jsFile==null) {
-			_showHelpAndExit = true;
-		}
+		OutLog.printInfo("Bye!");
+	}
+	
+	public JsFuzzer(JsFuzzerArgs args) {
+		_args = args;
 	}
 	
 	private void run()
 	{
-		// check if the user asked for help
-		if (_showHelpAndExit) {
-			System.out.println(getUsageString());
+		// print help if help flag was up or no js file was supplied
+		if (_args.showHelpAndExit() || _args.jsFile() == null) {
+			System.out.println(JsFuzzerArgs.getUsageString());
 			return;
 		}
 		
-		// check that the client supplied output file
-		if (_jsFile == null) {
-			System.out.println("Please specify an output file with -o <FILE>");
-			return;
-		}
+		// run JsFuuzer and measure total runtime
+		TimerRunner<Void> worker = new TimerRunner<Void>()
+		{
+			@Override public Void run()
+			{
+				// check whether to generate a new program
+				if (_args.isGenerate()) {
+					generate();
+				}
+				
+				// run js program over engines if user asked for it
+				if (_args.runEngines()) {
+					runEngines();
+				}
+				
+				return null;
+			}
+		};
 		
-		long startTime = System.currentTimeMillis();
-		
-		// check whether to generate a new program
-		if (_isGenerate) {
-			generate();
-		}
-		
-		// run js program over engines if user asked for it
-		if (_runEngines) {
-			runEngines();
-		}
-		
-		long endTime = System.currentTimeMillis();
-		double totalTimeSeconds = (endTime - startTime) / 1000.0;
-		
-		OutLog.printInfo(String.format("All done. Execution time: %.2f sec", totalTimeSeconds));
+		OutLog.printInfo(String.format("All done. Execution time: %.2f sec", worker.lastRuntime()));
 	}
 
 	private void runEngines()
 	{
-		if (_runEngines)
+		// create browser launcher
+		try
 		{
-			
-			// create browser launcher
-			try {
-				String jsFilename = new File(_jsFile).getName();
-				String launcherCode = FilesIO.getSnippet("browserLauncher").replace("{FILENAME}", jsFilename);
-				Utils.FilesIO.WriteToFile(_jsFile+".html", launcherCode);
-				OutLog.printInfo(String.format("Created launcher for js file '%s'", _jsFile+".html"));
-			} catch (IOException e) {
-				e.printStackTrace();
-			}			
-			
-			EnginesUtil engines = new EnginesUtil();
-			engines.compare(new File(_jsFile), _runTimeout);
+			String jsFilename = new File(_args.jsFile()).getName();
+			String launcherCode = FilesIO.getSnippet("browserLauncher").replace("{FILENAME}", jsFilename);
+			Utils.FilesIO.WriteToFile(_args.jsFile()+".html", launcherCode);
+			OutLog.printInfo(String.format("Created launcher for js file '%s'", _args.jsFile()+".html"));
 		}
+		catch (IOException e) { OutLog.printError("Could not create browser launcher"); }
+		
+		EnginesUtil engines = new EnginesUtil();
+		engines.compare(new File(_args.jsFile()), _args.runTimeout());
 	}
 
 	private void generate()
@@ -169,11 +89,11 @@ public class JsFuzzer
 		try
 		{
 			// load configuration file
-			Configs configs = Configs.loadConfigFile(_configsFile);
+			Configs configs = Configs.loadConfigFile(_args.configsFile());
 			OutLog.printInfo("Configuration file was successfully loaded");
 			
 			// generate program
-			Generator gen = new Generator(configs, _seed, _execFlow);
+			Generator gen = new Generator(configs, _args.seed(), _args.execFlow());
 			Program program = gen.createProgram();
 			String jsProgram = JstToJs.executeCostum(program, "\t", "\n");
 			String jsVerbose = gen.getVerboseOutput();
@@ -182,16 +102,16 @@ public class JsFuzzer
 			OutLog.printInfo(String.format("New random program was successfully generated (%.2f Kb)", sizeKb));
 			
 			// save program as Javascript file
-			Utils.FilesIO.WriteToFile(_jsFile, jsProgram);
-			OutLog.printInfo(String.format("The generated program was successfully saved to '%s'", _jsFile));
+			Utils.FilesIO.WriteToFile(_args.jsFile(), jsProgram);
+			OutLog.printInfo(String.format("The generated program was successfully saved to '%s'", _args.jsFile()));
 			
 			// save verbose to file
-			Utils.FilesIO.WriteToFile(_jsFile+".verbose", jsVerbose);
-			OutLog.printInfo(String.format("The verbose was successfully saved to '%s'", _jsFile+".verbose"));
+			Utils.FilesIO.WriteToFile(_args.jsFile()+".verbose", jsVerbose);
+			OutLog.printInfo(String.format("The verbose was successfully saved to '%s'", _args.jsFile()+".verbose"));
 			
 			// save tree to file
-			Utils.FilesIO.WriteToFile(_jsFile+".tree", jsTree);
-			OutLog.printInfo(String.format("The program tree was successfully saved to '%s'", _jsFile+".tree"));
+			Utils.FilesIO.WriteToFile(_args.jsFile()+".tree", jsTree);
+			OutLog.printInfo(String.format("The program tree was successfully saved to '%s'", _args.jsFile()+".tree"));
 			
 			// make sure that verbose and tree are identical
 			if (!jsTree.equals(jsVerbose)) {
