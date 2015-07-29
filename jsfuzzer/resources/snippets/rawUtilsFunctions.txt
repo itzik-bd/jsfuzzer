@@ -2,7 +2,7 @@ var JSFuzzer = (function()
 {
 	// private
 	var callDepth = -1;
-	var registeredFunctions = {};
+	var registeredFunctions = [];
 	
 	// public
 	var api = {};
@@ -47,9 +47,7 @@ var JSFuzzer = (function()
 				for (key in arguments) if (key != '0' && key != '1') params.push(arguments[key]);
 				result = f.apply(f, params);
 			}
-			else {
-				api.print("found case");
-			}
+			else api.traceDebug('call to non-func ' + f_name + ' that is not defined during runtime: ' + registeredFunctions.join(", "));
 		}
 		else api.traceDebug('call to non-func ' + f_name);
 		callDepth--;
@@ -63,14 +61,15 @@ var JSFuzzer = (function()
 
 	api.regFunc = function(name)
 	{
-		registeredFunctions[name] = true;
+		if (registeredFunctions.indexOf(name) == -1) {
+			registeredFunctions.push(name);
+		}
 	};
 
 	function isRegisterFunction(name)
 	{
-		return (name.indexOf("anonymous ") == 0 || name in registeredFunctions);
+		return (name.indexOf("anonymous ") == 0 || registeredFunctions.indexOf(name) > -1);
 	}
 
-	
 	return api;
 })();

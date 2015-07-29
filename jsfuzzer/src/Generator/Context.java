@@ -10,12 +10,14 @@ public class Context
 	private final int _loopDepth;
 	private final boolean _inFunction;
 	private final int _contextDepth;
+	private final boolean _isImaginaryContext;
 
 	/**
 	 * Constructor for root of the tree
 	 */
 	public Context() {
 		_parentContext = null;
+		_isImaginaryContext = false;
 		_symTable = new SymTable(null);
 		_loopDepth = 0;
 		_inFunction = false;
@@ -28,11 +30,12 @@ public class Context
 	 * @param parent - the parent of the node
 	 * @param inLoop - flag if its a loop context - null means use the parent's inLoop
 	 * @param inFunction - flag if its a function context - null means use the parent's inFunction  
-	 * @param createNewSymTable - whether to create new symbol table or to use parent's 
+	 * @param isImaginaryContext - whether it's a imaginary context (=not create new symbol table) 
 	 */
-	public Context(Context parent, Boolean inLoop, Boolean inFunction, boolean createNewSymTable) {
+	public Context(Context parent, Boolean inLoop, Boolean inFunction, boolean isImaginaryContext) {
 		_parentContext = parent;
-		_symTable = createNewSymTable ? new SymTable(parent._symTable) : parent._symTable;
+		_isImaginaryContext = isImaginaryContext;
+		_symTable = isImaginaryContext ? parent._symTable : new SymTable(parent._symTable);
 		_loopDepth = calculateLoopDepth(parent, inLoop);
 		_inFunction = calculateInFunction(parent, inFunction);
 		_contextDepth = parent._contextDepth + 1;
@@ -80,5 +83,10 @@ public class Context
 
 	public Context getParent() {
 		return _parentContext;
+	}
+	
+	/** imaginary context is a context that did not create the symbol table */
+	public boolean isImaginaryContext() {
+		return _isImaginaryContext;
 	}
 }

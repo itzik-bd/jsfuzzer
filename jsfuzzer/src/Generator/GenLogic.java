@@ -64,7 +64,7 @@ public class GenLogic
 		case LiteralString: node = _gen.createLiteralString(context, params); break;
 
 		// generate expression
-		case AbsExpression: node = generateExpression(context, params); break;
+		case AbsExpression: node = generateExpression(context, (GenerateExpressionParams)params); break;
 		
 		default: throw new IllegalArgumentException("JSTnode '"+methodName+"' creation method was not defined");
 		}
@@ -77,7 +77,7 @@ public class GenLogic
 	 * Get all probabilities from the config and chose randomly with respect to their relations
 	 * @return
 	 */
-	AbsStatement generateStatement(Context context, createParams params)
+	AbsStatement generateStatement(Context context)
 	{
 		HashMap<JSTNodes, Double> hs = new HashMap<JSTNodes, Double>();
 	
@@ -103,13 +103,16 @@ public class GenLogic
 			hs.put(JSTNodes.Break, (double) _configs.valInt(ConfigProperties.STMT_BREAK) / factorDepth);
 			hs.put(JSTNodes.Continue, (double) _configs.valInt(ConfigProperties.STMT_CONTINUE) / factorDepth);
 		}
-		
+
 	// Non-Leafs
 		hs.put(JSTNodes.If, (double) _configs.valInt(ConfigProperties.STMT_IF) * factorDepth);
 		hs.put(JSTNodes.Switch, (double) _configs.valInt(ConfigProperties.STMT_SWITCH) * factorDepth);
 		
-		// make function def in high depth very not common
-		hs.put(JSTNodes.FunctionDef, (double) _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION) * factorDepth * factorDepth);
+		// Prevent some JSTnodes from being generated within imaginary scopes
+		if (!context.isImaginaryContext())
+		{
+			hs.put(JSTNodes.FunctionDef, (double) _configs.valInt(ConfigProperties.STMT_FUNCTIONDEFINITION) * factorDepth);
+		}
 		
 		// Lower the probability of nested loop
 		factorDepth *= _configs.valDouble(ConfigProperties.NESTED_LOOPS_FACTOR) * (context.getLoopDepth() + 1); // depth must starts from 1 (not 0)
@@ -122,6 +125,15 @@ public class GenLogic
 		// randomly choose statement
 		JSTNodes createMethod = StdRandom.choseFromProbList(hs);
 		
+		GenerateExpressionParams params = null;
+		
+		// if expression was selected then prevent object expression and anonymous function
+		if (createMethod==JSTNodes.AbsExpression) {
+			params = new GenerateExpressionParams(false);
+			params.addOption(JSTNodes.ObjectExp, null);
+			params.addOption(JSTNodes.FunctionExp, null);
+		}
+		
 		return (AbsStatement) applyMethod(createMethod, context, params);
 	}
 
@@ -130,7 +142,7 @@ public class GenLogic
 	 * Get all pr  obabilities from the config and chose randomly with respect to their relations
 	 * @return
 	 */
-	AbsExpression generateExpression(Context context, createParams params)
+	AbsExpression generateExpression(Context context, GenerateExpressionParams params)
 	{
 		// Get expression type options from params
 		HashMap<JSTNodes, Double> hs = new HashMap<JSTNodes, Double>();
@@ -157,10 +169,9 @@ public class GenLogic
 		JSTNodes createMethod = StdRandom.choseFromProbList(hs);
 		
 		// If this is a special expresstion transfer its special parameters
-		if (params!= null)
-			params = ((GenerateExpressionParams)params).getOptions().get(createMethod);
+		createParams applyParams = (params!= null) ? params.getOptions().get(createMethod) : null;
 		
-		return (AbsExpression) applyMethod(createMethod, context, params);
+		return (AbsExpression) applyMethod(createMethod, context, applyParams);
 	}
 
 	/**
@@ -198,16 +209,14 @@ public class GenLogic
 			options = ExpParams.getOptions();
 		
 			// If no options were given or include this or disclude other than this
-			if ((options == null) ||
-				(ExpParams.getInclude() && options.containsKey(node)) ||
-				(!ExpParams.getInclude() && !options.containsKey(node)))
+			if ((options == null) || (ExpParams.getInclude() == options.containsKey(node)))
 			{
 				hs.put(node, val);
 			}
 		}
 	}
 
-	public List<AbsExpression> generateExpression(Context context, createParams params, int size)
+	public List<AbsExpression> generateExpression(Context context, GenerateExpressionParams params, int size)
 	{
 		List<AbsExpression> expList = new LinkedList<AbsExpression>();
 		
@@ -218,12 +227,12 @@ public class GenLogic
 		return expList;
 	}
 	
-	public List<AbsStatement> generateStatement(Context context, createParams params, int size)
+	public List<AbsStatement> generateStatement(Context context, int size)
 	{
 		List<AbsStatement> stmtList = new LinkedList<AbsStatement>();
 		
 		for (int i=0 ; i<size ; i++) {
-			stmtList.add(generateStatement(context, params));
+			stmtList.add(generateStatement(context));
 		}
 		
 		return stmtList;

@@ -86,7 +86,7 @@ public class Generator
 		int size = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.PROGRAM_SIZE_LAMBDA));
 		
 		// generate statements
-		_program.addStatement(_logic.generateStatement(_rootContext, null, size));
+		_program.addStatement(_logic.generateStatement(_rootContext, size));
 		_program.addStatement(newOutputStatement("Execution is over."));
 		
 		// add print stmts for each program identifier
@@ -172,13 +172,16 @@ public class Generator
 		// Genersate condition
 		AbsExpression conditionExp = _logic.generateCondition(context, params);
 		
+		// create the imaginary context defined by the if (note: same context for if and else)
+		Context newContext = new Context(context, null, null, true);
+		
 		// create Statements Block
-		StatementsBlock trueOp = createStatementsBlock(context, null);
+		StatementsBlock trueOp = createStatementsBlock(newContext, null);
 		StatementsBlock falseOp = null;
 		
 		// decide on "else" operation
 		if (StdRandom.bernoulli())
-			falseOp = createStatementsBlock(context, null);
+			falseOp = createStatementsBlock(newContext, null);
 
 		// create If JST Node
 		If ifStmt = new If(conditionExp, trueOp, falseOp);
@@ -210,7 +213,7 @@ public class Generator
 		traceIn("For");
 
 		// create new loop context that has the same symbol table as his parent
-		Context newContext = new Context(context, true, null, false);
+		Context newContext = new Context(context, true, null, true);
 
 		AbsStatement initStmt = createVarDecleration(newContext, new VarDeclerationParams(null, 1, null));
 		AbsExpression stepExpr = _logic.generateExpression(newContext, null);
@@ -243,7 +246,7 @@ public class Generator
 		ArrayExp arr = createArrayExp(context, null);
 		
 		// create new loop context that has the same symbol table as his parent
-		Context newContext = new Context(context, true, null, false);
+		Context newContext = new Context(context, true, null, true);
 
 		// create one varDecl (with new identifier) wihtout init value
 		VarDecleration varDecl = createVarDecleration(newContext, new VarDeclerationParams(true, 1, false));
@@ -313,9 +316,12 @@ public class Generator
 
 		for (int i = 0; i < casesNum; i++)
 			cases.add(createCase(context, null));
+		
+		// create the imaginary context defined by the case block
+		Context newContext = new Context(context, null, null, true);
 
 		// generate operation - statement block
-		StatementsBlock stmtBlock = createStatementsBlock(context, null);
+		StatementsBlock stmtBlock = createStatementsBlock(newContext, null);
 
 		caseBlock = new CaseBlock(cases, stmtBlock);
 
@@ -344,7 +350,7 @@ public class Generator
 			((funcDefParams)params).setParamNumber(ParamNum);
 				
 		// create the context defined by the function (force no loop)
-		Context newContext = new Context(context, false, true, true);
+		Context newContext = new Context(context, false, true, false);
 		
 		// Generate parameters
 		List<Identifier> formals = getFunctionParametersList(newContext, ParamNum);
@@ -369,7 +375,7 @@ public class Generator
 		int paramsNum = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP));
 		
 		// Create the context defined by the function (force no loop)
-		Context newContext = new Context(context, false, true, true);
+		Context newContext = new Context(context, false, true, false);
 				
 		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
 
@@ -386,25 +392,6 @@ public class Generator
 		return funcDef;
 	}
 
-	private List<Identifier> getFunctionParametersList(Context context, Integer paramsNum)
-	{
-		// param for create identifier
-		IdentifierParams idParams = new IdentifierParams(_configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P));
-
-		List<Identifier> funcParams = new LinkedList<Identifier>();
-		for (int i = 0; i < paramsNum; i++)
-		{
-			Identifier id = createVarIdentifierNotInCurrentScope(context, idParams);
-			
-			// add param id to function symbol table
-			context.getSymTable().newEntry(new SymEntryVar(id));
-
-			// add param id to params list
-			funcParams.add(id);
-		}
-		
-		return funcParams;
-	}
 	
 	VarDecleration createVarDecleration(Context context, createParams params)
 	{
@@ -522,7 +509,7 @@ public class Generator
 		}
 
 		// generate statements
-		stmtBlock.addStatement(_logic.generateStatement(context, null, size));
+		stmtBlock.addStatement(_logic.generateStatement(context, size));
 
 		traceOut();
 		return stmtBlock;
@@ -828,7 +815,7 @@ public class Generator
 	{
 		AbsWhileLoop whileLoop = null;
 
-		// create new loop context that has the same symbol table as his parent
+		// create new loop imaginary context that has the same symbol table as his parent
 		Context newContext = new Context(context, true, null, false);
 
 		// create loop condition
@@ -886,6 +873,26 @@ public class Generator
 		stmts.add(ifStoppingCondition);
 
 		return stmts;
+	}
+	
+	private List<Identifier> getFunctionParametersList(Context context, Integer paramsNum)
+	{
+		// param for create identifier
+		IdentifierParams idParams = new IdentifierParams(_configs.valDouble(ConfigProperties.FUNC_PARAM_USE_EXISTING_VAR_BERNOULLY_P));
+
+		List<Identifier> funcParams = new LinkedList<Identifier>();
+		for (int i = 0; i < paramsNum; i++)
+		{
+			Identifier id = createVarIdentifierNotInCurrentScope(context, idParams);
+			
+			// add param id to function symbol table
+			context.getSymTable().newEntry(new SymEntryVar(id));
+
+			// add param id to params list
+			funcParams.add(id);
+		}
+		
+		return funcParams;
 	}
 	
 	private int getRandomLoopIterationsLimit()
