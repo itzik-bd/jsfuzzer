@@ -1,10 +1,12 @@
 package Engines;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.util.concurrent.TimeUnit;
+
+import Utils.FilesIO;
+import Utils.TimerRunner;
 
 public abstract class AbstractEngine
 {
@@ -20,48 +22,60 @@ public abstract class AbstractEngine
 		return _platformName;
 	}
 	
-	public RunEngineResult runFile(File filePath)
-	{		
-		// create new js process
-		ProcessBuilder procBuild = new ProcessBuilder(getCommandLineList(filePath));		
+	public RunEngineResult runFile(File filePath, final int timeoutMilliseconds)
+	{
+		
 		RunEngineResult runResult = null;
 		
-		// execute program
 		try
 		{
-			// run process
-			Process proc = procBuild.start();
+			// create new js process
+			final ProcessBuilder pb = new ProcessBuilder(getCommandLineList(filePath));
 			
-			// read proccess stdout and stdin
-			String stdout = communicateProcess(proc.getInputStream()); // getInputStream actually returns the stdout!
-			String stderr = communicateProcess(proc.getErrorStream());
+			// redirect process stdout and stdin to temporary files
+			File outputFile = (Files.createTempFile(filePath.getName(), ".out.txt")).toFile();
+			File errorFile = (Files.createTempFile(filePath.getName(), ".err.txt")).toFile();
+			pb.redirectOutput(outputFile);
+			pb.redirectError(errorFile);
 			
-			runResult = new RunEngineResult(stdout, stderr);
+			// execute js process with timeout limitation
+			// if timeout limitation was exceeded - kill the process
+			// also measure running time
+			TimerRunner<Boolean> worker = new TimerRunner<Boolean>()
+			{
+				@Override public Boolean run()
+				{
+					boolean timeoutExcided = false;
+					
+					try {
+						Process p = pb.start();
+						if (!p.waitFor(timeoutMilliseconds, TimeUnit.MILLISECONDS))
+						{
+							timeoutExcided = true;
+							p.destroy();
+						}
+					} catch (IOException | InterruptedException e) { e.printStackTrace(); }
+	
+					return timeoutExcided;
+				}
+			};
+			
+			// read stdout and stderr for files
+			String stdout = FilesIO.ReadFile(outputFile.getAbsolutePath());
+			String stderr = FilesIO.ReadFile(errorFile.getAbsolutePath());
+			
+			// delete temporary files
+			outputFile.delete();
+			outputFile.delete();		
+			
+			// compose run engine result
+			runResult = new RunEngineResult(stdout, stderr, worker.lastResult(), worker.lastRuntime());
 		}
-		catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		catch (IOException e) { e.printStackTrace(); }
 		
 		return runResult;
 	}
 	
 	/** this method should return a array of cli command to be executed */
 	protected abstract String[] getCommandLineList(File filePath);
-	
-	private String communicateProcess(InputStream is)
-	{
-		BufferedReader in = new BufferedReader(new InputStreamReader(is));
-		String lineFeed = System.getProperty("line.separator");
-		StringBuffer sb = new StringBuffer();
-		String line;
-		
-		try {
-			while ((line = in.readLine()) != null) sb.append(line+lineFeed);
-			in.close();
-		}
-		catch (IOException e) { e.printStackTrace(); }
-
-		return sb.toString();
-	}
 }

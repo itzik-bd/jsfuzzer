@@ -20,13 +20,14 @@ public class EnginesUtil
 		_engineList.add(new NashornEngine());
 	}
 	
-	public void compare(File file)
+	public void compare(File file, int timeoutMilliseconds)
 	{
-		EnginesCompareModel compareModel = runFileAndGetCompareModel(file);
+		EnginesCompareModel compareModel = runFileAndGetCompareModel(file, timeoutMilliseconds);
 		
 		// print passed and failed engines
 		OutLog.printInfo("Failed: " + String.join(", ", compareModel.getFailedEngines()));
 		OutLog.printInfo("Passed: " + String.join(", ", compareModel.getPassedEngines()));
+		OutLog.printInfo("Timeout: " + String.join(", ", compareModel.getTimeoutEngines()));
 		
 		// print Equivalence classed based on output
 		for (Entry<String, List<String>> eqvClass : compareModel.getEquivalenceEngines().entrySet())
@@ -42,14 +43,16 @@ public class EnginesUtil
 		}
 	}
 	
-	private EnginesCompareModel runFileAndGetCompareModel(File file)
+	private EnginesCompareModel runFileAndGetCompareModel(File file, int timeoutMilliseconds)
 	{
 		EnginesCompareModel compareModel = new EnginesCompareModel();
 		
 		for (AbstractEngine engine : _engineList)
 		{
 			OutLog.printInfo(String.format("Running file '%s' over engine '%s'", file, engine.getPlatformName()));
-			compareModel.addEngineResult(engine.getPlatformName(), engine.runFile(file));
+			RunEngineResult model = engine.runFile(file, timeoutMilliseconds);
+			OutLog.appendLastLine(String.format("; runtime: %.2f sec", model.getActualRuntime()));
+			compareModel.addEngineResult(engine.getPlatformName(), model);
 		}
 		
 		compareModel.removeLastExecutionEnginesOutput(file);

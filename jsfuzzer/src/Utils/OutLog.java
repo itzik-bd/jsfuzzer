@@ -31,10 +31,15 @@ public class OutLog
 	public static void printDebug(String title, String content) {
 		print(title, LogLevel.DEBUG);
 		System.out.println(content);
-		System.out.println("------------------------------------");
+		System.out.print("------------------------------------");
 	}
 	
 	private static void print(String msg, LogLevel level) {
-		System.out.println(String.format(pattern, level, msg));
+		System.out.println();
+		System.out.print(String.format(pattern, level, msg));
+	}
+
+	public static void appendLastLine(String msg) {
+		System.out.print(msg);		
 	}
 }

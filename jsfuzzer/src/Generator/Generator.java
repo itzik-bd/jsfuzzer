@@ -816,7 +816,7 @@ public class Generator
 		AbsWhileLoop whileLoop = null;
 
 		// create new loop imaginary context that has the same symbol table as his parent
-		Context newContext = new Context(context, true, null, false);
+		Context newContext = new Context(context, true, null, true);
 
 		// create loop condition
 		AbsExpression conditionExp = _logic.generateCondition(newContext, null);

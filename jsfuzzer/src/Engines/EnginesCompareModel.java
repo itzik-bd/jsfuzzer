@@ -17,6 +17,7 @@ public class EnginesCompareModel
 {
 	Map<String,RunEngineResult> failed = new HashMap<String,RunEngineResult>();
 	Map<String,RunEngineResult> passed = new HashMap<String,RunEngineResult>();
+	Map<String,RunEngineResult> timeout = new HashMap<String,RunEngineResult>();
 	Map<String,RunEngineResult> all = new HashMap<String,RunEngineResult>();
 	
 	Map<String,List<String>> eqvClasses = new HashMap<String,List<String>>(); 
@@ -26,8 +27,9 @@ public class EnginesCompareModel
 		// add result to all map
 		all.put(platformName, result);
 		
-		// check if error occurred (pass <=> sderr is empty) and add it to failes/passed map
-		Map<String,RunEngineResult> map = result.getStderr().equals("") ? passed : failed;
+		// add result to the right map: timeout/pass/error
+		// (error <=> sderr is empty)
+		Map<String,RunEngineResult> map = result.isTimeExcided() ? timeout : (result.getStderr().equals("") ? passed : failed);
 		map.put(platformName, result);
 		
 		// add result to equivalence class
@@ -112,5 +114,10 @@ public class EnginesCompareModel
 	public Set<String> getPassedEngines()
 	{
 		return passed.keySet();
+	}
+	
+	public Set<String> getTimeoutEngines()
+	{
+		return timeout.keySet();
 	}
 }

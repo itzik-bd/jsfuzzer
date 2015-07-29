@@ -26,6 +26,7 @@ public class JsFuzzer
 	
 	private boolean _showHelpAndExit = false;
 	private boolean _runEngines = false;
+	private int _runTimeout = 8000; // 8 seconds default
 	
 	public static void main(String... args)
 	{
@@ -51,7 +52,8 @@ public class JsFuzzer
 				+ "To use a javascript file:\n"
 				+ "--load <FILE>    - load javascript file\n\n"
 				+ "To compare over supported engines:\n"
-				+ "--run            - runs generated program over engines\n";
+				+ "--run            - runs generated program over engines\n"
+				+ "--timeout <MS>   - limit each javascript engine total runtime (milliseconds)\n";
 	}
 	
 	public void parseArguments(String[] args)
@@ -91,6 +93,9 @@ public class JsFuzzer
 			}
 			else if (args[i].equals("--run")) {
 				_runEngines = true;
+			}
+			else if (args[i].equals("--timeout") && i+1 < len) {
+				_runTimeout = Integer.parseInt(args[i+1]);
 			}
 			else if (args[i].equals("--help")) {
 				_showHelpAndExit = true;
@@ -154,7 +159,7 @@ public class JsFuzzer
 			}			
 			
 			EnginesUtil engines = new EnginesUtil();
-			engines.compare(new File(_jsFile));
+			engines.compare(new File(_jsFile), _runTimeout);
 		}
 	}
 
