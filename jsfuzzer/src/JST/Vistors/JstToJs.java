@@ -104,6 +104,8 @@ public class JstToJs implements Visitor
 		StringBuffer s = new StringBuffer();
 		
 		ident(s);
+		s.append(functionDefinition.getRegisterFunctionInRuntimeCall().accept(this, true)); // print function register call via out API
+		ident(s);
 		s.append(String.format("function %s(%s)", functionDefinition.getId().accept(this, false), listJoin(functionDefinition.getFormals(), false, ", ")));
 		s.append(functionDefinition.getStatementsBlock().accept(this, true));
 

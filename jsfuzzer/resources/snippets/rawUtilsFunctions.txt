@@ -2,6 +2,7 @@ var JSFuzzer = (function()
 {
 	// private
 	var callDepth = -1;
+	var registeredFunctions = {};
 	
 	// public
 	var api = {};
@@ -40,10 +41,15 @@ var JSFuzzer = (function()
 		var f = arguments['0'];
 		var f_name = arguments['1'];
 		if (typeof f === 'function') {
-			api.traceDebug(f_name);
-			var params = [];
-			for (key in arguments) if (key != '0' && key != '1') params.push(arguments[key]);
-			result = f.apply(f, params);		
+			if (isRegisterFunction(f_name)) {
+				api.traceDebug(f_name);
+				var params = [];
+				for (key in arguments) if (key != '0' && key != '1') params.push(arguments[key]);
+				result = f.apply(f, params);
+			}
+			else {
+				api.print("found case");
+			}
 		}
 		else api.traceDebug('call to non-func ' + f_name);
 		callDepth--;
@@ -54,6 +60,17 @@ var JSFuzzer = (function()
 	{
 		api.print(Array(callDepth+1).join("\t") + str);
 	};
+
+	api.regFunc = function(name)
+	{
+		registeredFunctions[name] = true;
+	};
+
+	function isRegisterFunction(name)
+	{
+		return (name.indexOf("anonymous ") == 0 || name in registeredFunctions);
+	}
+
 	
 	return api;
 })();

@@ -5,7 +5,7 @@ public enum ApiOptions
 	PRINT("print"),
 	DEBUG_VARS("debugVars"),
 	PROXY_CALL("call"),
-	TRACE_DEBUG("traceDebug");
+	TRACE_DEBUG("traceDebug"), REGISTER_FUNCTION_IN_RUNTIME("regFunc");
 	
 	private String _apiName;
 	

@@ -1,7 +1,5 @@
 package JST;
 
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 import JST.Interfaces.Visitor;
@@ -11,22 +9,14 @@ public class FunctionDef extends AbsStatement
 	private Identifier _id;
 	private List<Identifier> _formals;
 	private StatementsBlock _stmtsBlock;
+	private Call _registerFunctionInRuntimeCall;
 	
-	public FunctionDef(Identifier id, List<Identifier> formals, StatementsBlock stmtsBlock)
+	public FunctionDef(Identifier id, List<Identifier> formals, StatementsBlock stmtsBlock, Call registerFunctionInRuntimeCall)
 	{
 		_id = id;
 		_formals = formals;
 		_stmtsBlock = stmtsBlock;
-	}
-	
-	public FunctionDef(Identifier id, Identifier ... formals)
-	{
-		this(id, Arrays.asList(formals), new StatementsBlock());
-	}
-	
-	public FunctionDef(Identifier id)
-	{
-		this(id, new LinkedList<Identifier>(), new StatementsBlock());
+		_registerFunctionInRuntimeCall = registerFunctionInRuntimeCall;
 	}
 	
 	public Identifier getId()
@@ -52,6 +42,11 @@ public class FunctionDef extends AbsStatement
 	public StatementsBlock getStatementsBlock()
 	{
 		return _stmtsBlock;
+	}
+	
+	public Call getRegisterFunctionInRuntimeCall()
+	{
+		return _registerFunctionInRuntimeCall;
 	}
 	
 	@Override

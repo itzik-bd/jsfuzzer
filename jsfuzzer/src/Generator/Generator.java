@@ -374,8 +374,9 @@ public class Generator
 		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
 
 		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
+		Call registerFunctionInRuntimeCall = createRegisterFunctionInRuntimeCall(functionId);
 
-		FunctionDef funcDef = new FunctionDef(functionId, funcParams, stmtsBlock);
+		FunctionDef funcDef = new FunctionDef(functionId, funcParams, stmtsBlock, registerFunctionInRuntimeCall);
 
 		// Add function to current scope
 		// (!) This is performed after FunctionDef() to avoid recursion (and inner defined function calling father function)
@@ -892,6 +893,13 @@ public class Generator
 		int exp = _configs.valInt(ConfigProperties.LOOP_MAX_ITERATIONS_NORMAL_EXP);
 		int stddev = _configs.valInt(ConfigProperties.LOOP_MAX_ITERATIONS_NORMAL_STDDEV);
 		return (int) StdRandom.gaussian(exp, stddev);
+	}
+
+	private Call createRegisterFunctionInRuntimeCall(Identifier functionId)
+	{
+		Call debugCall = new Call(getApiMethod(ApiOptions.REGISTER_FUNCTION_IN_RUNTIME), new LiteralString(functionId.getName()));
+		debugCall.setNoneRandomBranch();
+		return debugCall;
 	}
 	
 	private Identifier createVarIdentifierNotInCurrentScope(Context context, createParams params)
