@@ -1,6 +1,7 @@
 package Main;
 
 import java.io.File;
+import java.io.IOException;
 
 import Engines.EnginesUtil;
 import Generator.ExecFlow;
@@ -9,6 +10,7 @@ import Generator.Config.Configs;
 import JST.Program;
 import JST.Vistors.JstToJs;
 import JST.Vistors.JstToTree;
+import Utils.FilesIO;
 import Utils.OutLog;
 
 public class JsFuzzer
@@ -140,8 +142,19 @@ public class JsFuzzer
 	{
 		if (_runEngines)
 		{
+			
+			// create browser launcher
+			try {
+				String jsFilename = new File(_jsFile).getName();
+				String launcherCode = FilesIO.getSnippet("browserLauncher").replace("{FILENAME}", jsFilename);
+				Utils.FilesIO.WriteToFile(_jsFile+".html", launcherCode);
+				OutLog.printInfo(String.format("Created launcher for js file '%s'", _jsFile+".html"));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+			
 			EnginesUtil engines = new EnginesUtil();
-			engines.compare(new File(_jsFile));	
+			engines.compare(new File(_jsFile));
 		}
 	}
 

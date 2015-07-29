@@ -50,4 +50,16 @@ public class FilesIO
 		
 		return p;
 	}
+	
+	public static String getSnippet(String snippetName)
+	{
+		String path = "resources/snippets/" + snippetName + ".txt";
+		String text = null;
+		try {
+			 text = FilesIO.ReadFile(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return text;
+	}
 }

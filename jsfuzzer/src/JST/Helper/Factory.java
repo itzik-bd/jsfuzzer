@@ -1,6 +1,5 @@
 package JST.Helper;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -108,13 +107,7 @@ public class Factory
 	public RawCode getSnippet(String snippetName)
 	{
 		if (!_snippets.containsKey(snippetName)) {
-			String path = "resources/snippets/" + snippetName + ".txt";
-			String code = null;
-			try {
-				 code = FilesIO.ReadFile(path);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			String code = FilesIO.getSnippet(snippetName);
 			_snippets.put(snippetName, new RawCode(code));
 		}
 		
