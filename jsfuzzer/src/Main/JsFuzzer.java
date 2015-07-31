@@ -50,13 +50,15 @@ public class JsFuzzer
 		{
 			@Override public Void run()
 			{
+				boolean programFlag = true;
+				
 				// check whether to generate a new program
 				if (_args.isGenerate()) {
-					generate();
+					programFlag = generate();
 				}
 				
 				// run js program over engines if user asked for it
-				if (_args.runEngines()) {
+				if (programFlag && _args.runEngines()) {
 					runEngines();
 				}
 				
@@ -83,7 +85,7 @@ public class JsFuzzer
 		engines.compare(new File(_args.jsFile()), _args.runTimeout());
 	}
 
-	private void generate()
+	private boolean generate()
 	{
 		// try to generate program, and in case of exception - print the error
 		try
@@ -120,7 +122,11 @@ public class JsFuzzer
 		}
 		catch (Exception e)
 		{
+			OutLog.printError("An error occurred: " + e.getMessage());
 			e.printStackTrace();
+			return false;
 		}
+		
+		return true;
 	}
 }

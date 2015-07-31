@@ -3,9 +3,9 @@ package Generator;
 public enum ApiOptions
 {
 	PRINT("print"),
-	DEBUG_VARS("debugVars"),
+	TRACE_DEBUG_VARS("traceDebugVars"),
 	PROXY_CALL("call"),
-	TRACE_DEBUG("traceDebug"), REGISTER_FUNCTION_IN_RUNTIME("regFunc");
+	REGISTER_FUNCTION_IN_RUNTIME("regFunc");
 	
 	private String _apiName;
 	

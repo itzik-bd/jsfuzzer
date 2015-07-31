@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import Generator.Config.ConfigProperties;
 import Generator.Config.Configs;
@@ -21,7 +22,6 @@ import JST.Enums.LiteralTypes;
 import JST.Enums.Operator;
 import JST.Interfaces.Caseable;
 import JST.Interfaces.ObjectKeys;
-import JST.Interfaces.ProgramUnit;
 import Main.JsFuzzerConfigs;
 import Utils.OutLog;
 import Utils.StdRandom;
@@ -85,12 +85,18 @@ public class Generator
 		// choose how many statements the program will have
 		int size = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.PROGRAM_SIZE_LAMBDA));
 		
-		// generate statements
+		// generate random statements
 		_program.addStatement(_logic.generateStatement(_rootContext, size));
-		_program.addStatement(newOutputStatement("Execution is over."));
 		
-		// add print stmts for each program identifier
-		_program.addStatement(generatePrintVarsSection());
+		// add statement that print "Execution is over"		
+		Call printExecutionIsOverCall = new Call(getApiMethod(ApiOptions.PRINT), new LiteralString("\n\nExecution is over.\n\n"));
+		printExecutionIsOverCall.setNoneRandomBranch();
+		_program.addStatement(printExecutionIsOverCall);
+		
+		// add print stmts for each program's top scope identifier
+		List<Identifier> idList = _rootContext.getSymTable().getAvaiableEntries(SymEntryType.VAR).stream().map(element->element.getIdentifier()).collect(Collectors.toList());
+		_program.addStatement(new Comment("-------------------------- Printing All The Program Variables --------------------------", false, 3, 1));
+		_program.addStatement(generateTraceDebugVarsCall(idList, null));
 
 		// attach configuration used to generate program
 		_program.addStatement(generateFooter());
@@ -353,11 +359,19 @@ public class Generator
 		Context newContext = new Context(context, false, true, false);
 		
 		// Generate parameters
-		List<Identifier> formals = getFunctionParametersList(newContext, ParamNum);
+		List<Identifier> funcParams = getFunctionParametersList(newContext, ParamNum);
 		
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
+		StatementBlockParams stmtParams = null;
+		
+		if (_flowLevel.isA(ExecFlow.EXTENSIVE))
+		{	
+			Call debugParamsCall = generateTraceDebugVarsCall(funcParams, "param %s");	
+			stmtParams = new StatementBlockParams(debugParamsCall);
+		}
+		
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, stmtParams);
 
-		FunctionExp funcExp = new FunctionExp(formals, stmtsBlock);
+		FunctionExp funcExp = new FunctionExp(funcParams, stmtsBlock);
 		
 		traceOut();
 		return funcExp;
@@ -376,10 +390,19 @@ public class Generator
 		
 		// Create the context defined by the function (force no loop)
 		Context newContext = new Context(context, false, true, false);
-				
+		
+		// create function params identifiers
 		List<Identifier> funcParams = getFunctionParametersList(newContext, paramsNum);
+		
+		StatementBlockParams stmtParams = null;
+		
+		if (_flowLevel.isA(ExecFlow.EXTENSIVE))
+		{	
+			Call debugParamsCall = generateTraceDebugVarsCall(funcParams, "param %s");	
+			stmtParams = new StatementBlockParams(debugParamsCall);
+		}
 
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, stmtParams);
 		Call registerFunctionInRuntimeCall = createRegisterFunctionInRuntimeCall(functionId);
 
 		FunctionDef funcDef = new FunctionDef(functionId, funcParams, stmtsBlock, registerFunctionInRuntimeCall);
@@ -392,7 +415,6 @@ public class Generator
 		return funcDef;
 	}
 
-	
 	VarDecleration createVarDecleration(Context context, createParams params)
 	{
 		traceIn("VarDecleration");
@@ -485,7 +507,7 @@ public class Generator
 		
 		if (_flowLevel.isA(ExecFlow.EXTENSIVE))
 		{
-			Call debugCall = new Call(getApiMethod(ApiOptions.TRACE_DEBUG), new LiteralString("block " + stmtBlock.getUniqueId()));
+			Call debugCall = new Call(getApiMethod(ApiOptions.PRINT), new LiteralString("block " + stmtBlock.getUniqueId()));
 			debugCall.setNoneRandomBranch();
 			stmtBlock.addStatement(debugCall);
 		}
@@ -606,14 +628,17 @@ public class Generator
 		// create list of parameter
 		List<AbsExpression> callParams = _logic.generateExpression(context, genExpParams, paramNum);
 		
-		// add the function name (or its implementation in case of anonymous function) 
-		// as the first parameter to the proxy call function
-		callParams.add(0, funcName);
-		callParams.add(0, func);
-		
 		// create a proxy call to function
 		Call wrappedCall = new Call(getApiMethod(ApiOptions.PROXY_CALL), callParams);
-			
+		
+		// adding to the wrapped call the following information:
+		// 1) the call unique id (for later debug purpose)
+		// 2) as the first parameter to the proxy call function
+		// 3) add the function name (or its implementation in case of anonymous function) 
+		callParams.add(0, new LiteralNumber(wrappedCall.getUniqueId()+"")); // +"" is to convert int to string
+		callParams.add(0, funcName);
+		callParams.add(0, func);
+					
 		traceOut();
 		return wrappedCall;
 	}
@@ -748,11 +773,14 @@ public class Generator
 		int maxLength = _configs.valInt(ConfigProperties.LITERAL_STRING_MAX_LENGTH);
 		StringBuilder strBld = new StringBuilder();
 
+		// get alphabet set from configs
+		String alphabet = _configs.valString(ConfigProperties.STING_CHARS);
+		
 		// Randomize string's length
 		int length = Math.min(maxLength, StdRandom.expCeiled(_configs.valDouble(ConfigProperties.LITERAL_STRING_LAMBDA)));
 
 		for (int i = 0; i < length; i++)
-			strBld.append((char) (1+StdRandom.uniform(127)));
+			strBld.append(alphabet.charAt(StdRandom.uniform(alphabet.length())));
 
 		litStr = new LiteralString(strBld.toString());
 
@@ -948,43 +976,29 @@ public class Generator
 	}
 	
 	/**
-	 * generate a call to debug function that prints all variables with their data:
-	 * it constructs an array of pairs: (id name, id val) and pass it to the function
+	 * generate a call to traceDebugVars function that prints all variables with their data:
+	 * it constructs an array of pairs: (id title, id val) and pass it to the function
 	 */
-	private List<ProgramUnit> generatePrintVarsSection() 
+	private Call generateTraceDebugVarsCall(List<Identifier> identifierList, String titleTemplate) 
 	{
-		List<ProgramUnit> units = new LinkedList<ProgramUnit>();
-		
-		units.add(new Comment("-------------------------- Printing All The Program Variables --------------------------", false, 3, 1));
-		
+		if (titleTemplate == null)
+			titleTemplate = "%s";
+			
 		// create array of pairs: (id name, id val)
 		List<AbsExpression> list = new LinkedList<AbsExpression>();
-		for(SymEntry entry : _rootContext.getSymTable().getAvaiableEntries(SymEntryType.VAR))
+		for(Identifier id: identifierList)
 		{
-			Identifier id = entry.getIdentifier();
-			list.add(new ArrayExp(new LiteralString(id.getName()), id));
-		}
+			String title = String.format(titleTemplate, id.getName());
+			list.add(new ArrayExp(new LiteralString(title), id));
+		}		
 		
 		// create call to predefined function to print vars
-		Call call = new Call(getApiMethod(ApiOptions.DEBUG_VARS), new ArrayExp(list));
+		Call call = new Call(getApiMethod(ApiOptions.TRACE_DEBUG_VARS), new ArrayExp(list));
 		call.setNoneRandomBranch();
-		units.add(call);
 		
-		return units;
-	}
-
-	private Call newOutputStatement(String str)
-	{
-		return newOutputStatement(new LiteralString(str));
-	}
-
-	private Call newOutputStatement(AbsExpression expr)
-	{
-		Call call = new Call(getApiMethod(ApiOptions.PRINT), expr);
-		call.setNoneRandomBranch();
 		return call;
 	}
-	
+
 	private MemberExp getApiMethod(ApiOptions apiMethod)
 	{
 		return new MemberExp(_factoryJST.getIdentifier("JSFuzzer"), _factoryJST.getFuncIdentifier(apiMethod.getApiName()));

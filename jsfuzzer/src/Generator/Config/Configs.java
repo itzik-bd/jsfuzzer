@@ -69,6 +69,10 @@ public class Configs
 		{
 			return Double.parseDouble(valStr);
 		}
+		else if (prop.getClassType() == String.class)
+		{
+			return valStr;
+		}
 		
 		throw new Exception(String.format("error in enum ConfigProperties: found property %s with unkown type", prop));
 	}
@@ -81,6 +85,11 @@ public class Configs
 	public double valDouble(ConfigProperties prop)
 	{
 		return (double) _configsMap.get(prop);
+	}
+	
+	public String valString(ConfigProperties prop)
+	{
+		return (String) _configsMap.get(prop);
 	}
 	
 	@Override

@@ -84,7 +84,10 @@ public enum ConfigProperties
 	
 	// Properties for injected code to limit loops
 	LOOP_MAX_ITERATIONS_NORMAL_EXP("loop_max_iterations_normal_exp", Integer.class),
-	LOOP_MAX_ITERATIONS_NORMAL_STDDEV("loop_max_iterations_normal_stddev", Integer.class);
+	LOOP_MAX_ITERATIONS_NORMAL_STDDEV("loop_max_iterations_normal_stddev", Integer.class),
+	
+	// string chars
+	STING_CHARS("string_chars", String.class);
 
 	private String _name;
 	private Class<?> _classType;
