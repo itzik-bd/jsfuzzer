@@ -130,7 +130,7 @@ public class JsFuzzerArgs
 					if (key.equals("out")) {
 						argumentOut(value);
 					}
-					else if (key.equals("--config")) {
+					else if (key.equals("config")) {
 						argumentConfig(value);
 					}
 					else if (key.equals("seed")) {

@@ -19,7 +19,7 @@ def run():
 	
 	# Set Run line
 	runLine = "java -classpath \""+jsFuzzDir+"\jsfuzzer\\bin;"+jsFuzzDir+"\jsfuzzer\\lib\\commons-lang3-3.4.jar;"+jsFuzzDir+"\jsfuzzer\\lib\\json-simple-1.1.1.jar\" Main.JsFuzzer "
-	params = " --run --timeout 5000 --out " + tmpDir + "code.js"
+	params = " --run --execFlow extensive --out " + tmpDir + "code.js"
 
 	# Run program
 	os.system(runLine + params + " > " + tmpDir + "out.txt")
