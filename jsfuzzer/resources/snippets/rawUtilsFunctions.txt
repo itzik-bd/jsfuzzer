@@ -1,4 +1,4 @@
-var JSFuzzer = (function()
+var $ = (function()
 {
 	// private
 	var callDepth = 0;
@@ -81,6 +81,9 @@ var JSFuzzer = (function()
 	{
 		return (name.indexOf("anonymous ") == 0 || registeredFunctions.indexOf(name) > -1);
 	}
+
+	// override toString method of function to make a standard across engines
+	Function.prototype.toString = function() { return "function"; };
 
 	return api;
 })();

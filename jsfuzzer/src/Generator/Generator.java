@@ -234,7 +234,7 @@ public class Generator
 		VarDecleration loopCounterDecl = (VarDecleration) stmts.get(0);
 		If stopAndStepCond = (If) stmts.get(1);
 
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(stopAndStepCond));
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(stopAndStepCond, null));
 
 		// create for loop: for(random var decl; random expr; random expr)
 		For forLoop = new For(initStmt, conditionExpr, stepExpr, stmtsBlock, loopCounterDecl);
@@ -366,7 +366,7 @@ public class Generator
 		if (_flowLevel.isA(ExecFlow.EXTENSIVE))
 		{	
 			Call debugParamsCall = generateTraceDebugVarsCall(funcParams, "param %s");	
-			stmtParams = new StatementBlockParams(debugParamsCall);
+			stmtParams = new StatementBlockParams(debugParamsCall, null);
 		}
 		
 		StatementsBlock stmtsBlock = createStatementsBlock(newContext, stmtParams);
@@ -399,7 +399,7 @@ public class Generator
 		if (_flowLevel.isA(ExecFlow.EXTENSIVE))
 		{	
 			Call debugParamsCall = generateTraceDebugVarsCall(funcParams, "param %s");	
-			stmtParams = new StatementBlockParams(debugParamsCall);
+			stmtParams = new StatementBlockParams(debugParamsCall, null);
 		}
 
 		StatementsBlock stmtsBlock = createStatementsBlock(newContext, stmtParams);
@@ -512,12 +512,10 @@ public class Generator
 			stmtBlock.addStatement(debugCall);
 		}
 		
-		// add output string
+		// add first statement from params
 		AbsStatement firstStatement = StatementBlockParams.getFirstStatement(params);
 		if (firstStatement != null)
-		{
 			stmtBlock.addStatement(firstStatement);
-		}
 
 		// decide how many statements will be generate
 		int size = 0;
@@ -532,6 +530,11 @@ public class Generator
 
 		// generate statements
 		stmtBlock.addStatement(_logic.generateStatement(context, size));
+		
+		// add last statement from params
+		AbsStatement lastStatement = StatementBlockParams.getLastStatement(params);
+		if (lastStatement != null)
+			stmtBlock.addStatement(lastStatement);
 
 		traceOut();
 		return stmtBlock;
@@ -869,7 +872,7 @@ public class Generator
 		If stopAndStepCond = (If) stmts.get(1);
 
 		// create loop content
-		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(stopAndStepCond));
+		StatementsBlock stmtsBlock = createStatementsBlock(newContext, new StatementBlockParams(stopAndStepCond, null));
 
 		try {
 			// create new while/doWhile instance
@@ -1013,6 +1016,6 @@ public class Generator
 
 	private MemberExp getApiMethod(ApiOptions apiMethod)
 	{
-		return new MemberExp(_factoryJST.getIdentifier("JSFuzzer"), _factoryJST.getFuncIdentifier(apiMethod.getApiName()));
+		return new MemberExp(_factoryJST.getIdentifier("$"), _factoryJST.getFuncIdentifier(apiMethod.getApiName()));
 	}
 }
