@@ -12,7 +12,7 @@ public class NodejsEngine extends AbstractEngine
 	@Override
 	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"../JSEngines/Nodejs/node.exe", filePath.toString()};
+		String[] list = {_enginesFolder + "Nodejs/node.exe", filePath.toString()};
 		
 		return list;
 	}

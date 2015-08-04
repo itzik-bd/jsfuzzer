@@ -12,7 +12,7 @@ public class SpiderMonkeyEngine extends AbstractEngine
 	@Override
 	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"../JSEngines/SpiderMonkey/js.exe",filePath.toString()};
+		String[] list = {_enginesFolder + "SpiderMonkey/js.exe",filePath.toString()};
 		
 		return list;
 	}

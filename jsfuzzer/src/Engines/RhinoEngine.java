@@ -12,7 +12,7 @@ public class RhinoEngine extends AbstractEngine
 	@Override
 	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"java", "-jar", "../JSEngines/Rhino/js.jar", filePath.toString()};
+		String[] list = {"java", "-jar", _enginesFolder + "Rhino/js.jar", filePath.toString()};
 		
 		return list;
 	}

@@ -10,6 +10,7 @@ import Utils.TimerRunner;
 
 public abstract class AbstractEngine
 {
+	protected static String _enginesFolder = FilesIO.getBinDirGlobalLocation() + "../JSEngines/";
 	private String _platformName;
 	
 	public AbstractEngine(String name)

@@ -53,7 +53,7 @@ public class FilesIO
 	
 	public static String getSnippet(String snippetName)
 	{
-		String path = "resources/snippets/" + snippetName + ".txt";
+		String path = getBinDirGlobalLocation() + "resources/snippets/" + snippetName + ".txt";
 		String text = null;
 		try {
 			 text = FilesIO.ReadFile(path);
@@ -61,5 +61,10 @@ public class FilesIO
 			e.printStackTrace();
 		}
 		return text;
+	}
+
+	public static String getBinDirGlobalLocation()
+	{
+		return FilesIO.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6) + "../";
 	}
 }

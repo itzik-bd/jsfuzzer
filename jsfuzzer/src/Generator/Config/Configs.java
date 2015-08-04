@@ -14,8 +14,11 @@ public class Configs
 	
 	public static Configs loadConfigFile(String configFile) throws Exception
 	{
-		// load properties
-		String actualFile = (configFile != null) ? configFile : DEFAULT_CONFIG_FILE;
+		// load properties, if default use actual class file location (bin\) 
+		String actualFile = configFile;
+		if (actualFile == null)
+			actualFile = FilesIO.getBinDirGlobalLocation() + DEFAULT_CONFIG_FILE; 
+		
 		Properties p = FilesIO.loadPropertiesFile(actualFile);
 		
 		StringBuffer errorsList = new StringBuffer();

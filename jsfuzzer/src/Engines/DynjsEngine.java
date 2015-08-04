@@ -12,7 +12,7 @@ public class DynjsEngine extends AbstractEngine
 	@Override
 	protected String[] getCommandLineList(File filePath)
 	{
-		String[] list = {"java", "-jar", "../JSEngines/Dynjs/dynjs.jar", filePath.toString()};
+		String[] list = {"java", "-jar", _enginesFolder + "Dynjs/dynjs.jar", filePath.toString()};
 		
 		return list;
 	}
