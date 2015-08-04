@@ -688,15 +688,27 @@ public class Generator
 		if (StdRandom.bernoulli(IdentifierParams.getUseExistingVarProb(params)))
 		{
 			// fetch all available vars in the current scope or higher
-			List<SymEntry> existingVars = context.getSymTable().getAvaiableEntries(SymEntryType.VAR);
-			int totalVars = existingVars.size();
+			Map<SymEntry,Integer> existingVarsLevels = new HashMap<SymEntry,Integer>();
+			int maxLevel = context.getSymTable().getAvaiableEntriesWithLevels(SymEntryType.VAR, existingVarsLevels);
+			int totalVars = existingVarsLevels.size();
 
 			// if no var is defined then throw an error.
 			if (totalVars == 0)
 				throw new RuntimeException("no var symbols found when thrying to get one");
 			
+			// build probability map for each var (prefering nested vars = low level)
+			double factor = _configs.valDouble(ConfigProperties.VARIABLE_FUNCTION_WISE_FACTOR);
+			
+			Map<SymEntry,Double> probMap = new HashMap<SymEntry, Double>();
+			for (SymEntry entry : existingVarsLevels.keySet())
+			{
+				// compute p^(n-i) where p is the factor, n is max level, and i is the current level
+				double prob = Math.pow(factor, maxLevel - existingVarsLevels.get(entry));
+				probMap.put(entry, prob);
+			}
+			
 			// select random var among the list
-			id = (existingVars.get(StdRandom.uniform(totalVars))).getIdentifier();
+			id = StdRandom.choseFromProbList(probMap).getIdentifier();
 		}
 		else
 		{

@@ -1,5 +1,7 @@
 package Generator.SymTable;
 
+import java.util.Objects;
+
 import JST.Identifier;
 
 public abstract class SymEntry
@@ -23,6 +25,25 @@ public abstract class SymEntry
 		return _type;
 	}
 
+	@Override public int hashCode()
+	{
+		return Objects.hash(_id, _type);
+	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		if(obj == null)
+			return false;
+		if (obj == this)
+			return true;
+		if(!(obj instanceof SymEntry))
+			return false;
+		SymEntry other = (SymEntry) obj;
+		
+		return _id.equals(other._id) && _type.equals(other._type);
+	}
+	
 	@Override
 	public String toString()
 	{

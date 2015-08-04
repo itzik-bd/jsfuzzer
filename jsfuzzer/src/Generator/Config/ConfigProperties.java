@@ -87,7 +87,10 @@ public enum ConfigProperties
 	LOOP_MAX_ITERATIONS_NORMAL_STDDEV("loop_max_iterations_normal_stddev", Integer.class),
 	
 	// string chars
-	STING_CHARS("string_chars", String.class);
+	STING_CHARS("string_chars", String.class),
+	
+	// factor to prioritize nested variables in function (must be > 1)
+	VARIABLE_FUNCTION_WISE_FACTOR("variable_function_wise_factor", Double.class);
 
 	private String _name;
 	private Class<?> _classType;

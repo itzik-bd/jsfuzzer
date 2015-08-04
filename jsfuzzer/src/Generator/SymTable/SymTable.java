@@ -2,6 +2,7 @@ package Generator.SymTable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -66,26 +67,51 @@ public class SymTable
 		// no symbol has been found
 		return null;
 	}
-	
+
 	public List<SymEntry> getAvaiableEntries(SymEntryType type)
 	{
-		List<SymEntry> resList = new ArrayList<SymEntry>();
-		
+		List<SymEntry> resMap = new ArrayList<SymEntry>();
 		SymTable currentSymTable = this;
 		
 		while (currentSymTable != null)
-		{
+		{			
 			if (type.equals(SymEntryType.VAR) || type == null)
-				resList.addAll(currentSymTable._entriesVar.values());
+				resMap.addAll(currentSymTable._entriesVar.values());
 			
 			if (type.equals(SymEntryType.FUNC) || type == null)
-				resList.addAll(currentSymTable._entriesFunc.values());
+				resMap.addAll(currentSymTable._entriesFunc.values());
 			
 			// climb up to the root
 			currentSymTable = currentSymTable._parent;
 		}
 		
-		return resList;
+		return resMap;
+	}
+	
+	public int getAvaiableEntriesWithLevels(SymEntryType type, Map<SymEntry,Integer> resMap)
+	{		
+		SymTable currentSymTable = this;
+		int level = 0;
+		
+		while (currentSymTable != null)
+		{
+			List<SymEntry> currentLevelEntries = new LinkedList<SymEntry>();
+			
+			if (type.equals(SymEntryType.VAR) || type == null)
+				currentLevelEntries.addAll(currentSymTable._entriesVar.values());
+			
+			if (type.equals(SymEntryType.FUNC) || type == null)
+				currentLevelEntries.addAll(currentSymTable._entriesFunc.values());
+			
+			for (SymEntry entry : currentLevelEntries)
+				resMap.put(entry, level);
+			
+			// climb up to the root
+			currentSymTable = currentSymTable._parent;
+			level++;
+		}
+		
+		return level-1;
 	}
 	
 	@Override

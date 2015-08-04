@@ -25,16 +25,16 @@ public class Identifier extends AbsExpression implements ObjectKeys, Assignable
 	}
 	
 	@Override
-	public boolean equals(Object other)
+	public boolean equals(Object obj)
 	{
-		if (other == this)
+		if (obj == this)
 			return true;
-		if(other == null)
+		if(obj == null)
 			return false;
-		if(!(other instanceof Identifier))
+		if(!(obj instanceof Identifier))
 			return false;
 		
-		return _name.equals(((Identifier) other).getName());
+		return _name.equals(((Identifier) obj).getName());
 	}
 	
 	@Override

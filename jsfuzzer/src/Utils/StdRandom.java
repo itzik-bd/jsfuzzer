@@ -47,8 +47,8 @@ package Utils;
  *
  *************************************************************************/
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /**
@@ -358,7 +358,7 @@ public final class StdRandom {
 	}
     
 	//Get probs and chose rendomly with respect to their relations
-	public static <T> T choseFromProbList(HashMap<T, Double> hs)
+	public static <T> T choseFromProbList(Map<T, Double> hs)
 	{
 		// randomlly get a value in range 0-sumOfProps
 		double max=0;
