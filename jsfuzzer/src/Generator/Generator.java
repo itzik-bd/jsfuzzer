@@ -20,6 +20,7 @@ import JST.Enums.DataTypes;
 import JST.Enums.JSTNodes;
 import JST.Enums.LiteralTypes;
 import JST.Enums.Operator;
+import JST.Interfaces.Assignable;
 import JST.Interfaces.Caseable;
 import JST.Interfaces.ObjectKeys;
 import Main.JsFuzzerConfigs;
@@ -56,12 +57,16 @@ public class Generator
 	private Program _program; // generated program instance
 	private Context _rootContext; // global scope
 	
+	private Map<String, Double> _assignableProbMap = null;
+	
 	public Generator(Configs configs, String seed, ExecFlow flowLevel)
 	{
 		// set internal properties
 		_configs = configs;
 		_flowLevel = flowLevel;
 		_logic = new GenLogic(this, configs);
+		
+		initAssignableProbMap();
 		
 		// set seed random seed, to be able to generate the same program again
 		if (seed != null) {
@@ -549,15 +554,24 @@ public class Generator
 		traceIn("Assignment");
 		Assignment assignment;
 
-		// force an existing variable (1.0) to be assigned to
-		// TODO: change to assignable instead of var. To make it less restrictive
-		Identifier id = createIdentifier(context, new IdentifierParams(1.0)); 
+		Assignable leftHandSide = createAssignable(context, null);
 		AbsExpression expr = _logic.generateExpression(context, null);
 
-		assignment = new Assignment(id, expr);
+		assignment = new Assignment(leftHandSide, expr);
 
 		traceOut();
 		return assignment;
+	}
+ 
+	Assignable createAssignable(Context context, Object object)
+	{
+		switch (StdRandom.chooseFromProbList(_assignableProbMap))
+		{
+			case "Variable":    return createIdentifier(context, new IdentifierParams(1.0)); //force existing var
+			case "MemberExpr":  return createMemberExp(context, null);
+		}
+
+		return null;
 	}
 
 	CompoundAssignment createCompoundAssignment(Context context, createParams params)
@@ -646,9 +660,19 @@ public class Generator
 		return wrappedCall;
 	}
 
-	MemberExp createMemberExp(Context context, createParams params) {
-		// TODO Auto-generated method stub
-		return null;
+	MemberExp createMemberExp(Context context, createParams params)
+	{
+		traceIn("MemberExpr");
+		
+		AbsExpression baseId = createIdentifier(context, new IdentifierParams(1.0)); //force existing var
+		
+		// key will be in {k_1, .... , k_n} , where n is configurabe
+		int totalKeysNum = _configs.valInt(ConfigProperties.MEMBER_EXPR_TOTAL_KEYS_NUM);
+		int keyNum = StdRandom.uniform(1, totalKeysNum + 1);
+		Identifier key = _factoryJST.getIdentifier("k" + keyNum);
+		
+		traceOut();
+		return new MemberExp(baseId, key);
 	}
 
 	ObjectExp createObjectExp(Context context, createParams params)
@@ -660,7 +684,7 @@ public class Generator
 
 		for (int i = 0; i < size; i++)
 		{
-			ObjectKeys key = (ObjectKeys) _logic.applyMethod(StdRandom.choseFromListUniform(_jstProp.getObjectKeys()), context, null);
+			ObjectKeys key = (ObjectKeys) _logic.applyMethod(StdRandom.chooseFromListUniform(_jstProp.getObjectKeys()), context, null);
 			AbsExpression val = _logic.generateExpression(context, null);
 
 			objExp.addToMap(key, val);
@@ -711,7 +735,7 @@ public class Generator
 			}
 			
 			// select random var among the list
-			id = StdRandom.choseFromProbList(probMap).getIdentifier();
+			id = StdRandom.chooseFromProbList(probMap).getIdentifier();
 		}
 		else
 		{
@@ -747,7 +771,7 @@ public class Generator
 		if (Arrays.asList(unaryOpAssignable).contains(operator))
 		{
 			operandsList = new ArrayList<AbsExpression>();
-			operandsList.add((AbsExpression) _logic.applyMethod(StdRandom.choseFromListUniform(_jstProp.getAssignable()), context, null));
+			operandsList.add((AbsExpression) _logic.applyMethod(StdRandom.chooseFromListUniform(_jstProp.getAssignable()), context, null));
 		}
 		else
 		{
@@ -1017,5 +1041,12 @@ public class Generator
 	private MemberExp getApiMethod(ApiOptions apiMethod)
 	{
 		return new MemberExp(_factoryJST.getIdentifier("$"), _factoryJST.getFuncIdentifier(apiMethod.getApiName()));
+	}
+
+	private void initAssignableProbMap()
+	{
+		_assignableProbMap = new HashMap<String, Double>();
+		_assignableProbMap.put("Variable", _configs.valDouble(ConfigProperties.ASSIGNABLE_VARIABLE));
+		_assignableProbMap.put("MemberExpr", _configs.valDouble(ConfigProperties.ASSIGNABLE_MEMBER_EXP));
 	}
 }

@@ -123,7 +123,7 @@ public class GenLogic
 		hs.put(JSTNodes.For, (double) (_configs.valInt(ConfigProperties.STMT_FOR) * factorDepth));
 		
 		// randomly choose statement
-		JSTNodes createMethod = StdRandom.choseFromProbList(hs);
+		JSTNodes createMethod = StdRandom.chooseFromProbList(hs);
 		
 		GenerateExpressionParams params = null;
 		
@@ -158,7 +158,7 @@ public class GenLogic
 		testAndPut(params, hs, JSTNodes.OperationExp, _configs.valInt(ConfigProperties.EXPR_EXPRESSIONOP)*factorDepth);
 		testAndPut(params, hs, JSTNodes.Call, _configs.valInt(ConfigProperties.EXPR_CALL)*factorDepth);
 		//testAndPut(params, hs, JSTNodes.ArrayExp, _configs.valInt(ConfigProperties.EXPR_ARRAYEXPRESSION)*factorDepth);
-		//testAndPut(params, hs, JSTNodes.MemberExp, _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
+		testAndPut(params, hs, JSTNodes.MemberExp, _configs.valInt(ConfigProperties.EXPR_MEMBEREXPRESSION)*factorDepth);
 		
 		//ObjectExp is illegal statement
 		testAndPut(params, hs, JSTNodes.ObjectExp, _configs.valInt(ConfigProperties.EXPR_OBJECTEXPRESSION)*factorDepth);
@@ -166,7 +166,7 @@ public class GenLogic
 		testAndPut(params, hs, JSTNodes.FunctionExp, _configs.valInt(ConfigProperties.EXPR_FUNCTIONEXPRESSION)*factorDepth);
 		
 		// randomly choose expression
-		JSTNodes createMethod = StdRandom.choseFromProbList(hs);
+		JSTNodes createMethod = StdRandom.chooseFromProbList(hs);
 		
 		// If this is a special expresstion transfer its special parameters
 		createParams applyParams = (params!= null) ? params.getOptions().get(createMethod) : null;

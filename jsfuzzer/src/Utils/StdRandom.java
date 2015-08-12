@@ -352,13 +352,13 @@ public final class StdRandom {
         }
     }
 
-	public static <T> T choseFromListUniform(List<T> list)
+	public static <T> T chooseFromListUniform(List<T> list)
 	{
 		return list.get(uniform(list.size()));
 	}
     
 	//Get probs and chose rendomly with respect to their relations
-	public static <T> T choseFromProbList(Map<T, Double> hs)
+	public static <T> T chooseFromProbList(Map<T, Double> hs)
 	{
 		// randomlly get a value in range 0-sumOfProps
 		double max=0;
