@@ -56,18 +56,14 @@ public class Generator
 	// instance fields - many time initialize (for each generated program)
 	private Program _program; // generated program instance
 	private Context _rootContext; // global scope
-	
-	private Map<String, Double> _assignableProbMap = null;
-	
+		
 	public Generator(Configs configs, String seed, ExecFlow flowLevel)
 	{
 		// set internal properties
 		_configs = configs;
 		_flowLevel = flowLevel;
 		_logic = new GenLogic(this, configs);
-		
-		initAssignableProbMap();
-		
+
 		// set seed random seed, to be able to generate the same program again
 		if (seed != null) {
 			StdRandom.setSeed(Long.parseLong(seed)); // development: use seed: 1436423645
@@ -554,24 +550,13 @@ public class Generator
 		traceIn("Assignment");
 		Assignment assignment;
 
-		Assignable leftHandSide = createAssignable(context, null);
+		Assignable leftHandSide = createIdentifier(context, new IdentifierParams(1.0)); //force existing var
 		AbsExpression expr = _logic.generateExpression(context, null);
 
 		assignment = new Assignment(leftHandSide, expr);
 
 		traceOut();
 		return assignment;
-	}
- 
-	Assignable createAssignable(Context context, Object object)
-	{
-		switch (StdRandom.chooseFromProbList(_assignableProbMap))
-		{
-			case "Variable":    return createIdentifier(context, new IdentifierParams(1.0)); //force existing var
-			case "MemberExpr":  return createMemberExp(context, null);
-		}
-
-		return null;
 	}
 
 	CompoundAssignment createCompoundAssignment(Context context, createParams params)
@@ -660,7 +645,8 @@ public class Generator
 		return wrappedCall;
 	}
 
-	MemberExp createMemberExp(Context context, createParams params)
+
+	Call createMemberExp(Context context, createParams params)
 	{
 		traceIn("MemberExpr");
 		
@@ -669,10 +655,11 @@ public class Generator
 		// key will be in {k_1, .... , k_n} , where n is configurabe
 		int totalKeysNum = _configs.valInt(ConfigProperties.MEMBER_EXPR_TOTAL_KEYS_NUM);
 		int keyNum = StdRandom.uniform(1, totalKeysNum + 1);
-		Identifier key = _factoryJST.getIdentifier("k" + keyNum);
+
+		LiteralString keyStr = _factoryJST.getObjectKeyLiteralString("k" + keyNum);
 		
 		traceOut();
-		return new MemberExp(baseId, key);
+		return new Call(getApiMethod(ApiOptions.MEMBER_EXPR), baseId, keyStr); //use api method [ $.mem(baseId, 'key') ]
 	}
 
 	ObjectExp createObjectExp(Context context, createParams params)
@@ -1041,12 +1028,5 @@ public class Generator
 	private MemberExp getApiMethod(ApiOptions apiMethod)
 	{
 		return new MemberExp(_factoryJST.getIdentifier("$"), _factoryJST.getFuncIdentifier(apiMethod.getApiName()));
-	}
-
-	private void initAssignableProbMap()
-	{
-		_assignableProbMap = new HashMap<String, Double>();
-		_assignableProbMap.put("Variable", _configs.valDouble(ConfigProperties.ASSIGNABLE_VARIABLE));
-		_assignableProbMap.put("MemberExpr", _configs.valDouble(ConfigProperties.ASSIGNABLE_MEMBER_EXP));
 	}
 }

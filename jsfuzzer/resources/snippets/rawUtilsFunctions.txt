@@ -82,6 +82,13 @@ var $ = (function()
 		return (name.indexOf("anonymous ") == 0 || registeredFunctions.indexOf(name) > -1);
 	}
 
+	api.mem = function(x, y)
+	{
+		if(x == null || x == undefined)
+			return undefined;
+		return x[y];
+	};
+
 	// override toString method of function to make a standard across engines
 	Function.prototype.toString = function() { return "function"; };
 

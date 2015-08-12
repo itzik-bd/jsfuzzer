@@ -5,9 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import Generator.Config.ConfigProperties;
 import JST.Identifier;
 import JST.JSTNode;
 import JST.Literal;
+import JST.LiteralString;
 import JST.RawCode;
 import JST.Enums.LiteralTypes;
 import Utils.FilesIO;
@@ -20,6 +22,7 @@ public class Factory
 	private Map<String, Identifier> _identifierNodes = new HashMap<String, Identifier>();
 	private Map<String, Identifier> _loopIdentifierNodes = new HashMap<String, Identifier>();
 	private Map<String, RawCode> _snippets = new HashMap<String, RawCode>();
+	private Map<String, LiteralString> _objectKeysStrings = new HashMap<String, LiteralString>();
 
 	public Factory()
 	{		
@@ -112,5 +115,18 @@ public class Factory
 		}
 		
 		return _snippets.get(snippetName);
+	}
+	
+	public LiteralString getObjectKeyLiteralString(String key)
+	{
+		LiteralString literalKey = _objectKeysStrings.get(key);
+		
+		if(literalKey == null)
+		{
+			literalKey = new LiteralString(key);
+			_objectKeysStrings.put(key, literalKey);
+		}
+		
+		return literalKey;
 	}
 }

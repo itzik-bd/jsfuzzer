@@ -89,10 +89,6 @@ public enum ConfigProperties
 	// Number of variables to be used as object keys (==  # {i | k_i is an obj key} )
 	MEMBER_EXPR_TOTAL_KEYS_NUM("member_expr_total_keys_num", Integer.class),
 	
-	// Discrete distribution for generating the assignment left hand side
-	ASSIGNABLE_VARIABLE("assignable_variable", Double.class),
-	ASSIGNABLE_MEMBER_EXP("assignable_member_exp", Double.class),
-	
 	// string chars
 	STING_CHARS("string_chars", String.class),
 	
