@@ -1,5 +1,11 @@
 package JST.Enums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
 import Utils.StdRandom;
 
 public enum LiteralTypes
@@ -16,6 +22,8 @@ public enum LiteralTypes
 
 	TRUE("true", DataTypes.BOOLEAN),
 	FALSE("false", DataTypes.BOOLEAN);
+	
+	public static final LiteralTypes[] ALL = values(); 
 
 	private String _token;
 	private DataTypes _type;
@@ -37,16 +45,23 @@ public enum LiteralTypes
 		return _type;
 	}
 
-	public static LiteralTypes getRandomly() {
-		LiteralTypes[] values = values();
-
-		return values[StdRandom.uniform(values.length)];
-	}
-	
-	public static LiteralTypes getNonTrivialRandomly() {
-		LiteralTypes[] values = {NUMBER, STRING, TRUE, FALSE, INFINITY};
-
-		return values[StdRandom.uniform(values.length)];
+	public static LiteralTypes getRandomly(Set<LiteralTypes> acceptedLiteralTypes)
+	{
+		if (acceptedLiteralTypes == null || acceptedLiteralTypes.size() == 0) {
+			throw new IllegalArgumentException("acceptedLiteralTypes must be a non-empty valid set");
+		}
+		
+		List<LiteralTypes> values = new ArrayList<LiteralTypes> (Arrays.asList(values()));
+				
+		// remove operator whose return value type is other then desired type
+		for (Iterator<LiteralTypes> iter = values.iterator(); iter.hasNext() ; ) {
+			LiteralTypes litType = iter.next();
+		    if (!acceptedLiteralTypes.contains(litType)) {
+		        iter.remove();
+		    }
+		}
+ 
+		return values.get(StdRandom.uniform(values.size()));
 	}
 	
 	@Override

@@ -12,7 +12,7 @@ public class GenerateExpressionParams extends createParams
 	
 	/**
 	 * Basic consructor for GenerateExpressionParams
-	 * @param include - true if options are do be included, false for disscluded
+	 * @param include - true if options are do be included, false for disscluded, null for neither
 	 */
 	public GenerateExpressionParams(Boolean include)
 	{

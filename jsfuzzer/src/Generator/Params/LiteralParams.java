@@ -1,24 +1,29 @@
 package Generator.Params;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import JST.Enums.LiteralTypes;
+
 public class LiteralParams extends createParams
 {
-	private boolean _onlyIntOrString = false;
+	private static final Set<LiteralTypes> DEFAULT_LITERALTYPE_SET = new HashSet<LiteralTypes>(Arrays.asList(LiteralTypes.ALL));
 	
-	public LiteralParams(boolean onlyIntOrString) {
-		_onlyIntOrString = onlyIntOrString;
+	private Set<LiteralTypes> _acceptedLiteralTypes = DEFAULT_LITERALTYPE_SET;
+	
+	public LiteralParams(LiteralTypes[] acceptedLiteralTypes) {
+		_acceptedLiteralTypes = new HashSet<LiteralTypes>(Arrays.asList(acceptedLiteralTypes));
 	}
 
-	public void setIncludeDefualt(boolean onlyIntOrString) {
-		_onlyIntOrString = onlyIntOrString;
-	}
-	
-	public static boolean getOnlyIntOrString(createParams params)
+	@SuppressWarnings("unchecked")
+	public static Set<LiteralTypes> getAcceptedLiteralTypes(createParams params)
 	{
-		boolean defaultValue = false;
-		return (boolean) decide(params, defaultValue, new getParamField() {
+		Set<LiteralTypes> defaultValue = DEFAULT_LITERALTYPE_SET;
+		return (Set<LiteralTypes>) decide(params, defaultValue, new getParamField() {
 			@Override
 			public Object fetch(createParams params) {
-				return ((LiteralParams) params)._onlyIntOrString;
+				return ((LiteralParams) params)._acceptedLiteralTypes;
 			}
 		});
 	}

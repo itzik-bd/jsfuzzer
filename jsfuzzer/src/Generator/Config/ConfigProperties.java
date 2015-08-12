@@ -90,7 +90,7 @@ public enum ConfigProperties
 	MEMBER_EXPR_TOTAL_KEYS_NUM("member_expr_total_keys_num", Integer.class),
 	
 	// string chars
-	STING_CHARS("string_chars", String.class),
+	STRING_CHARS("string_chars", String.class),
 	
 	// factor to prioritize nested variables in function (must be > 1)
 	VARIABLE_FUNCTION_WISE_FACTOR("variable_function_wise_factor", Double.class), 

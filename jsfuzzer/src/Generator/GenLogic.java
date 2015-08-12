@@ -4,13 +4,12 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import Utils.StdRandom;
 import Generator.Config.ConfigProperties;
 import Generator.Config.Configs;
 import Generator.Params.GenerateExpressionParams;
-import Generator.Params.GenerateOpExprParams;
+import Generator.Params.OperationExpressionParams;
 import Generator.Params.createParams;
 import JST.AbsExpression;
 import JST.AbsStatement;
@@ -190,7 +189,7 @@ public class GenLogic
 		GenExpParams.addOption(JSTNodes.Call, null);
 		
 		// OperationExp that returns boolean value
-		GenerateOpExprParams opExpParams = new GenerateOpExprParams(DataTypes.BOOLEAN);
+		OperationExpressionParams opExpParams = new OperationExpressionParams(DataTypes.BOOLEAN);
 		GenExpParams.addOption(JSTNodes.OperationExp, opExpParams);
 		
 		return generateExpression(context, GenExpParams);

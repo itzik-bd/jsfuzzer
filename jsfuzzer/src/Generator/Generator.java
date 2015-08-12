@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import Generator.Config.ConfigProperties;
@@ -581,7 +582,7 @@ public class Generator
 		
 		// Right side (with GenerateExpressionParams)
 		GenerateExpressionParams expParam = new GenerateExpressionParams(null);
-		expParam.addOption(JSTNodes.Literal, new LiteralParams(true));
+		expParam.addOption(JSTNodes.Literal, new LiteralParams(new LiteralTypes[] {LiteralTypes.NUMBER, LiteralTypes.STRING, LiteralTypes.TRUE, LiteralTypes.FALSE, LiteralTypes.INFINITY}));
 		AbsExpression expr = _logic.generateExpression(context, expParam);
 
 		assignment = new Assignment(leftHandSide, expr);
@@ -773,7 +774,7 @@ public class Generator
 
 	OperationExp createOperationExp(Context context, createParams params)
 	{
-		DataTypes desiredType = GenerateOpExprParams.getDataType(params);
+		Set<DataTypes> desiredType = OperationExpressionParams.getDataType(params);
 		Operator operator = Operator.getRandomly(desiredType);
 		
 		traceIn(String.format("OperationExp (%s)", operator));
@@ -793,7 +794,16 @@ public class Generator
 		}
 		else
 		{
-			operandsList = _logic.generateExpression(context, null, operator.getNumOperands());
+			DataTypes[][] operatorArgsTypes = operator.getArgsInputTypes();
+			operandsList = new ArrayList<AbsExpression>();
+			
+			for (int i=0; i<operator.getNumOperands(); i++)
+			{
+				GenerateExpressionParams opParams = new GenerateExpressionParams(null);
+				opParams.addOption(JSTNodes.OperationExp, new OperationExpressionParams(operatorArgsTypes[i]));
+				
+				operandsList.add(_logic.generateExpression(context, opParams));
+			}
 		}
 
 		expressionOp = new OperationExp(operator, operandsList);
@@ -805,8 +815,7 @@ public class Generator
 	Literal createLiteral(Context context, createParams params)
 	{
 		Literal lit = null;
-		LiteralTypes litType = LiteralParams.getOnlyIntOrString(params) ?
-				LiteralTypes.getNonTrivialRandomly() : LiteralTypes.getRandomly();
+		LiteralTypes litType = LiteralTypes.getRandomly(LiteralParams.getAcceptedLiteralTypes(params));
 		
 		if (litType.isSingleValue())
 		{
@@ -832,7 +841,7 @@ public class Generator
 		StringBuilder strBld = new StringBuilder();
 
 		// get alphabet set from configs
-		String alphabet = _configs.valString(ConfigProperties.STING_CHARS);
+		String alphabet = _configs.valString(ConfigProperties.STRING_CHARS);
 		
 		// Randomize string's length
 		int length = Math.min(maxLength, StdRandom.expCeiled(_configs.valDouble(ConfigProperties.LITERAL_STRING_LAMBDA)));
@@ -842,7 +851,7 @@ public class Generator
 
 		litStr = new LiteralString(strBld.toString());
 
-		trace("LiteralString");
+		trace(String.format("LiteralString (%s)", litStr.getValue()));
 		return litStr;
 	}
 

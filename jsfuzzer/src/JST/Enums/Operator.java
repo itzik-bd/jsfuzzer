@@ -2,54 +2,56 @@ package JST.Enums;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import Utils.StdRandom;
 
 public enum Operator
 {
 	// Unary Operations
-	UMINUS(1, DataTypes.NUMBER, "-%s", "unary subtraction"), 
-	UPLUS(1, DataTypes.NUMBER, "+%s", "unary addition"),
+	UMINUS("unary subtraction", DataTypes.NUMBER_sig, "-%s", 1, DataTypes.NUMBER_sig), 
+	UPLUS("unary addition", DataTypes.NUMBER_sig, "+%s", 1, DataTypes.NUMBER_sig),
 	
-	LNEG(1, DataTypes.BOOLEAN, "!%s", "logical negation"),
-	BITNEG(1, DataTypes.NUMBER, "~%s", "bitwise negation"),
+	LNEG("logical negation", DataTypes.BOOLEAN_sig, "!%s", 1, new DataTypes[] { DataTypes.BOOLEAN, DataTypes.NUMBER }),
+	BITNEG("bitwise negation", DataTypes.NUMBER_sig, "~%s", 1, DataTypes.NUMBER_sig),
 
-	PLUSPLUSLEFT(1, DataTypes.NUMBER, "++%s", "plus plus"),
-	MINUSMINUSLEFT(1, DataTypes.NUMBER, "--%s", "minus minus"),
-	PLUSPLUSRIGHT(1, DataTypes.NUMBER, "%s++", "plus plus"),
-	MINUSMINUSRIGHT(1, DataTypes.NUMBER, "%s--", "minus minus"),
+	PLUSPLUSLEFT("plus plus", DataTypes.NUMBER_sig, "++%s", 1, (DataTypes[]) null),
+	MINUSMINUSLEFT("minus minus", DataTypes.NUMBER_sig, "--%s", 1, (DataTypes[]) null),
+	PLUSPLUSRIGHT("plus plus", DataTypes.NUMBER_sig, "%s++", 1, (DataTypes[]) null),
+	MINUSMINUSRIGHT("minus minus", DataTypes.NUMBER_sig, "%s--", 1, (DataTypes[]) null),
 	
-	TYPEOF(1, DataTypes.STRING,"typeof %s", "type of"),
-	VOID(1, DataTypes.UNDEFINED,"void %s", "void"),
+	TYPEOF("type of", DataTypes.STRING_sig, "typeof %s", 1, DataTypes.ALL),
+	VOID("void", DataTypes.UNDEFINED_sig, "void %s", 1, DataTypes.ALL),
 	
 	// Binary Operations
-	PLUS(2, null, "%s + %s", "addition"),
-	MINUS(2, DataTypes.NUMBER, "%s - %s", "subtraction"),
-	MULTIPLY(2, DataTypes.NUMBER, "%s * %s", "multiplication"),
-	DIVIDE(2, DataTypes.NUMBER, "%s / %s", "division"),
-	MOD(2, DataTypes.NUMBER, "%s %% %s", "modulo"),
+	PLUS("addition", DataTypes.ALL, "%s + %s", 2, new DataTypes[] {DataTypes.NUMBER, DataTypes.STRING, DataTypes.BOOLEAN}),
+	MINUS("subtraction", DataTypes.NUMBER_sig, "%s - %s", 2, DataTypes.NUMBER_sig),
+	MULTIPLY("multiplication", DataTypes.NUMBER_sig, "%s * %s", 2, DataTypes.NUMBER_sig),
+	DIVIDE("division", DataTypes.NUMBER_sig, "%s / %s", 2, DataTypes.NUMBER_sig),
+	MOD("modulo", DataTypes.NUMBER_sig, "%s %% %s", 2, DataTypes.NUMBER_sig),
 	
-	LAND(2, DataTypes.BOOLEAN, "%s && %s", "logical and"),
-	LOR(2, DataTypes.BOOLEAN, "%s || %s", "logical or"),
-	LT(2, DataTypes.BOOLEAN, "%s < %s", "less than"),
-	LTE(2, DataTypes.BOOLEAN, "%s <= %s", "less than or equal to"),
-	GT(2, DataTypes.BOOLEAN, "%s > %s", "greater than"),
-	GTE(2, DataTypes.BOOLEAN, "%s >= %s", "greater than or equal to"),
+	LAND("logical and", DataTypes.BOOLEAN_sig, "%s && %s", 2, DataTypes.BOOLEAN_sig),
+	LOR("logical or", DataTypes.BOOLEAN_sig, "%s || %s", 2, DataTypes.BOOLEAN_sig),
+	LT("less than", DataTypes.BOOLEAN_sig, "%s < %s", 2, DataTypes.NUMBER_sig),
+	LTE("less than or equal to", DataTypes.BOOLEAN_sig, "%s <= %s", 2, DataTypes.NUMBER_sig),
+	GT("greater than", DataTypes.BOOLEAN_sig, "%s > %s", 2, DataTypes.NUMBER_sig),
+	GTE("greater than or equal to", DataTypes.BOOLEAN_sig, "%s >= %s", 2, DataTypes.NUMBER_sig),
 	
-	EQUAL(2, DataTypes.BOOLEAN, "%s == %s", "equality"),
-	EQUALTYPE(2, DataTypes.BOOLEAN, "%s === %s", "equality + type"),
-	NEQUALTYPE(2, DataTypes.BOOLEAN, "%s !== %s", "inequality or different type"),
-	NEQUAL(2, DataTypes.BOOLEAN, "%s != %s", "inequality"),
+	EQUAL("equality", DataTypes.BOOLEAN_sig, "%s == %s", 2, DataTypes.ALL),
+	EQUALTYPE("equality + type", DataTypes.BOOLEAN_sig, "%s === %s", 2, DataTypes.ALL),
+	NEQUALTYPE("inequality or different type", DataTypes.BOOLEAN_sig, "%s !== %s", 2, DataTypes.ALL),
+	NEQUAL("inequality", DataTypes.BOOLEAN_sig, "%s != %s", 2, DataTypes.ALL),
 	
-	SHIFTRIGHT(2, DataTypes.NUMBER, "%s >> %s", "sign propagating right shift"),
-	SHIFTLEFT(2, DataTypes.NUMBER, "%s << %s", "shift left"),
-	SHIFTRIGHTZERO(2, DataTypes.NUMBER, "%s >>> %s", "zero-fill right shift"),
+	SHIFTRIGHT("sign propagating right shift", DataTypes.NUMBER_sig, "%s >> %s", 2, DataTypes.NUMBER_sig),
+	SHIFTLEFT("shift left", DataTypes.NUMBER_sig, "%s << %s", 2, DataTypes.NUMBER_sig),
+	SHIFTRIGHTZERO("zero-fill right shift", DataTypes.NUMBER_sig, "%s >>> %s", 2, DataTypes.NUMBER_sig),
 	
-	BITXOR(2, DataTypes.NUMBER, "%s ^ %s", "bitwise xor"),
-	BITAND(2, DataTypes.NUMBER, "%s & %s", "bitwise and"),
-	BITOR(2, DataTypes.NUMBER, "%s | %s", "bitwise or"),
+	BITXOR("bitwise xor", DataTypes.NUMBER_sig, "%s ^ %s", 2, DataTypes.NUMBER_sig),
+	BITAND("bitwise and", DataTypes.NUMBER_sig, "%s & %s", 2, DataTypes.NUMBER_sig),
+	BITOR("bitwise or", DataTypes.NUMBER_sig, "%s | %s", 2, DataTypes.NUMBER_sig),
 	
 	// INSTANCEOF is not relevant for now because we do not allow "var x = FuncName()"
 	// INSTANCEOF(2, DataTypes.BOOLEAN, "%s instanceof %s", "instance of"),
@@ -59,43 +61,62 @@ public enum Operator
 	// DELETE(1, DataTypes.BOOLEAN,"delete %s", "delete object"),
 	
 	// Ternary Operations
-	CONDOP(3, null,"%s ? %s : %s", "conditional operation");
+	CONDOP("conditional operation", DataTypes.ALL, "%s ? %s : %s", 3, DataTypes.BOOLEAN_sig, DataTypes.ALL, DataTypes.ALL);
 	
-	private final int _numOperands;
-	private final DataTypes _outputType;
 	private final String _pattern;
 	private final String _description;
+	private final Set<DataTypes> _outputTypeSet;
+	private final DataTypes[][] _argsInputTypes;
 
-	private Operator(int numOperands, DataTypes outputType, String pattern, String description) {
-		_numOperands = numOperands;
-		_outputType = outputType;
-		_pattern = pattern;
+	private Operator(String description, DataTypes[] outputTypeArr, String pattern, int numOperands, DataTypes[]... argsInputTypes) {
 		_description = description;
+		_outputTypeSet = new HashSet<DataTypes>(Arrays.asList(outputTypeArr));
+		_pattern = pattern;
+		
+		if (numOperands == argsInputTypes.length) {
+			_argsInputTypes = argsInputTypes;
+		}
+		else if (argsInputTypes.length == 1) {
+			// create an array of size numOperands and each element will be the single value
+			_argsInputTypes = new DataTypes[numOperands][];
+			for (int i=0; i<numOperands; i++) {
+				_argsInputTypes[i] = argsInputTypes[0];
+			}
+		}
+		else { throw new IllegalArgumentException("numOperands and argsInputTypes are not consistent"); }
 	}
 	
 	public int getNumOperands() {
-		return _numOperands;
+		return _argsInputTypes.length;
 	}
 	
-	public DataTypes getOutputType() {
-		return _outputType;
+	public Set<DataTypes> getOutputTypeSet() {
+		return _outputTypeSet;
+	}
+	
+	public DataTypes[][] getArgsInputTypes()
+	{
+		return _argsInputTypes;
 	}
 	
 	public String formatOp(List<String> params) {
 		return String.format(_pattern, params.toArray(new Object[params.size()]));
 	}
 
-	public static Operator getRandomly(DataTypes type) {
-		List<Operator> values = new ArrayList<Operator> (Arrays.asList(values()));
+	public static Operator getRandomly(Set<DataTypes> returnTypesSet)
+	{
+		if (returnTypesSet == null || returnTypesSet.size() == 0) {
+			throw new IllegalArgumentException("returnTypesSet must be a non-empty valid set");
+		}
 		
+		List<Operator> values = new ArrayList<Operator> (Arrays.asList(values()));
+				
 		// remove operator whose return value type is other then desired type
-		if (type != null) {
-			for (Iterator<Operator> iter = values.iterator(); iter.hasNext() ; ) {
-				Operator op = iter.next();
-			    if (op != null && op._outputType != type) {
-			        iter.remove();
-			    }
-			}
+		for (Iterator<Operator> iter = values.iterator(); iter.hasNext() ; ) {
+			Operator op = iter.next();
+		    if (!returnTypesSet.containsAll(op._outputTypeSet)) {
+		        iter.remove();
+		    }
 		}
  
 		return values.get(StdRandom.uniform(values.size()));
