@@ -14,11 +14,15 @@ public class VarDeclerationParams extends createParams
 	 * Undef for default behavior (randomly init) */
 	private final ThreeVal _hasInitValues; 
 	
-	public VarDeclerationParams(Boolean forceNewIdentifier, Integer numDeclerators, Boolean hasInitValue) 
+	/** False if right side must not be a call to a function (or to anonymous function) */
+	private final Boolean _isCallAllowed;
+	
+	public VarDeclerationParams(Boolean forceNewIdentifier, Integer numDeclerators, Boolean hasInitValue, Boolean isCallAllowed) 
 	{
 		_forceNewIdentifier = forceNewIdentifier;
 		_numDeclerators = numDeclerators;
 		_hasInitValues = ThreeVal.parse(hasInitValue);
+		_isCallAllowed = isCallAllowed;
 	}
 	
 	public static boolean getForceNewIdentifier(createParams params)
@@ -54,4 +58,14 @@ public class VarDeclerationParams extends createParams
 		});
 	}
 
+	public static boolean getIsCallAllowed(createParams params)
+	{
+		boolean defaultValue = false;
+		return (boolean) decide(params, defaultValue, new getParamField() {
+			@Override
+			public Object fetch(createParams params) {
+				return ((VarDeclerationParams) params)._isCallAllowed;
+			}
+		});
+	}
 }

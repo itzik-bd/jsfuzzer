@@ -43,6 +43,12 @@ public enum LiteralTypes
 		return values[StdRandom.uniform(values.length)];
 	}
 	
+	public static LiteralTypes getNonTrivialRandomly() {
+		LiteralTypes[] values = {NUMBER, STRING, TRUE, FALSE, INFINITY};
+
+		return values[StdRandom.uniform(values.length)];
+	}
+	
 	@Override
 	public String toString() {
 		return _token;

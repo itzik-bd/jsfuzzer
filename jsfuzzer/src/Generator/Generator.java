@@ -81,7 +81,14 @@ public class Generator
 		_program.addStatement(new Comment("--------------------------------- [ Generated Program ] ---------------------------------", 2, 1));
 		
 		// first of all generate variables to be used
-		_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true, null, null)));
+		int numAutoGenVars = _configs.valInt(ConfigProperties.NUM_FORCED_GENERATED_VARS);
+		_program.addStatement(createVarDecleration(_rootContext, new VarDeclerationParams(true, numAutoGenVars, null, false)));
+		
+		int numAutoGenFuncs = _configs.valInt(ConfigProperties.NUM_FORCED_GENERATED_FUNCS);
+		for (int i = 0 ; i < numAutoGenFuncs ; i++)
+		{
+			_program.addStatement(createFunctionDef(_rootContext, null));
+		}
 		
 		// choose how many statements the program will have
 		int size = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.PROGRAM_SIZE_LAMBDA));
@@ -222,7 +229,7 @@ public class Generator
 		// create new loop context that has the same symbol table as his parent
 		Context newContext = new Context(context, true, null, true);
 
-		AbsStatement initStmt = createVarDecleration(newContext, new VarDeclerationParams(null, 1, null));
+		AbsStatement initStmt = createVarDecleration(newContext, new VarDeclerationParams(null, 1, null, false));
 		AbsExpression stepExpr = _logic.generateExpression(newContext, null);
 		
 		// Generate condition
@@ -256,7 +263,7 @@ public class Generator
 		Context newContext = new Context(context, true, null, true);
 
 		// create one varDecl (with new identifier) wihtout init value
-		VarDecleration varDecl = createVarDecleration(newContext, new VarDeclerationParams(true, 1, false));
+		VarDecleration varDecl = createVarDecleration(newContext, new VarDeclerationParams(true, 1, false, false));
 
 		// Generate StatementsBlock
 		StatementsBlock stmtsBlock = createStatementsBlock(newContext, null);
@@ -348,6 +355,7 @@ public class Generator
 	FunctionExp createFunctionExp(Context context, createParams params) 
 	{
 		traceIn("FunctionExp");
+		_logic.increaseFuncDepth(3);
 		
 		// Randomize number of parameters
 		int ParamNum = StdRandom.expCeiled(_configs.valDouble(ConfigProperties.FUNC_PARAMS_NUM_LAMBDA_EXP));
@@ -374,6 +382,7 @@ public class Generator
 
 		FunctionExp funcExp = new FunctionExp(funcParams, stmtsBlock);
 		
+		_logic.decreaseFuncDepth(3);
 		traceOut();
 		return funcExp;
 	}
@@ -381,6 +390,7 @@ public class Generator
 	FunctionDef createFunctionDef(Context context, createParams params)
 	{
 		traceIn("FunctionDef");
+		_logic.increaseFuncDepth(1);
 
 		// Randomize function name
 		Identifier functionId = _factoryJST.getFuncIdentifier(_counterFunc.getNext());
@@ -412,6 +422,7 @@ public class Generator
 		// (!) This is performed after FunctionDef() to avoid recursion (and inner defined function calling father function)
 		context.getSymTable().newEntry(new SymEntryFunc(functionId, paramsNum));
 		
+		_logic.decreaseFuncDepth(1);
 		traceOut();
 		return funcDef;
 	}
@@ -464,7 +475,16 @@ public class Generator
 			default: createInitExp = false;
 		}
 
-		AbsExpression exp = createInitExp ? _logic.generateExpression(context, null) : null;
+		// If right side cannot be call, exclude it
+		GenerateExpressionParams genExpPar = null;
+		if (!VarDeclerationParams.getIsCallAllowed(params))
+		{
+			genExpPar = new GenerateExpressionParams(false);
+			genExpPar.addOption(JSTNodes.FunctionExp, null);
+			genExpPar.addOption(JSTNodes.Call, null);
+		}
+		
+		AbsExpression exp = createInitExp ? _logic.generateExpression(context, genExpPar) : null;
 		varDeclerator = new VarDeclerator(id, exp);
 
 		traceOut();
@@ -524,7 +544,13 @@ public class Generator
 		if (_logic.getDepth() < _configs.valInt(ConfigProperties.MAX_JST_DEPTH))
 		{
 			// choose the block size
-			double factorDepth = Math.pow(_configs.valDouble(ConfigProperties.FACTOR_DEPTH), _logic.getDepth());
+			double factorDepth;
+			if (StatementBlockParams.getIsFunction(params))
+				factorDepth = Math.pow(_configs.valDouble(ConfigProperties.FACTOR_DEPTH), _logic.getDepth());
+			else
+				factorDepth = Math.pow(_configs.valDouble(ConfigProperties.FACTOR_DEPTH), _logic.getFuncDepth());
+			
+			
 			double lambda = _configs.valDouble(ConfigProperties.STMTS_BLOCK_SIZE_LAMBDA) / factorDepth;
 			size = StdRandom.expCeiled(lambda);
 		}
@@ -550,8 +576,13 @@ public class Generator
 		traceIn("Assignment");
 		Assignment assignment;
 
+		// Left side
 		Assignable leftHandSide = createIdentifier(context, new IdentifierParams(1.0)); //force existing var
-		AbsExpression expr = _logic.generateExpression(context, null);
+		
+		// Right side (with GenerateExpressionParams)
+		GenerateExpressionParams expParam = new GenerateExpressionParams(null);
+		expParam.addOption(JSTNodes.Literal, new LiteralParams(true));
+		AbsExpression expr = _logic.generateExpression(context, expParam);
 
 		assignment = new Assignment(leftHandSide, expr);
 
@@ -770,12 +801,13 @@ public class Generator
 		traceOut();
 		return expressionOp;
 	}
-	
+
 	Literal createLiteral(Context context, createParams params)
 	{
-		LiteralTypes litType = LiteralTypes.getRandomly();
 		Literal lit = null;
-
+		LiteralTypes litType = LiteralParams.getOnlyIntOrString(params) ?
+				LiteralTypes.getNonTrivialRandomly() : LiteralTypes.getRandomly();
+		
 		if (litType.isSingleValue())
 		{
 			trace(String.format("Literal (%s)", litType));

@@ -18,7 +18,7 @@ public class GenerateOpExprParams extends createParams
 	
 	public static DataTypes getDataType(createParams params)
 	{
-		DataTypes defaultValue = DataTypes.UNDEFINED;
+		DataTypes defaultValue = null;
 		return (DataTypes) decide(params, defaultValue, new getParamField() 
 		{
 			@Override

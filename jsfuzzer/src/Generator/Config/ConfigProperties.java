@@ -93,7 +93,11 @@ public enum ConfigProperties
 	STING_CHARS("string_chars", String.class),
 	
 	// factor to prioritize nested variables in function (must be > 1)
-	VARIABLE_FUNCTION_WISE_FACTOR("variable_function_wise_factor", Double.class);
+	VARIABLE_FUNCTION_WISE_FACTOR("variable_function_wise_factor", Double.class), 
+	
+	// On first statements generate this many variables and functions
+	NUM_FORCED_GENERATED_VARS("num_forced_generated_vars", Integer.class),
+	NUM_FORCED_GENERATED_FUNCS("num_forced_generated_funcs", Integer.class);
 
 	private String _name;
 	private Class<?> _classType;

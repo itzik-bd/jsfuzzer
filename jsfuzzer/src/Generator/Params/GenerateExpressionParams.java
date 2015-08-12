@@ -7,14 +7,14 @@ import JST.Enums.*;
 
 public class GenerateExpressionParams extends createParams
 {
-	private boolean _include; 
+	private Boolean _include; 
 	private Map<JSTNodes, createParams> _optionalExpresstions = null;
 	
 	/**
 	 * Basic consructor for GenerateExpressionParams
 	 * @param include - true if options are do be included, false for disscluded
 	 */
-	public GenerateExpressionParams(boolean include)
+	public GenerateExpressionParams(Boolean include)
 	{
 		_include = include;
 		_optionalExpresstions = new HashMap<JSTNodes, createParams>();
@@ -32,7 +32,7 @@ public class GenerateExpressionParams extends createParams
 		return _optionalExpresstions;
 	}
 	
-	public boolean getInclude(){
+	public Boolean getInclude(){
 		return _include;
 	}
 }

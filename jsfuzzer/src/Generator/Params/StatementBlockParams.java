@@ -6,10 +6,17 @@ public class StatementBlockParams extends createParams
 {
 	private AbsStatement _firstSatement = null;
 	private AbsStatement _lastSatement = null;
+	private boolean		_isFunction = false;
 	
 	public StatementBlockParams(AbsStatement firstSatement, AbsStatement lastSatement) {
 		_firstSatement = firstSatement;
 		_lastSatement = lastSatement;
+	}
+	
+	public StatementBlockParams(AbsStatement firstSatement, AbsStatement lastSatement, boolean isFunction) {
+		_firstSatement = firstSatement;
+		_lastSatement = lastSatement;
+		_isFunction = isFunction;
 	}
 
 	public static AbsStatement getFirstStatement(createParams params)
@@ -30,6 +37,17 @@ public class StatementBlockParams extends createParams
 			@Override
 			public Object fetch(createParams params) {
 				return ((StatementBlockParams) params)._lastSatement;
+			}
+		});
+	}
+	
+	public static boolean getIsFunction(createParams params)
+	{
+		boolean defaultValue = false;
+		return (boolean) decide(params, defaultValue, new getParamField() {
+			@Override
+			public Object fetch(createParams params) {
+				return ((StatementBlockParams) params)._isFunction;
 			}
 		});
 	}

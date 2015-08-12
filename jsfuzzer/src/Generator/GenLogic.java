@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import Utils.StdRandom;
 import Generator.Config.ConfigProperties;
@@ -22,6 +23,7 @@ public class GenLogic
 	private final Generator _gen;
 	private final Configs _configs;
 	private int _depth = 0;
+	private int _funcDepth = 0;
 
 	public GenLogic(Generator gen, Configs configs) {
 		_gen = gen;
@@ -209,7 +211,7 @@ public class GenLogic
 			options = ExpParams.getOptions();
 		
 			// If no options were given or include this or disclude other than this
-			if ((options == null) || (ExpParams.getInclude() == options.containsKey(node)))
+			if ((options == null) || ExpParams.getInclude() == null || (ExpParams.getInclude() == options.keySet().contains(node)))
 			{
 				hs.put(node, val);
 			}
@@ -249,5 +251,17 @@ public class GenLogic
 	public int getDepth() {
 		return _depth;
 	}
+
+	public void increaseFuncDepth(int d) {
+		_funcDepth += d;		
+	}
 	
+	public void decreaseFuncDepth(int d) {
+		_funcDepth -= d;		
+	}
+	
+	public int getFuncDepth() {
+		return _funcDepth;
+	}
+
 }
