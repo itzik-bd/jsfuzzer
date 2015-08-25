@@ -12,6 +12,4 @@ function f1()
 	(function () { var v1; })();
 }
 
-myPrint(typeof(f1));
-myPrint(f1);
 f1();
