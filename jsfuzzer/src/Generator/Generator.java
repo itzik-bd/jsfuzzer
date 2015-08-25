@@ -40,7 +40,7 @@ public class Generator
 	private final static JST.Helper.Factory _factoryJST = new JST.Helper.Factory();
 	private final static JST.Helper.JSTProperties _jstProp = new JST.Helper.JSTProperties();
 	
-	private final static String _largestJSNumber = "9007199254740992";
+	private final static String _largestJSNumber = "9007199254740991";
 	
 	// instance fields - one time initialize
 	private final Configs _configs;

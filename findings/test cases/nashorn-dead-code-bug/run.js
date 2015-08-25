@@ -1,18 +1,14 @@
-var x;
+var x = "string";
+print(x);
 
-(function ()
-{
-	(function ()
-	{
+(function () {
+	(function () {
 		// print is undefined!
-		print("hello");
-		return x;
+		print(x);
 	})();
 
-	if (false)
-	{
-		(function ()
-		{
+	if (false) {
+		(function () {
 			var x;
 		})();
 	}
