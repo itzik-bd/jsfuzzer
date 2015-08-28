@@ -4,13 +4,13 @@ public class RunEngineResult
 {	
 	private String _stdout;
 	private String _stderr;
-	private boolean _timeoutExcided;
+	private boolean _timeoutExceeded;
 	private double _actualRuntime;
 	
-	public RunEngineResult(String stdout, String stderr, boolean timeoutExcided, double actualRuntime) {
+	public RunEngineResult(String stdout, String stderr, boolean timeoutExceeded, double actualRuntime) {
 		_stdout = normalizeLineFeed(stdout);
 		_stderr = normalizeLineFeed(stderr);
-		_timeoutExcided = timeoutExcided;
+		_timeoutExceeded = timeoutExceeded;
 		_actualRuntime = actualRuntime;
 	}
 	
@@ -22,8 +22,8 @@ public class RunEngineResult
 		return _stderr;
 	}
 	
-	public boolean isTimeExcided() {
-		return _timeoutExcided;
+	public boolean isTimeExceeded() {
+		return _timeoutExceeded;
 	}
 	
 	public double getActualRuntime() {

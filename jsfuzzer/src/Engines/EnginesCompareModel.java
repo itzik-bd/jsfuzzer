@@ -29,7 +29,7 @@ public class EnginesCompareModel
 		
 		// add result to the right map: timeout/pass/error
 		// (error <=> sderr is empty)
-		Map<String,RunEngineResult> map = result.isTimeExcided() ? timeout : (result.getStderr().equals("") ? passed : failed);
+		Map<String,RunEngineResult> map = result.isTimeExceeded() ? timeout : (result.getStderr().equals("") ? passed : failed);
 		map.put(platformName, result);
 		
 		// add result to equivalence class
