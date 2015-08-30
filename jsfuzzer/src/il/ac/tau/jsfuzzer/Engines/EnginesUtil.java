@@ -29,6 +29,10 @@ public class EnginesUtil
 			OutLog.printError(String.format("No engines were loaded", runEnginesFolder));
 			return null;
 		}
+		else
+		{
+			OutLog.printInfo(String.format("Loaded %d engines", enginesUtilsInstance._engineList.size()));
+		}
 		
 		return enginesUtilsInstance;
 	}

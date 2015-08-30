@@ -4,8 +4,9 @@ import java.io.File;
 
 public class SpiderMonkeyEngine extends AbstractEngine
 {
+	// no support for linux
 	public SpiderMonkeyEngine(File runEnginesFolder)
 	{
-		super("SpiderMonkey", "js.exe", runEnginesFolder);
+		super("SpiderMonkey", (IS_WINDOWS ? "js.exe" : null), runEnginesFolder);
 	}
 }

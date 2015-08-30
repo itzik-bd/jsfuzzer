@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractEngine
 {
+	protected final static boolean IS_WINDOWS = System.getProperty("os.name").contains("Windows"); 
 	private final String _engineName;
 	private final File _engineFolder; // = FilesIO.PROJECT_PATH + "resources/engines/";
 	
@@ -20,7 +21,7 @@ public abstract class AbstractEngine
 	{
 		_engineName = name;
 		_engineFolder = new File(runEnginesFolder, name);
-		_execFile = new File(_engineFolder, execFile);
+		_execFile = (execFile != null) ? new File(_engineFolder, execFile) : null;
 	}
 	
 	public String getEngineName()
@@ -49,7 +50,9 @@ public abstract class AbstractEngine
 		}
 		
 		// check that the executable exists
-		if (!_execFile.exists()) {
+		if (_execFile == null) {
+			return false;
+		} else if (!_execFile.exists()) {
 			OutLog.printError(String.format("%s: executable '%s' could not be found in engine's directory", _engineName, _execFile.getName()));
 			return false;
 		}

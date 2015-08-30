@@ -6,6 +6,6 @@ public class NodejsEngine extends AbstractEngine
 {	
 	public NodejsEngine(File runEnginesFolder)
 	{
-		super("NodeJs", "node.exe", runEnginesFolder);
+		super("NodeJs", (IS_WINDOWS ? "node.exe" : "node"), runEnginesFolder);
 	}
 }

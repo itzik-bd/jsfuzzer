@@ -22,6 +22,10 @@ public class FilesIO
 	public static void WriteToFile(File fileToWrite, String contents) throws IOException
 	{
 		Writer writer = null;
+		if (!fileToWrite.exists()) {
+			fileToWrite.getAbsoluteFile().getParentFile().mkdirs();
+			fileToWrite.createNewFile();
+		}
 		
 		try {
 			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite), "utf-8"));

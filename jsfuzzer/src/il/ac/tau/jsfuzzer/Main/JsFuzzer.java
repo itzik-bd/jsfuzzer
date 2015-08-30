@@ -19,12 +19,10 @@ public class JsFuzzer
 	
 	public static void main(String... args)
 	{
-		OutLog.printInfo(System.getProperty("os.name"));
-		
 		// parse arguments
 		JsFuzzerArgs parsedArgs = JsFuzzerArgs.parse(args);
 		
-		// check that no errors occured while parsing JsFuzzer arguments
+		// check that no errors occurred while parsing JsFuzzer arguments
 		if (parsedArgs != null)
 		{
 			// instantiate new fuzzer and run
