@@ -74,7 +74,7 @@ public class EnginesCompareModel
 	
 	public void removeLastExecutionEnginesOutput(final File file)
 	{
-		File[] myFiles = file.getParentFile().listFiles(new FilenameFilter() {
+		File[] myFiles = file.getAbsoluteFile().getParentFile().listFiles(new FilenameFilter() {
 		    public boolean accept(File currentDirectory, String currFile) {
 		        return (currFile.startsWith(file.getName()+".engines") && currFile.endsWith(".out"));
 		    }
@@ -90,9 +90,9 @@ public class EnginesCompareModel
 			
 	}
 	
-	private String generateEngineOutFileName(File file, List<String> engines)
+	private File generateEngineOutFileName(File file, List<String> engines)
 	{
-		return String.format("%s.engines.%s.out", file, String.join(".", engines));
+		return FilesIO.getExtendedFile(file, String.format(".engines.%s.out", String.join(".", engines)));
 	}
 	
 	public Map<String,String> getFailedErrors()

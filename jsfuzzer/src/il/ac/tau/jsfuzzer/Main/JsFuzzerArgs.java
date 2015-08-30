@@ -14,7 +14,7 @@ import org.json.simple.parser.ParseException;
 public class JsFuzzerArgs
 {
 	// var to hold js file path
-	private String _jsFile = null;
+	private File _jsFile = null;
 	
 	// vars for generating program
 	private boolean _isGenerate = true;
@@ -171,7 +171,7 @@ public class JsFuzzerArgs
 	
 	// -------- Getters
 	
-	public String jsFile() {
+	public File jsFile() {
 		return _jsFile;
 	}
 	
@@ -206,7 +206,7 @@ public class JsFuzzerArgs
 	// -------- Setters
 	
 	private void argumentOut(String outFile) {
-		_jsFile = outFile;
+		_jsFile = new File(outFile);
 		_isGenerate = true;
 	}
 	
@@ -229,7 +229,7 @@ public class JsFuzzerArgs
 	}
 	
 	private void argumentLoad(String loadFile) {
-		_jsFile  = loadFile;
+		_jsFile  = new File(loadFile);
 		_isGenerate = false; // no need to generate new program
 	}
 	

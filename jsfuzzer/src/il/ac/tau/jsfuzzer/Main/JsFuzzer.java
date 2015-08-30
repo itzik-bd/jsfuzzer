@@ -19,6 +19,8 @@ public class JsFuzzer
 	
 	public static void main(String... args)
 	{
+		OutLog.printInfo(System.getProperty("os.name"));
+		
 		// parse arguments
 		JsFuzzerArgs parsedArgs = JsFuzzerArgs.parse(args);
 		
@@ -54,10 +56,16 @@ public class JsFuzzer
 				boolean programFlag = true;
 				
 				// check whether to generate a new program
-				if (_args.isGenerate()) {
+				if (_args.isGenerate())
+				{
 					programFlag = generate();
-					OutLog.printSep();
-				}				
+				}
+				else if (!_args.jsFile().exists())
+				{
+					OutLog.printError(String.format("Could not load javascript file %s", _args.jsFile().getPath()));
+					programFlag = false;
+				}
+				OutLog.printSep();
 				
 				// run js program over engines if user asked for it
 				if (programFlag && _args.runEnginesFolder() != null) {
@@ -77,7 +85,7 @@ public class JsFuzzer
 		EnginesUtil engines = EnginesUtil.create(_args.runEnginesFolder());
 		OutLog.printSep();
 		if (engines != null) {
-			engines.compare(new File(_args.jsFile()), _args.runTimeout());
+			engines.compare(_args.jsFile(), _args.runTimeout());
 		}
 	}
 
@@ -100,16 +108,18 @@ public class JsFuzzer
 			OutLog.printInfo(String.format("New random program was successfully generated (%.2f Kb)", sizeKb));
 			
 			// save program as Javascript file
-			il.ac.tau.jsfuzzer.Utils.FilesIO.WriteToFile(_args.jsFile(), jsProgram);
-			OutLog.printInfo(String.format("The generated program was successfully saved to '%s'", _args.jsFile()));
+			FilesIO.WriteToFile(_args.jsFile(), jsProgram);
+			OutLog.printInfo(String.format("The generated program was successfully saved to '%s'", _args.jsFile().getPath()));
 			
 			// save verbose to file
-			il.ac.tau.jsfuzzer.Utils.FilesIO.WriteToFile(_args.jsFile()+".verbose", jsVerbose);
-			OutLog.printInfo(String.format("The verbose was successfully saved to '%s'", _args.jsFile()+".verbose"));
+			File verboseFile = FilesIO.getExtendedFile(_args.jsFile(), ".verbose");
+			FilesIO.WriteToFile(verboseFile, jsVerbose);
+			OutLog.printInfo(String.format("The verbose was successfully saved to '%s'", verboseFile.getPath()));
 			
 			// save tree to file
-			il.ac.tau.jsfuzzer.Utils.FilesIO.WriteToFile(_args.jsFile()+".tree", jsTree);
-			OutLog.printInfo(String.format("The program tree was successfully saved to '%s'", _args.jsFile()+".tree"));
+			File treeFile = FilesIO.getExtendedFile(_args.jsFile(), ".tree");
+			FilesIO.WriteToFile(treeFile, jsTree);
+			OutLog.printInfo(String.format("The program tree was successfully saved to '%s'", treeFile.getPath()));
 			
 			// make sure that verbose and tree are identical
 			if (!jsTree.equals(jsVerbose)) {
@@ -119,10 +129,10 @@ public class JsFuzzer
 			// create browser launcher
 			try
 			{
-				String jsFilename = new File(_args.jsFile()).getName();
-				String launcherCode = FilesIO.getSnippet("browserLauncher").replace("{FILENAME}", jsFilename);
-				il.ac.tau.jsfuzzer.Utils.FilesIO.WriteToFile(_args.jsFile()+".html", launcherCode);
-				OutLog.printInfo(String.format("Created launcher for js file '%s'", _args.jsFile()+".html"));
+				String launcherCode = FilesIO.getSnippet("browserLauncher").replace("{FILENAME}", _args.jsFile().getName());
+				File launcherFile = FilesIO.getExtendedFile(_args.jsFile(), ".html");
+				il.ac.tau.jsfuzzer.Utils.FilesIO.WriteToFile(launcherFile, launcherCode);
+				OutLog.printInfo(String.format("Created launcher for js file '%s'", launcherFile.getPath()));
 			}
 			catch (IOException e) { OutLog.printError("Could not create browser launcher"); }
 		}

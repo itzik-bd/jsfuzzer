@@ -1,7 +1,6 @@
 jsfuzze/bin/
 jsfuzzer/doc/
 jsfuzzer/tests/
-jsfuzzer/dist/
 jsfuzzer/tmp/
 
 *.class

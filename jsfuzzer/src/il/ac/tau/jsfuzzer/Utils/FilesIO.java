@@ -2,6 +2,7 @@ package il.ac.tau.jsfuzzer.Utils;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -18,12 +19,12 @@ public class FilesIO
 {
 	public static final String PROJECT_PATH = FilesIO.class.getProtectionDomain().getCodeSource().getLocation().toString().substring(6) + "../";
 	
-	public static void WriteToFile(String path, String contents) throws IOException
+	public static void WriteToFile(File fileToWrite, String contents) throws IOException
 	{
 		Writer writer = null;
 		
 		try {
-			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path), "utf-8"));
+			writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(fileToWrite), "utf-8"));
 			writer.write(contents);
 		} finally {
 			if (writer != null) {
@@ -89,5 +90,10 @@ public class FilesIO
 			catch (FileNotFoundException e) { OutLog.printError(String.format("Could not found resource %s", resource)); }
 		}
 		return res;
+	}
+	
+	public static File getExtendedFile(File currentFile, String extension)
+	{
+		return new File(currentFile.getAbsoluteFile().getParentFile(), currentFile.getName()+extension);
 	}
 }
