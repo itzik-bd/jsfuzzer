@@ -156,17 +156,17 @@ public class JsFuzzerArgs
 	{
 		return "JsFuzzer version " + JsFuzzerConfigs.getVersion() + "\n\n"
 				+ "usage: JsFuzzer [OPTIONS]\n"
-				+ "--help           - show this help\n\n"
+				+ "--help            - show this help\n\n"
 				+ "To generate new program:\n"
-				+ "--out <FILE>     - save output to file\n"
-				+ "--config <FILE>  - load costum configuration file\n"
-				+ "--seed <SEED>    - set the seed of the random generator\n"
-				+ "--execFlow <normal | extensive> - set the javascript execution print level\n\n"
-				+ "To use a javascript file:\n"
-				+ "--load <FILE>    - load javascript file\n\n"
+				+ "--out <FILE>      - save output to file\n"
+				+ "--config <FILE>   - load costum configuration file\n"
+				+ "--seed <SEED>     - set the seed of the random generator\n"
+				+ "--execFlow <TYPE> - set the javascript execution print level (values: 'normal' or 'extensive')\n\n"
+				+ "To use an existing javascript file:\n"
+				+ "--load <FILE>     - load javascript file\n\n"
 				+ "To compare over supported engines:\n"
-				+ "--run <ENGINES FOLDER> - runs generated program over engines, path to engines folder\n"
-				+ "--timeout <MS>   - limit each javascript engine total runtime (milliseconds)\n";
+				+ "--run <FOLDER>    - runs generated program over engines (path to engines folder)\n"
+				+ "--timeout <MS>    - limit each javascript engine total runtime (milliseconds, default=8000)\n";
 	}
 	
 	// -------- Getters

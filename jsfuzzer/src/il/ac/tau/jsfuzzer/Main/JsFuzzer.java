@@ -22,6 +22,12 @@ public class JsFuzzer
 		// parse arguments
 		JsFuzzerArgs parsedArgs = JsFuzzerArgs.parse(args);
 		
+		// print help if help flag was up or no js file was supplied
+		if (parsedArgs.showHelpAndExit() || parsedArgs.jsFile() == null) {
+			System.out.println(JsFuzzerArgs.getUsageString());
+			return;
+		}
+		
 		// check that no errors occurred while parsing JsFuzzer arguments
 		if (parsedArgs != null)
 		{
@@ -29,9 +35,8 @@ public class JsFuzzer
 			OutLog.printSep();
 			JsFuzzer fuzzer = new JsFuzzer(parsedArgs);
 			fuzzer.run();
+			OutLog.printInfo("Bye!");
 		}
-		
-		OutLog.printInfo("Bye!");
 	}
 	
 	public JsFuzzer(JsFuzzerArgs args) {
@@ -40,12 +45,6 @@ public class JsFuzzer
 	
 	private void run()
 	{
-		// print help if help flag was up or no js file was supplied
-		if (_args.showHelpAndExit() || _args.jsFile() == null) {
-			System.out.println(JsFuzzerArgs.getUsageString());
-			return;
-		}
-		
 		// run JsFuuzer and measure total runtime
 		TimerRunner<Void> worker = new TimerRunner<Void>()
 		{

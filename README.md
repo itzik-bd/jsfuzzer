@@ -1,4 +1,4 @@
-# JsFuzzer Using Instructions
+# JsFuzzer
 
 Pre Requirements
 ----
@@ -8,7 +8,7 @@ Platforms
 ----
 **JsFuzzer** can compare JavaScript execution over different engines automatically.
 In order to run JavaScript programs over an engine, an engine's executable has to be provided.
-JsFuzzer has out-of-the-box support for the following engines and platforms:
+**JsFuzzer** has out-of-the-box support for the following engines and platforms:
 
 |Platform|SpiderMonkey|NodeJs|Nashorn|Rhino|Dynjs|
 |---|:---:|:---:|:---:|:---:|:---:|
@@ -33,7 +33,7 @@ To install __JsFuzzer__:
 
 Running JsFuzzer
 ----
-Running __JsFuzzer__ is via CLI, open a terminal/CMD and ```cd``` to the directory of which the files were unzipped into.
+__JsFuzzer__ is a command-line tool: open a terminal/CMD and ```cd``` to the directory of which the files were unzipped into.
 Running __JsFuzzer__ with no arguments ```java -jar jsfuzzer.zip``` prints usage information:
 ```
 JsFuzzer version 1.0
