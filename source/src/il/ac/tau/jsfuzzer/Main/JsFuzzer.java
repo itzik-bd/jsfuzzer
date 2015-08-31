@@ -22,20 +22,21 @@ public class JsFuzzer
 		// parse arguments
 		JsFuzzerArgs parsedArgs = JsFuzzerArgs.parse(args);
 		
-		// print help if help flag was up or no js file was supplied
-		if (parsedArgs.showHelpAndExit() || parsedArgs.jsFile() == null) {
-			System.out.println(JsFuzzerArgs.getUsageString());
-			return;
-		}
-		
 		// check that no errors occurred while parsing JsFuzzer arguments
 		if (parsedArgs != null)
 		{
+			// print help if help flag was up or no js file was supplied
+			if (parsedArgs.showHelpAndExit() || parsedArgs.jsFile() == null) {
+				System.out.println(JsFuzzerArgs.getUsageString());
+				return;
+			}
+			
 			// instantiate new fuzzer and run
 			OutLog.printSep();
 			JsFuzzer fuzzer = new JsFuzzer(parsedArgs);
 			fuzzer.run();
 			OutLog.printInfo("Bye!");
+			OutLog.printNewLine();
 		}
 	}
 	

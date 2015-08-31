@@ -1,7 +1,0 @@
-{
-	"out": "tests\/eeee.js",
-	"seed": "1438170389728",
-	"run": true,
-	"execFlow": "extensive",
-	"timeout": "1000"
-}

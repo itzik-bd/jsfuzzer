@@ -46,4 +46,8 @@ public class OutLog
 	public static void printSep() {
 		System.out.println();		
 	}
+
+	public static void printNewLine() {
+		System.out.println();		
+	}
 }
