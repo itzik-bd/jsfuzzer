@@ -1,8 +1,0 @@
-<html>
-	<head>
-		<title>JSFuzzer - {FILENAME}</title>
-		<script type="text/javascript" src="{FILENAME}"></script>
-	</head>
-	<body>
-	</body>
-</html>

@@ -1,0 +1,810 @@
+  0Program
+  1 VarDecleration
+  2  VarDeclerator
+  3   Identifier (v1)
+  1 Call
+  2  FunctionExp
+  3   Identifier (v1)
+  3   Identifier (v2)
+  3   Identifier (v3)
+  3   StatementsBlock
+  4    Call
+  5     FunctionExp
+  6      Identifier (v2)
+  6      Identifier (v4)
+  6      StatementsBlock
+  7       Return
+  7       CompoundAssignment (DIVIDE)
+  8        Identifier (v4)
+  8        Literal (NaN)
+  7       Assignment
+  8        Identifier (v1)
+  8        Identifier (v3)
+  7       DoWhile
+  8        Literal (NaN)
+  8        StatementsBlock
+  9         Call
+ 10          FunctionExp
+ 11           Identifier (v5)
+ 11           Identifier (v3)
+ 11           StatementsBlock
+ 12            VarDecleration
+ 13             VarDeclerator
+ 14              Identifier (v6)
+ 14              Identifier (v3)
+ 13             VarDeclerator
+ 14              Identifier (v7)
+ 14              Identifier (v6)
+ 12            Assignment
+ 13             Identifier (v2)
+ 13             Identifier (v5)
+ 10          This
+ 10          Identifier (v1)
+  9         Call
+ 10          FunctionExp
+ 11           Identifier (v8)
+ 11           Identifier (v9)
+ 11           StatementsBlock
+ 12            CompoundAssignment (MULTIPLY)
+ 13             Identifier (v3)
+ 13             Identifier (v2)
+ 10          OperationExp (multiplication)
+ 11           Identifier (v1)
+ 11           This
+ 10          Identifier (v2)
+  7       Assignment
+  8        Identifier (v2)
+  8        Literal (true)
+  7       Assignment
+  8        Identifier (v1)
+  8        Literal (undefined)
+  5     Identifier (v2)
+  5     Literal (Infinity)
+  4    VarDecleration
+  5     VarDeclerator
+  6      Identifier (v10)
+  6      OperationExp (bitwise and)
+  7       Identifier (v1)
+  7       Identifier (v1)
+  2  Identifier (v1)
+  2  Identifier (v1)
+  2  Identifier (v1)
+  1 Assignment
+  2  Identifier (v1)
+  2  LiteralNumber (66)
+  1 VarDecleration
+  2  VarDeclerator
+  3   Identifier (v11)
+  3   Literal (NaN)
+  2  VarDeclerator
+  3   Identifier (v12)
+  3   Call
+  4    FunctionExp
+  5     Identifier (v1)
+  5     Identifier (v13)
+  5     Identifier (v14)
+  5     Identifier (v15)
+  5     StatementsBlock
+  6      VarDecleration
+  7       VarDeclerator
+  8        Identifier (v16)
+  6      Assignment
+  7       Identifier (v1)
+  7       Identifier (v1)
+  6      VarDecleration
+  7       VarDeclerator
+  8        Identifier (v17)
+  8        Literal (undefined)
+  4    Identifier (v11)
+  4    Literal (undefined)
+  4    Identifier (v12)
+  4    LiteralString
+  1 If
+  2  LiteralNumber (5876)
+  2  StatementsBlock
+  3   Assignment
+  4    Identifier (v12)
+  4    OperationExp (division)
+  5     Identifier (v12)
+  5     This
+  3   Assignment
+  4    Identifier (v11)
+  4    Identifier (v1)
+  3   Call
+  4    FunctionExp
+  5     Identifier (v18)
+  5     Identifier (v19)
+  5     Identifier (v1)
+  5     StatementsBlock
+  6      Assignment
+  7       Identifier (v18)
+  7       Identifier (v1)
+  6      Assignment
+  7       Identifier (v18)
+  7       Identifier (v11)
+  4    OperationExp (zero-fill right shift)
+  5     OperationExp (logical and)
+  6      Identifier (v11)
+  6      Literal (false)
+  5     LiteralNumber (397)
+  4    Identifier (v1)
+  4    This
+  3   While
+  4    Literal (undefined)
+  4    StatementsBlock
+  5     CompoundAssignment (SHIFTRIGHT)
+  6      Identifier (v1)
+  6      Identifier (v1)
+  1 If
+  2  Identifier (v1)
+  2  StatementsBlock
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v20)
+  4    VarDeclerator
+  5     Identifier (v21)
+  5     Identifier (v11)
+  4    VarDeclerator
+  5     Identifier (v22)
+  3   If
+  4    This
+  4    StatementsBlock
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v23)
+  7       Identifier (v23)
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v24)
+  6      VarDeclerator
+  7       Identifier (v25)
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v26)
+  7       Literal (NaN)
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v27)
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v28)
+  7       Identifier (v27)
+  5     CompoundAssignment (MULTIPLY)
+  6      Identifier (v25)
+  6      Identifier (v25)
+  5     Call
+  6      FunctionExp
+  7       Identifier (v22)
+  7       Identifier (v29)
+  7       Identifier (v30)
+  7       StatementsBlock
+  8        VarDecleration
+  9         VarDeclerator
+ 10          Identifier (v31)
+ 10          Identifier (v30)
+  9         VarDeclerator
+ 10          Identifier (v32)
+  8        Assignment
+  9         Identifier (v26)
+  9         Identifier (v12)
+  6      OperationExp (zero-fill right shift)
+  7       OperationExp (addition)
+  8        Literal (false)
+  8        Identifier (v21)
+  7       Identifier (v26)
+  6      Literal (NaN)
+  6      Identifier (v23)
+  4    StatementsBlock
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v33)
+  7       Identifier (v22)
+  6      VarDeclerator
+  7       Identifier (v34)
+  6      VarDeclerator
+  7       Identifier (v35)
+  7       OperationExp (equality + type)
+  8        Literal (undefined)
+  8        Identifier (v35)
+  6      VarDeclerator
+  7       Identifier (v36)
+  7       Identifier (v21)
+  6      VarDeclerator
+  7       Identifier (v37)
+  6      VarDeclerator
+  7       Identifier (v38)
+  6      VarDeclerator
+  7       Identifier (v39)
+  5     CompoundAssignment (BITOR)
+  6      Identifier (v22)
+  6      Identifier (v25)
+  5     Assignment
+  6      Identifier (v35)
+  6      LiteralNumber (4495)
+  5     Call
+  6      FunctionExp
+  7       Identifier (v40)
+  7       Identifier (v39)
+  7       Identifier (v41)
+  7       Identifier (v34)
+  7       Identifier (v27)
+  7       StatementsBlock
+  8        CompoundAssignment (SHIFTRIGHTZERO)
+  9         Identifier (v22)
+  9         Identifier (v12)
+  8        Call
+  9         FunctionExp
+ 10          Identifier (v42)
+ 10          StatementsBlock
+ 11           Call
+ 12            FunctionExp
+ 13             Identifier (v43)
+ 13             StatementsBlock
+ 14              Assignment
+ 15               Identifier (v34)
+ 15               Identifier (v23)
+ 12            Identifier (v24)
+  9         Identifier (v34)
+  6      Literal (false)
+  6      Call
+  7       FunctionExp
+  8        Identifier (v26)
+  8        Identifier (v44)
+  8        Identifier (v45)
+  8        Identifier (v35)
+  8        Identifier (v46)
+  8        Identifier (v47)
+  8        StatementsBlock
+  9         VarDecleration
+ 10          VarDeclerator
+ 11           Identifier (v48)
+ 10          VarDeclerator
+ 11           Identifier (v49)
+ 11           Identifier (v12)
+ 10          VarDeclerator
+ 11           Identifier (v50)
+  9         VarDecleration
+ 10          VarDeclerator
+ 11           Identifier (v51)
+ 10          VarDeclerator
+ 11           Identifier (v52)
+  7       Identifier (v37)
+  7       Identifier (v21)
+  7       LiteralString
+  7       Identifier (v28)
+  7       Identifier (v37)
+  7       Identifier (v37)
+  6      Identifier (v23)
+  6      OperationExp (inequality or different type)
+  7       OperationExp (less than)
+  8        LiteralNumber (4)
+  8        LiteralString
+  7       Identifier (v26)
+  6      Literal (Infinity)
+  5     Assignment
+  6      Identifier (v21)
+  6      Literal (false)
+  2  StatementsBlock
+  3   Assignment
+  4    Identifier (v37)
+  4    Call
+  5     FunctionExp
+  6      Identifier (v28)
+  6      Identifier (v53)
+  6      Identifier (v39)
+  6      StatementsBlock
+  7       Return
+  8        Identifier (v11)
+  5     Identifier (v38)
+  5     Identifier (v26)
+  5     Identifier (v22)
+  3   ForEach
+  4    ArrayExp
+  5     Identifier (v12)
+  5     This
+  4    VarDecleration
+  5     VarDeclerator
+  6      Identifier (v54)
+  4    StatementsBlock
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v55)
+  6      VarDeclerator
+  7       Identifier (v56)
+  6      VarDeclerator
+  7       Identifier (v57)
+  7       Identifier (v36)
+  3   If
+  4    Call
+  5     FunctionExp
+  6      Identifier (v39)
+  6      Identifier (v58)
+  6      Identifier (v36)
+  6      Identifier (v59)
+  6      StatementsBlock
+  7       Return
+  8        Identifier (v36)
+  7       VarDecleration
+  8        VarDeclerator
+  9         Identifier (v60)
+  7       Call
+  8        FunctionExp
+  9         Identifier (v61)
+  9         Identifier (v62)
+  9         StatementsBlock
+ 10          Call
+ 11           FunctionExp
+ 12            Identifier (v63)
+ 12            StatementsBlock
+ 13             Assignment
+ 14              Identifier (v22)
+ 14              Literal (true)
+ 11           Identifier (v36)
+ 10          Call
+ 11           FunctionExp
+ 12            Identifier (v64)
+ 12            Identifier (v27)
+ 12            StatementsBlock
+ 13             CompoundAssignment (PLUS)
+ 14              Identifier (v57)
+ 14              Identifier (v64)
+ 11           Identifier (v28)
+ 11           Identifier (v23)
+  8        Literal (null)
+  8        Literal (null)
+  7       Return
+  8        Identifier (v34)
+  7       VarDecleration
+  8        VarDeclerator
+  9         Identifier (v65)
+  8        VarDeclerator
+  9         Identifier (v66)
+  8        VarDeclerator
+  9         Identifier (v67)
+  9         Identifier (v38)
+  7       Call
+  8        FunctionExp
+  9         Identifier (v54)
+  9         Identifier (v68)
+  9         Identifier (v69)
+  9         Identifier (v57)
+  9         Identifier (v70)
+  9         Identifier (v71)
+  9         Identifier (v72)
+  9         Identifier (v22)
+  9         Identifier (v58)
+  9         Identifier (v35)
+  9         Identifier (v73)
+  9         Identifier (v27)
+  9         StatementsBlock
+ 10          VarDecleration
+ 11           VarDeclerator
+ 12            Identifier (v74)
+ 11           VarDeclerator
+ 12            Identifier (v75)
+ 11           VarDeclerator
+ 12            Identifier (v76)
+ 11           VarDeclerator
+ 12            Identifier (v77)
+ 10          Call
+ 11           FunctionExp
+ 12            Identifier (v35)
+ 12            Identifier (v58)
+ 12            Identifier (v22)
+ 12            StatementsBlock
+ 13             VarDecleration
+ 14              VarDeclerator
+ 15               Identifier (v78)
+ 15               Literal (false)
+ 14              VarDeclerator
+ 15               Identifier (v79)
+ 14              VarDeclerator
+ 15               Identifier (v80)
+ 15               Identifier (v78)
+ 14              VarDeclerator
+ 15               Identifier (v81)
+ 15               Literal (Infinity)
+ 11           Identifier (v34)
+ 11           LiteralString
+ 11           Literal (true)
+  8        Identifier (v25)
+  8        OperationExp (conditional operation)
+  9         Identifier (v54)
+  9         Identifier (v21)
+  9         Literal (NaN)
+  8        OperationExp (multiplication)
+  9         Identifier (v60)
+  9         Identifier (v27)
+  8        Literal (false)
+  8        Literal (NaN)
+  8        Identifier (v23)
+  8        Literal (undefined)
+  8        Identifier (v24)
+  8        Identifier (v24)
+  8        This
+  8        Literal (undefined)
+  8        Identifier (v12)
+  5     Identifier (v39)
+  5     Identifier (v12)
+  5     OperationExp (greater than)
+  6      Identifier (v33)
+  6      Identifier (v20)
+  5     Identifier (v36)
+  4    StatementsBlock
+  5     FunctionDef
+  6      Identifier (f1)
+  6      Identifier (v82)
+  6      Identifier (v55)
+  6      Identifier (v83)
+  6      StatementsBlock
+  7       Assignment
+  8        Identifier (v55)
+  8        LiteralString
+  7       Assignment
+  8        Identifier (v37)
+  8        Literal (null)
+  4    StatementsBlock
+  5     Switch
+  6      Identifier (v25)
+  6      CaseBlock
+  7       Case
+  8        Identifier (v36)
+  7       Case
+  8        Literal (false)
+  7       Case
+  8        Literal (false)
+  7       StatementsBlock
+  8        Call
+  9         Identifier (f1)
+  9         Literal (NaN)
+  9         Identifier (v35)
+  9         LiteralNumber (355)
+  8        ForEach
+  9         ArrayExp
+ 10          LiteralNumber (66346)
+ 10          Identifier (v25)
+ 10          Identifier (v39)
+  9         VarDecleration
+ 10          VarDeclerator
+ 11           Identifier (v84)
+  9         StatementsBlock
+ 10          Call
+ 11           Identifier (f1)
+ 11           Identifier (v37)
+ 11           Identifier (v25)
+ 11           Identifier (v21)
+ 10          CompoundAssignment (MINUS)
+ 11           Identifier (v24)
+ 11           Literal (Infinity)
+  5     Assignment
+  6      Identifier (v35)
+  6      Identifier (v21)
+  5     Call
+  6      Identifier (f1)
+  6      Call
+  7       FunctionExp
+  8        Identifier (v55)
+  8        Identifier (v85)
+  8        Identifier (v86)
+  8        Identifier (v22)
+  8        Identifier (v26)
+  8        Identifier (v87)
+  8        StatementsBlock
+  9         CompoundAssignment (MULTIPLY)
+ 10          Identifier (v25)
+ 10          Identifier (v84)
+  9         Call
+ 10          Identifier (f1)
+ 10          Identifier (v1)
+ 10          Identifier (v55)
+ 10          LiteralString
+  7       Identifier (v20)
+  7       Literal (undefined)
+  7       LiteralNumber (31)
+  7       Identifier (v27)
+  7       Identifier (v54)
+  7       Literal (undefined)
+  6      Identifier (v28)
+  6      LiteralString
+  3   Assignment
+  4    Identifier (v22)
+  4    OperationExp (minus minus)
+  5     Identifier (v54)
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v88)
+  5     Identifier (v36)
+  4    VarDeclerator
+  5     Identifier (v89)
+  5     This
+  4    VarDeclerator
+  5     Identifier (v90)
+  5     Literal (false)
+  4    VarDeclerator
+  5     Identifier (v91)
+  4    VarDeclerator
+  5     Identifier (v92)
+  5     Identifier (v1)
+  4    VarDeclerator
+  5     Identifier (v93)
+  5     Identifier (v54)
+  3   While
+  4    Identifier (v11)
+  4    StatementsBlock
+  5     VarDecleration
+  6      VarDeclerator
+  7       Identifier (v94)
+  6      VarDeclerator
+  7       Identifier (v95)
+  6      VarDeclerator
+  7       Identifier (v96)
+  6      VarDeclerator
+  7       Identifier (v97)
+  7       Identifier (v91)
+  6      VarDeclerator
+  7       Identifier (v98)
+  7       Identifier (v1)
+  6      VarDeclerator
+  7       Identifier (v99)
+  7       Identifier (v84)
+  6      VarDeclerator
+  7       Identifier (v100)
+  7       OperationExp (unary subtraction)
+  8        Identifier (v54)
+  6      VarDeclerator
+  7       Identifier (v101)
+  7       LiteralString
+  6      VarDeclerator
+  7       Identifier (v102)
+  6      VarDeclerator
+  7       Identifier (v103)
+  3   Call
+  4    Identifier (f1)
+  4    Identifier (v96)
+  4    Identifier (v94)
+  4    Literal (undefined)
+  1 DoWhile
+  2  LiteralString
+  2  StatementsBlock
+  3   Call
+  4    Identifier (f1)
+  4    Literal (undefined)
+  4    Identifier (v56)
+  4    This
+  1 Assignment
+  2  Identifier (v91)
+  2  Literal (false)
+  1 Assignment
+  2  Identifier (v33)
+  2  OperationExp (type of)
+  3   Identifier (v26)
+  1 VarDecleration
+  2  VarDeclerator
+  3   Identifier (v104)
+  1 FunctionDef
+  2  Identifier (f2)
+  2  Identifier (v103)
+  2  Identifier (v55)
+  2  Identifier (v105)
+  2  StatementsBlock
+  3   Call
+  4    Identifier (f1)
+  4    This
+  4    OperationExp (multiplication)
+  5     Identifier (v103)
+  5     Literal (undefined)
+  4    Call
+  5     Identifier (f1)
+  5     Literal (false)
+  5     This
+  5     Identifier (v12)
+  3   Return
+  4    This
+  1 Assignment
+  2  Identifier (v90)
+  2  OperationExp (minus minus)
+  3   Identifier (v11)
+  1 Assignment
+  2  Identifier (v93)
+  2  Identifier (v38)
+  1 VarDecleration
+  2  VarDeclerator
+  3   Identifier (v106)
+  1 Assignment
+  2  Identifier (v101)
+  2  OperationExp (addition)
+  3   OperationExp (equality)
+  4    OperationExp (division)
+  5     This
+  5     Identifier (v103)
+  4    Identifier (v27)
+  3   This
+  1 DoWhile
+  2  Identifier (v95)
+  2  StatementsBlock
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v107)
+  5     Identifier (v57)
+  4    VarDeclerator
+  5     Identifier (v108)
+  4    VarDeclerator
+  5     Identifier (v109)
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v110)
+  5     Identifier (v1)
+  3   FunctionDef
+  4    Identifier (f3)
+  4    Identifier (v93)
+  4    Identifier (v111)
+  4    Identifier (v110)
+  4    Identifier (v112)
+  4    Identifier (v113)
+  4    Identifier (v33)
+  4    Identifier (v97)
+  4    Identifier (v99)
+  4    Identifier (v114)
+  4    Identifier (v90)
+  4    Identifier (v115)
+  4    Identifier (v57)
+  4    Identifier (v116)
+  4    Identifier (v117)
+  4    Identifier (v109)
+  4    Identifier (v118)
+  4    StatementsBlock
+  5     Call
+  6      Identifier (f2)
+  6      Identifier (v33)
+  6      Identifier (v39)
+  6      Literal (null)
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v119)
+  4    VarDeclerator
+  5     Identifier (v120)
+  5     Identifier (v12)
+  4    VarDeclerator
+  5     Identifier (v121)
+  4    VarDeclerator
+  5     Identifier (v122)
+  5     Identifier (v84)
+  4    VarDeclerator
+  5     Identifier (v123)
+  4    VarDeclerator
+  5     Identifier (v124)
+  4    VarDeclerator
+  5     Identifier (v125)
+  5     Literal (null)
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v126)
+  4    VarDeclerator
+  5     Identifier (v127)
+  1 VarDecleration
+  2  VarDeclerator
+  3   Identifier (v128)
+  1 If
+  2  OperationExp (plus plus)
+  3   Identifier (v21)
+  2  StatementsBlock
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v129)
+  5     Call
+  6      Identifier (f2)
+  6      Identifier (v92)
+  6      Identifier (v26)
+  6      Identifier (v93)
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v130)
+  4    VarDeclerator
+  5     Identifier (v131)
+  4    VarDeclerator
+  5     Identifier (v132)
+  4    VarDeclerator
+  5     Identifier (v133)
+  5     Call
+  6      Identifier (f1)
+  6      Identifier (v101)
+  6      Identifier (v33)
+  6      Literal (NaN)
+  3   VarDecleration
+  4    VarDeclerator
+  5     Identifier (v134)
+  5     Call
+  6      Identifier (f3)
+  6      Literal (NaN)
+  6      LiteralNumber (8648)
+  6      Identifier (v20)
+  6      Identifier (v95)
+  6      Identifier (v125)
+  6      Literal (null)
+  6      Identifier (v36)
+  6      Identifier (v132)
+  6      Identifier (v130)
+  6      Identifier (v88)
+  6      Identifier (v126)
+  6      Identifier (v25)
+  6      LiteralNumber (1)
+  6      Identifier (v54)
+  6      Identifier (v100)
+  6      Identifier (v102)
+  2  StatementsBlock
+  3   Assignment
+  4    Identifier (v122)
+  4    Literal (true)
+  3   Call
+  4    FunctionExp
+  5     Identifier (v126)
+  5     StatementsBlock
+  6      Assignment
+  7       Identifier (v91)
+  7       Identifier (v95)
+  6      While
+  7       Literal (Infinity)
+  7       StatementsBlock
+  8        VarDecleration
+  9         VarDeclerator
+ 10          Identifier (v135)
+  9         VarDeclerator
+ 10          Identifier (v136)
+ 10          Identifier (v126)
+  9         VarDeclerator
+ 10          Identifier (v137)
+ 10          Literal (null)
+  9         VarDeclerator
+ 10          Identifier (v138)
+  9         VarDeclerator
+ 10          Identifier (v139)
+ 10          This
+  8        VarDecleration
+  9         VarDeclerator
+ 10          Identifier (v140)
+ 10          Identifier (v121)
+  9         VarDeclerator
+ 10          Identifier (v141)
+ 10          LiteralNumber (16177412)
+  9         VarDeclerator
+ 10          Identifier (v142)
+  6      Assignment
+  7       Identifier (v37)
+  7       Identifier (v124)
+  4    Identifier (v24)
+  1 If
+  2  OperationExp (subtraction)
+  3   Identifier (v95)
+  3   Literal (null)
+  2  StatementsBlock
+  3   Assignment
+  4    Identifier (v120)
+  4    Identifier (v12)
+  3   Assignment
+  4    Identifier (v109)
+  4    Call
+  5     Identifier (f1)
+  5     Identifier (v98)
+  5     Identifier (v91)
+  5     Identifier (v35)
+  1 VarDecleration
+  2  VarDeclerator
+  3   Identifier (v143)
+  3   Identifier (v21)
+  2  VarDeclerator
+  3   Identifier (v144)
+  2  VarDeclerator
+  3   Identifier (v145)
+  3   OperationExp (bitwise or)
+  4    Identifier (v104)
+  4    Identifier (v11)
+  2  VarDeclerator
+  3   Identifier (v146)
+  3   Identifier (v11)
+  2  VarDeclerator
+  3   Identifier (v147)
+  3   Identifier (v28)
+  2  VarDeclerator
+  3   Identifier (v148)
+  2  VarDeclerator
+  3   Identifier (v149)

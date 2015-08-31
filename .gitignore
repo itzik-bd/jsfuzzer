@@ -1,7 +1,7 @@
-jsfuzzer/bin/
-jsfuzzer/doc/
-jsfuzzer/tests/
-jsfuzzer/tmp/
-jsfuzzer/dist/
+source/bin/
+source/doc/
+source/tests/
+source/tmp/
+source/dist/
 
 *.class

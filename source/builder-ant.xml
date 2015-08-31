@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="JsFuzzer" default="make-jar" basedir=".">
+
+	<!-- makejar -->
+	<target name="make-jar" description="Create a jar for jsfuzzer project">
+		<jar jarfile="dist/jsfuzzer.jar">
+			<fileset dir="bin" />
+			<zipgroupfileset  dir="." includes="lib/**" />
+			<fileset dir="." includes="resources/**" />
+			<manifest>
+				<attribute name="Class-Path" value="lib/commons-lang3-3.4.jar lib/json-simple-1.1.1.jar"/>
+				<attribute name="Main-Class" value="il.ac.tau.jsfuzzer.Main.JsFuzzer"/>
+			</manifest>
+		</jar>
+	</target>
+
+	<!-- build-release -->
+	<target name="build-release" depends="make-jar" description="Create a complete build zip for jsfuzzer project">
+		<zip destfile="../releases/jsfuzzer.dist.zip">
+			<zipfileset dir=".." includes="engines/**" />
+			<zipfileset dir="dist" includes="jsfuzzer.jar" />
+			<zipfileset dir="python" includes="jsfuzzerBulk.py" />
+		</zip>
+	</target>
+</project>

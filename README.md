@@ -22,7 +22,7 @@ Installation
 __JsFuzzer__ distribution zip file contains the following files:
 * ___engines/___ - directory contains each engine's executable files
 * ___jsfuzzer.jar___ - the java executable compiled jar
-* ___JsFuzzerBulk.py___ - python script to run jsfuzzer in bulk mode
+* ___jsfuzzerBulk.py___ - python script to run jsfuzzer in bulk mode
 
 To install __JsFuzzer__:
 
