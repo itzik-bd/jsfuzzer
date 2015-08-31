@@ -9,11 +9,13 @@ Platforms
 **JsFuzzer** can compare JavaScript execution over different engines automatically.
 In order to run JavaScript programs over an engine, an engine's executable has to be provided.
 JsFuzzer has out-of-the-box support for the following engines and platforms:
-| Platform | SpiderMonkey | NodeJs | Nashorn | Rhino | Dynjs |
-| --- | :---: | :---: | :---: | :---: | :---: |
-| Windows 64-bit | V | V | V | V | V |
-| Linux 64-bit |  | V | V | V | V |
-In order to be able to run JsFuzzer on other platforms, an engine executable has to be provided as well as a new java class representing this engine.
+
+|Platform|SpiderMonkey|NodeJs|Nashorn|Rhino|Dynjs|
+|---|:---:|:---:|:---:|:---:|:---:|
+|Windows 64-bit|V|V|V|V|V|
+|Linux 64-bit||V|V|V|V|
+
+In order to be able to run **JsFuzzer** on other platforms, an engine executable has to be provided as well as a new java class representing this engine.
 
 Installation
 ----
@@ -23,6 +25,7 @@ __JsFuzzer__ distribution zip file contains the following files:
 * ___JsFuzzerBulk.py___ - python script to run jsfuzzer in bulk mode
 
 To install __JsFuzzer__:
+
 1. Unzip these files into a directory.
 2. ***Linux only***: Add execution premissions for each engine's executable file:
     * engines/Nashorn/jjs
