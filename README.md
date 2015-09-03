@@ -1,5 +1,13 @@
 # JsFuzzer
 
+**JsFuzzer** is a randomized JavaScript program generator written in Java, that supports automatically running a JavaScript program against muptiple JavaScript engines and compare diffrences between engines.
+
+**JsFuzzer**'s main goal is to detect Vulnerabilities and Errors in JavaScript engines.
+
+Results
+---
+for a list of our findings - [click here](docs/results.md)
+
 Pre Requirements
 ----
 java 1.8
