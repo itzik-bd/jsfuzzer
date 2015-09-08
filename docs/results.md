@@ -1,4 +1,4 @@
-# Results
+# Bugs that JsFuzzer found
 
 ## DynJs - [github](https://github.com/dynjs/dynjs)
 * [Logical not of number 2^n (where n=32,...) yields true instead of false](https://github.com/dynjs/dynjs/issues/156)
