@@ -4,9 +4,10 @@
 
 **JsFuzzer**'s main goal is to detect Vulnerabilities and Errors in JavaScript engines.
 
-Results
+Results and Conclusions
 ---
-for a list of our findings - [click here](docs/results.md)
+* [Bugs that **JsFuzzer** found](docs/results.md)
+* [Coding style conclusions](docs/code-style.md)
 
 Pre Requirements
 ----
