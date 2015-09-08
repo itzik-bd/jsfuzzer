@@ -8,3 +8,7 @@
 ## Nashorn
 * dead code elimination corrupts global scope (JI-9023716)
 * dead code elimination in js file causes an exception during runtime (JI-9023808)
+
+
+## Rhino
+ * [Wrong result of minus-minus expression](https://github.com/mozilla/rhino/issues/237)
